@@ -1,0 +1,8 @@
+Flask>=3.0,<4
+Flask-Cors>=4.0,<5
+# FinBERT's existing prediction code imports these packages.
+numpy>=1.26,<2
+torch>=2.2,<2.5
+transformers>=4.38,<4.41
+pandas>=2.0
+nltk>=3.8

@@ -1,0 +1,5 @@
+__pycache__/
+*.py[cod]
+.venv/
+# The FinBERT model is downloaded or provisioned locally; do not commit 438 MB weights.
+models/finbert/
