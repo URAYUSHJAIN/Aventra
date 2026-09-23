@@ -1,0 +1,3 @@
+import { SectionHeading } from '../common/SectionHeading'
+const items=[['Adaptive','Asset-specific behavioural baselines.'],['Temporal','Considers how abnormal behaviour evolves over time.'],['Contextual','Connects market signals with related information.'],['Explainable','Provides supporting evidence behind detected events.']]
+export function WhyAventra(){return <section className="section why" id="why-aventra"><div className="container"><SectionHeading eyebrow="DESIGNED FOR CONTEXT" title="Why Aventra?"/><div className="why-grid">{items.map(([title,text])=><article className="why-item" key={title}><h3>{title}</h3><p>{text}</p></article>)}</div></div></section>}

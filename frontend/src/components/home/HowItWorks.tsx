@@ -1,0 +1,4 @@
+import { Fragment } from 'react'
+import { SectionHeading } from '../common/SectionHeading'
+const steps=[['01','Collect','Market data · news · sentiment'],['02','Align','Timestamps · entities · tickers'],['03','Fingerprint','Learn normal asset behaviour'],['04','Detect','Identify behavioural deviations'],['05','Correlate','Connect related events and signals'],['06','Explain','Risk signal · evidence chain']]
+export function HowItWorks(){return <section className="section works" id="how-it-works"><div className="container"><SectionHeading eyebrow="CORE METHODOLOGY" title="How Aventra Works" intro="From raw financial signals to contextual anomaly evidence."/><div className="workflow"><div className="steps">{steps.map((s,i)=><Fragment key={s[0]}>{i===3&&<div className="workflow-arrow">→</div>}<article className={`step ${i===2?'fingerprint':''}`}><span>{s[0]}</span><h3>{s[1]}</h3><p>{s[2]}</p></article></Fragment>)}</div></div></div></section>}
