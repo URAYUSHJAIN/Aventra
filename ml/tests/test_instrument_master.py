@@ -145,5 +145,37 @@ class StoreAndSearchTests(TempDatabase):
         self.assertIn("Reliance Power", [a["alias"] for a in master.get("XNSE:RELIANCE")["aliases"] if a["kind"] == "exclude"])
 
 
+class DuplicateKeyUpsertTests(TempDatabase):
+    """A listing batch may repeat an instrument (e.g. one symbol in two segments). PostgreSQL rejects a statement that
+    updates the same key twice, so the store keeps the last row per key on every backend. Set AVENTRA_TEST_DATABASE_URL
+    (a disposable PostgreSQL database) to run the same check against PostgreSQL."""
+
+    def _check(self):
+        migrate.upgrade()
+        rows = [master.instrument_row("XNAS:ZZDUP", "ZZDUP", name, "equity", "XNAS", country="US", currency="USD", source="t", class_source="t", class_confidence=1.0)
+                for name in ("First Name", "Second Name")]
+        aliases = master.alias_rows("XNAS:ZZDUP", tickers=["ZZDUP"]) * 2
+        try:
+            store.upsert_instruments(rows, aliases)
+            self.assertEqual(master.get("XNAS:ZZDUP")["name"], "Second Name")
+        finally:
+            from sqlalchemy import delete
+            from ml.data import db
+            with store.begin() as conn:
+                conn.execute(delete(db.instrument_aliases).where(db.instrument_aliases.c.instrument_id == "XNAS:ZZDUP"))
+                conn.execute(delete(db.instruments).where(db.instruments.c.instrument_id == "XNAS:ZZDUP"))
+
+    def test_sqlite(self):
+        self._check()
+
+    def test_postgresql(self):
+        import os
+        url = os.getenv("AVENTRA_TEST_DATABASE_URL", "").strip()
+        if not url.startswith("postgresql"):
+            self.skipTest("AVENTRA_TEST_DATABASE_URL not set to a PostgreSQL database")
+        with patch.dict(os.environ, {"AVENTRA_DATABASE_URL": url}):
+            self._check()
+
+
 if __name__ == "__main__":
     unittest.main()

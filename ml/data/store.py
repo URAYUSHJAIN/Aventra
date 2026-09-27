@@ -55,6 +55,8 @@ def _upsert(conn, table, rows: list[dict], keys: list[str], update_cols: Iterabl
     """INSERT … ON CONFLICT (keys) DO UPDATE/NOTHING for PostgreSQL and SQLite."""
     if not rows:
         return
+    # PostgreSQL rejects a statement that touches the same conflict key twice; keep the last row per key (SQLite's behaviour).
+    rows = list({tuple(row.get(k) for k in keys): row for row in rows}.values())
     if conn.dialect.name == "postgresql":
         from sqlalchemy.dialects.postgresql import insert as dialect_insert
     else:

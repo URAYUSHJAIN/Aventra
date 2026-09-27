@@ -1,6 +1,11 @@
 Flask>=3.0,<4
 Flask-Cors>=4.0,<7
 requests>=2.31,<3
+# Database (SQLite locally/tests, PostgreSQL in Docker), migrations and market calendars.
+SQLAlchemy>=2.0.30,<2.1
+alembic>=1.13,<2
+psycopg[binary]>=3.1,<4
+exchange_calendars>=4.5,<5
 # FinBERT inference (existing) — versions pinned for the stored model and tokenizer.
 numpy>=1.26,<2
 torch>=2.2,<2.5

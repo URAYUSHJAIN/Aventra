@@ -78,6 +78,16 @@ class QueueTests(JobTestCase):
         self.assertEqual(run_job(queue.claim("w")), "failed")
         self.assertIn("PROVIDER_UNAVAILABLE", queue.get(job["id"])["error"])
 
+    def test_unexpected_errors_are_not_typed_and_hide_internals(self):
+        class LibraryError(Exception):
+            code = "f405"                     # SQLAlchemy-style error code: not an Aventra data state
+        job = queue.enqueue("sync_listings", max_attempts=1)
+        with patch.dict("ml.jobs.worker.HANDLERS", {"sync_listings": lambda _job: (_ for _ in ()).throw(LibraryError("INSERT INTO instruments ... secret SQL"))}),                 self.assertLogs("ml.jobs.worker", level="ERROR"):
+            self.assertEqual(run_job(queue.claim("w")), "failed")
+        record = queue.get(job["id"])
+        self.assertTrue(record["error"].startswith("INTERNAL_ERROR"))
+        self.assertNotIn("SQL", record["error"])
+
 
 class AsyncApiTests(JobTestCase):
     def test_intelligence_is_queued_then_served(self):

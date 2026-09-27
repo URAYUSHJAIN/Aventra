@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 import signal
 import socket
 import sys
@@ -73,6 +74,13 @@ def _refine_classes(job: dict) -> dict:
 HANDLERS = {"analyze": _analyze, "refresh_prices": _refresh_prices, "refresh_news": _refresh_news, "sync_listings": _sync_listings,
             "enrich_crypto": _enrich_crypto, "refine_classes": _refine_classes}
 NON_RETRYABLE = {"INSTRUMENT_NOT_FOUND", "NO_PROVIDER_FOR_ASSET", "INSUFFICIENT_HISTORY", "INVALID_INSTRUMENT_ID", "INSUFFICIENT_SOURCE_DATA"}
+TYPED_CODE = re.compile(r"[A-Z][A-Z_]{2,63}")
+
+
+def _typed_code(error: Exception) -> str | None:
+    """Aventra data-availability codes (e.g. PROVIDER_UNAVAILABLE). Library error codes (SQLAlchemy 'f405' …) are not typed states."""
+    code = getattr(error, "code", None)
+    return code if isinstance(code, str) and TYPED_CODE.fullmatch(code) else None
 
 
 def run_job(job: dict) -> str:
@@ -83,9 +91,10 @@ def run_job(job: dict) -> str:
     try:
         result = handler(job)
     except Exception as error:   # every failure is recorded on the job; typed provider states decide retry
-        code = getattr(error, "code", type(error).__name__)
-        if not getattr(error, "code", None):
+        code = _typed_code(error)
+        if code is None:   # unexpected: full detail goes to the log only (the job record is visible through the API)
             logger.exception("Job %s (%s) failed", job["id"], job["type"])
+            code, error = "INTERNAL_ERROR", f"{type(error).__name__} (see worker logs)"
         attempts = getattr(error, "attempts", None) or []
         # Retrying cannot help when every provider lacks credentials (configuration, not a transient failure).
         missing_credentials = bool(attempts) and all(a.get("reason") == "missing_credentials" for a in attempts)
