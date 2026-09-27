@@ -22,9 +22,9 @@ def rolling_zscores(features: pd.DataFrame, columns=config.STATISTICAL_FEATURES,
     return out
 
 
-def statistical_scores(features: pd.DataFrame) -> pd.DataFrame:
+def statistical_scores(features: pd.DataFrame, columns=config.STATISTICAL_FEATURES) -> pd.DataFrame:
     """Max deviation score over the statistical features (NaN only when every feature is unavailable)."""
-    zscores = rolling_zscores(features)
+    zscores = rolling_zscores(features, [c for c in columns if c in features.columns])
     scores = pd.DataFrame(deviation_score(zscores.to_numpy(dtype=float)), index=zscores.index)
     zscores["statistical_score"] = scores.max(axis=1, skipna=True)
     return zscores

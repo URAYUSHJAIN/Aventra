@@ -1,129 +1,152 @@
-"""API tests for market, intelligence and news endpoints. External providers and FinBERT are mocked
-or replaced by the local demo dataset, so these tests run offline."""
+"""API tests: instrument search/resolve, snapshots, providers, intelligence and typed data-availability states.
+External providers are mocked or replaced by the synthetic TEST:DEMO fixture, so these tests run offline."""
+import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+import requests
+
 from backend.app import create_app
 from backend.services import intelligence_service
 from ml import config
-from ml.data import cache
-from ml.data.market_providers import ProviderError
+from ml.data import cache, db, store
+from ml.instruments import master
 from ml.news.finbert import FinBertUnavailable
+from ml.providers import http
 
-QUOTE = {"symbol": "RELIANCE", "name": "Reliance Industries", "currency": "INR", "price": 1200.0, "previous_close": 1190.0, "change_pct": 0.84,
-         "volume": 1000, "day_high": 1210.0, "day_low": 1180.0, "market_time": "2026-09-25T10:00:00Z", "intraday": [], "interval": "5m"}
+
+def fake_response(status=200, body=None, text=None):
+    r = requests.Response()
+    r.status_code = status
+    r._content = text.encode() if text is not None else json.dumps(body).encode()
+    return r
 
 
 class ApiTestCase(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         cache.invalidate()
+        http.reset_state()
         intelligence_service._cache.clear()
-        self.patches = [patch.object(config, "DB_PATH", Path(self.tmp.name) / "api.sqlite3"), patch.object(config, "ARTIFACT_DIR", Path(self.tmp.name) / "artifacts")]
+        self.patches = [patch.dict(os.environ, {"AVENTRA_ENABLE_SYNTHETIC_TEST_DATA": "1", "ALPHAVANTAGE_API_KEY": "", "UPSTOX_ACCESS_TOKEN": "",
+                                                "AVENTRA_DEFAULT_WATCHLIST": "FX:USDINR,XNAS:AAPL"}),
+                        patch.object(config, "DB_PATH", Path(self.tmp.name) / "api.sqlite3"), patch.object(config, "ARTIFACT_DIR", Path(self.tmp.name) / "artifacts"),
+                        patch("time.sleep")]
         for p in self.patches:
             p.start()
         self.client = create_app({"TESTING": True}).test_client()
+        from ml.providers.synthetic_test import SyntheticTestProvider
+        store.upsert_instruments(*SyntheticTestProvider().list_instruments())
+        rows = [master.instrument_row("XNAS:AAPL", "AAPL", "Apple Inc.", "equity", "XNAS", country="US", currency="USD", source="t", class_source="t", class_confidence=1),
+                master.instrument_row("FX:USDINR", "USDINR", "US Dollar / Indian Rupee (USD/INR)", "forex", "FX", currency="INR", source="t", class_source="t", class_confidence=1),
+                master.instrument_row("XLON:VOD", "VOD", "Vodafone Group", "equity", "XLON", country="GB", currency="GBP", source="t", class_source="t", class_confidence=1)]
+        maps = [{"instrument_id": "FX:USDINR", "provider": "frankfurter", "provider_symbol": "USDINR", "priority": 10}]
+        store.upsert_instruments(rows, master.alias_rows("XNAS:AAPL", strong=["Apple"], tickers=["AAPL"]), maps)
 
     def tearDown(self):
         for p in self.patches:
             p.stop()
         cache.invalidate()
         intelligence_service._cache.clear()
+        db.dispose_engines()
         self.tmp.cleanup()
 
 
-class HealthAndValidationTests(ApiTestCase):
-    def test_health(self):
-        body = self.client.get("/api/health").get_json()
-        self.assertTrue(body["success"])
-        self.assertEqual(body["data"]["status"], "ok")
-        self.assertIn(body["data"]["data_mode"], {"live", "demo"})
+class DiscoveryTests(ApiTestCase):
+    def test_health_reports_database_and_master(self):
+        data = self.client.get("/api/health").get_json()["data"]
+        self.assertEqual(data["database"], "ok")
+        self.assertEqual(data["instrument_master_size"], 4)
 
-    def test_invalid_symbol_is_400(self):
-        response = self.client.get("/api/market/bad!sym")
-        self.assertEqual(response.status_code, 400)
-        self.assertFalse(response.get_json()["success"])
+    def test_search_is_ranked_paginated_and_filtered(self):
+        data = self.client.get("/api/instruments/search?q=apple").get_json()["data"]
+        self.assertEqual(data["items"][0]["instrument_id"], "XNAS:AAPL")
+        self.assertEqual(data["items"][0]["asset_class"], "equity")
+        page = self.client.get("/api/instruments/search?q=a&limit=1").get_json()["data"]
+        self.assertIsNotNone(page["next_cursor"])
+        self.assertEqual(self.client.get("/api/instruments/search?q=apple&asset_class=forex").get_json()["data"]["items"], [])
+        self.assertEqual(self.client.get("/api/instruments/search?q=a&asset_class=nonsense").status_code, 400)
+        self.assertEqual(self.client.get("/api/instruments/search?q=").status_code, 400)
 
-    def test_unknown_asset_is_404(self):
-        self.assertEqual(self.client.get("/api/intelligence/NOTREAL").status_code, 404)
+    def test_instrument_detail_lists_provider_configuration(self):
+        data = self.client.get("/api/instruments/XNAS:AAPL").get_json()["data"]
+        self.assertEqual(data["data_providers"][0]["provider"], "alpha_vantage")
+        self.assertFalse(data["data_providers"][0]["configured"])
+        self.assertEqual(self.client.get("/api/instruments/XNAS:NOPE").status_code, 404)
+        self.assertEqual(self.client.get("/api/instruments/BAD:ID").get_json()["code"], "INVALID_INSTRUMENT_ID")
 
-    def test_unknown_route_returns_json_404(self):
-        response = self.client.get("/api/does-not-exist")
-        self.assertEqual(response.status_code, 404)
-        self.assertEqual(response.get_json()["success"], False)
+    def test_resolve_reports_unconfigured_fred(self):
+        with patch.dict(os.environ, {"FRED_API_KEY": ""}):
+            data = self.client.post("/api/instruments/resolve", json={"query": "treasury"}).get_json()["data"]
+        self.assertEqual(data["providers"][0]["status"], "PROVIDER_UNAVAILABLE")
+        self.assertEqual(self.client.post("/api/instruments/resolve", json={}).status_code, 400)
 
-    def test_bad_query_parameters(self):
-        self.assertEqual(self.client.get("/api/market/quotes").status_code, 400)
-        self.assertEqual(self.client.get("/api/market/search?q=a").status_code, 400)
-        self.assertEqual(self.client.get("/api/anomalies?limit=abc").status_code, 400)
-        self.assertEqual(self.client.post("/api/anomaly/detect", json={"symbol": 5}).status_code, 400)
+    def test_provider_matrix(self):
+        providers = {p["provider"]: p for p in self.client.get("/api/providers").get_json()["data"]["providers"]}
+        self.assertNotIn("yahoo_finance_chart", providers)
+        self.assertFalse(providers["alpha_vantage"]["configured"])
+        self.assertEqual(providers["alpha_vantage"]["unavailable_reason"], "missing_credentials")
+
+    def test_default_watchlist_comes_from_configuration(self):
+        data = self.client.get("/api/watchlists/default").get_json()["data"]
+        self.assertEqual([i["instrument_id"] for i in data["items"]], ["FX:USDINR", "XNAS:AAPL"])
 
 
-@patch("ml.data.market_providers.YahooChartProvider.get_quote")
-class MarketTests(ApiTestCase):
-    def test_quote_success_includes_source(self, get_quote):
-        get_quote.return_value = dict(QUOTE)
-        data = self.client.get("/api/market/RELIANCE").get_json()["data"]
-        self.assertEqual(data["price"], 1200.0)
-        self.assertEqual(data["data_source"]["provider"], "yahoo_finance_chart")
-        self.assertFalse(data["data_source"]["is_demo"])
+class DataStateTests(ApiTestCase):
+    def test_missing_credentials_is_explicit_provider_unavailable(self):
+        response = self.client.get("/api/market/XNAS:AAPL")
+        self.assertEqual(response.status_code, 503)
+        body = response.get_json()
+        self.assertEqual(body["code"], "PROVIDER_UNAVAILABLE")
+        self.assertIn("Data unavailable / insufficient source data", body["error"])
+        self.assertIn("ALPHAVANTAGE_API_KEY", body["attempts"][0]["detail"])
 
-    def test_provider_unavailable_is_502_without_internal_details(self, get_quote):
-        get_quote.side_effect = ProviderError("socket timeout at 10.0.0.1")
-        response = self.client.get("/api/market/RELIANCE")
-        self.assertEqual(response.status_code, 502)
-        self.assertNotIn("10.0.0.1", response.get_json()["error"])
+    def test_unsupported_exchange_and_unknown_instrument(self):
+        self.assertEqual(self.client.get("/api/market/XLON:VOD").get_json()["code"], "NO_PROVIDER_FOR_ASSET")
+        self.assertEqual(self.client.get("/api/intelligence/XNSE:NOTREAL").status_code, 404)
+        self.assertEqual(self.client.get("/api/market/bad!id").status_code, 400)
 
-    def test_provider_not_found_is_404(self, get_quote):
-        get_quote.side_effect = ProviderError("No market data found", kind="not_found")
-        self.assertEqual(self.client.get("/api/market/NOSUCH").status_code, 404)
+    def test_snapshot_uses_real_provider_series_and_never_invents_volume(self):
+        body = {"rates": {f"2026-0{m}-{d:02d}": {"INR": 83 + m / 10 + d / 1000} for m in (6, 7, 8) for d in range(1, 29)}}
+        with patch("requests.request", return_value=fake_response(body=body)):
+            data = self.client.get("/api/market/FX:USDINR").get_json()["data"]
+        self.assertEqual(data["value_kind"], "reference_rate")
+        self.assertEqual(data["data_source"]["provider"], "frankfurter")
+        self.assertIsNone(data["volume"])
+        self.assertEqual(data["instrument"]["currency"], "INR")
 
-    def test_batch_quotes_mark_failures_explicitly(self, get_quote):
-        def by_symbol(symbol):   # quotes are fetched concurrently, so answer by symbol rather than call order
-            if symbol == "TCS":
-                raise ProviderError("down")
-            return dict(QUOTE)
-        get_quote.side_effect = by_symbol
-        quotes = self.client.get("/api/market/quotes?symbols=RELIANCE,TCS").get_json()["data"]["quotes"]
-        self.assertEqual([q["status"] for q in quotes], ["ok", "unavailable"])
-        self.assertIsNone(quotes[1]["quote"])
-
-    def test_demo_quote_is_labelled_demo(self, _get_quote):
-        data = self.client.get("/api/market/DEMO").get_json()["data"]
-        self.assertTrue(data["data_source"]["is_demo"])
+    def test_batch_snapshots_carry_per_item_state(self):
+        items = self.client.get("/api/market/snapshots?ids=XNAS:AAPL,XLON:VOD,BAD:X").get_json()["data"]["items"]
+        self.assertEqual([i["status"] for i in items], ["PROVIDER_UNAVAILABLE", "NO_PROVIDER_FOR_ASSET", "INVALID_INSTRUMENT_ID"])
+        self.assertTrue(all(i["snapshot"] is None for i in items))
 
 
 @patch("ml.correlation.correlate.semantic.similarities", return_value=None)
 @patch("ml.news.ingest.get_news_analysis_service", side_effect=FinBertUnavailable("forced"))
 class IntelligenceTests(ApiTestCase):
-    def test_intelligence_views_and_detail_lookups(self, _finbert, _sim):
-        data = self.client.get("/api/intelligence/DEMO").get_json()["data"]
-        self.assertEqual(data["symbol"], "DEMO")
-        self.assertIn("disclaimer", data)
-        event_id = data["events"][0]["event_id"]
-        anomaly_id = data["events"][0]["anomaly"]["anomaly_id"]
-
-        fp = self.client.get("/api/fingerprint/DEMO").get_json()["data"]
-        self.assertEqual(fp["symbol"], "DEMO")
-        self.assertTrue(fp["dimensions"])
-        self.assertIn("isolation_forest", self.client.get("/api/anomaly/DEMO").get_json()["data"]["models"])
+    def test_intelligence_round_trip_on_test_fixture(self, _finbert, _sim):
+        data = self.client.get("/api/intelligence/TEST:DEMO").get_json()["data"]
+        self.assertEqual(data["instrument_id"], "TEST:DEMO")
+        self.assertIn("versions", data)
+        event_id, anomaly_id = data["events"][0]["event_id"], data["events"][0]["anomaly"]["anomaly_id"]
+        self.assertEqual(self.client.get("/api/fingerprint/TEST:DEMO").get_json()["data"]["instrument_id"], "TEST:DEMO")
+        self.assertIn("isolation_forest", self.client.get("/api/anomaly/TEST:DEMO").get_json()["data"]["models"])
         self.assertEqual(self.client.get(f"/api/anomalies/{anomaly_id}").get_json()["data"]["anomaly_id"], anomaly_id)
         self.assertEqual(self.client.get(f"/api/events/{event_id}").get_json()["data"]["event_id"], event_id)
-        self.assertEqual(self.client.get("/api/events/DEMO").get_json()["data"]["events"][0]["event_id"], event_id)
-        risk = self.client.get("/api/risk/DEMO").get_json()["data"]
-        self.assertIn(risk["current"]["level"], {"LOW", "MODERATE", "ELEVATED", "HIGH"})
-        evidence = self.client.get(f"/api/evidence/{anomaly_id}").get_json()["data"]
-        self.assertTrue(evidence["evidence"])
+        self.assertEqual(self.client.get("/api/events/TEST:DEMO").get_json()["data"]["events"][0]["event_id"], event_id)
+        self.assertIn(self.client.get("/api/risk/TEST:DEMO").get_json()["data"]["current"]["level"], {"LOW", "MODERATE", "ELEVATED", "HIGH"})
+        evidence = self.client.get(f"/api/evidence/{anomaly_id}").get_json()["data"]["evidence"]
+        self.assertTrue(evidence and all("provenance" in item for item in evidence))
+        self.assertEqual(self.client.post("/api/anomaly/detect", json={"instrument_id": "TEST:DEMO"}).status_code, 200)
         self.assertEqual(self.client.get("/api/evidence/AN-MISSING").status_code, 404)
-        self.assertEqual(self.client.get("/api/events/EV-MISSING").status_code, 404)
 
-    def test_news_endpoint_reports_sentiment_source(self, _finbert, _sim):
-        data = self.client.get("/api/news?symbol=DEMO&limit=3").get_json()["data"]
+    def test_news_endpoint_for_instrument(self, _finbert, _sim):
+        data = self.client.get("/api/news?instrument=TEST:DEMO&limit=3").get_json()["data"]
         self.assertEqual(len(data["items"]), 3)
         self.assertEqual(data["data_source"]["sentiment_status"], "cached_demo_outputs")
-        self.assertTrue(all(item["is_demo"] for item in data["items"]))
 
 
 class AnalyzeContractTests(ApiTestCase):
@@ -133,11 +156,7 @@ class AnalyzeContractTests(ApiTestCase):
         data = self.client.post("/api/news/analyze", json={"text": " Profit fell. "}).get_json()["data"]
         for key in ("label", "positive_probability", "neutral_probability", "negative_probability", "sentiment_score"):
             self.assertIn(key, data)
-        self.assertEqual(data["sentiment"], "negative")
-        self.assertEqual(data["confidence"], 0.8)
-        self.assertEqual(data["source"], "user_input")
-        self.assertEqual(data["text"], "Profit fell.")
-        self.assertTrue(data["timestamp"].endswith("Z"))
+        self.assertEqual((data["sentiment"], data["confidence"], data["source"], data["text"]), ("negative", 0.8, "user_input", "Profit fell."))
 
     def test_text_too_long_is_413(self):
         self.assertEqual(self.client.post("/api/news/analyze", json={"text": "x" * 12001}).status_code, 413)

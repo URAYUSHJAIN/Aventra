@@ -2,10 +2,10 @@ import logging
 from flask import Blueprint, current_app, jsonify, request
 
 from backend.services.news_analysis_service import FinBertUnavailable, InvalidNewsText, get_news_analysis_service
-from backend.utils.responses import int_arg, ok, require_symbol
-from ml.data.assets import get_asset
+from backend.utils.responses import ApiError, int_arg, ok, require_instrument_id
 from ml.data.store import now_iso
 from ml.news.ingest import ingest_news
+from ml.pipelines.intelligence import resolve_instrument
 
 news_api = Blueprint("news", __name__)
 logger = logging.getLogger(__name__)
@@ -13,24 +13,28 @@ logger = logging.getLogger(__name__)
 
 @news_api.get("")
 def list_news():
-    """GET /api/news?symbol=RELIANCE&limit=20 — asset-linked news with FinBERT sentiment."""
-    symbol = require_symbol(request.args.get("symbol"), analysed_only=True)
-    return _news_for(symbol, int_arg(request.args.get("limit"), 20, 1, 100))
+    """GET /api/news?instrument=XNSE:RELIANCE&limit=20 (legacy ?symbol= still accepted): instrument-linked news with FinBERT sentiment."""
+    raw = request.args.get("instrument") or request.args.get("symbol")
+    if not raw:
+        raise ApiError("Provide ?instrument=<instrument ID>.", 400)
+    return _news_for(require_instrument_id(raw), int_arg(request.args.get("limit"), 20, 1, 100))
 
 
-@news_api.get("/<symbol>")
-def news_for_symbol(symbol: str):
-    """GET /api/news/<symbol> — ML Pipeline §33 path; same payload as /api/news?symbol=."""
-    return _news_for(require_symbol(symbol, analysed_only=True), int_arg(request.args.get("limit"), 20, 1, 100))
+@news_api.get("/<instrument_id>")
+def news_for_instrument(instrument_id: str):
+    """GET /api/news/<instrument_id> (ML Pipeline path); same payload as /api/news?instrument=."""
+    return _news_for(require_instrument_id(instrument_id), int_arg(request.args.get("limit"), 20, 1, 100))
 
 
-def _news_for(symbol: str, limit: int):
-    report = ingest_news(symbol, get_asset(symbol))
+def _news_for(instrument_id: str, limit: int):
+    report = ingest_news(instrument_id, resolve_instrument(instrument_id))
     items = [{"news_id": item["news_id"], "headline": item["headline"], "source": item.get("source"), "url": item.get("url"), "published_at": item["published_at"],
               "is_demo": item.get("is_demo", False), "sentiment": item.get("sentiment"),
-              "entity": next((link for link in item.get("links", []) if link["symbol"] == symbol), None)} for item in report["items"][:limit]]
+              "entity": next((link for link in item.get("links", []) if link["instrument_id"] == instrument_id), None)} for item in report["items"][:limit]]
     meta = {key: report.get(key) for key in ("provider", "is_demo", "fetched_at", "status", "message", "sentiment_status", "duplicates_removed")}
-    return ok({"symbol": symbol, "data_source": meta, "items": items})
+    if meta["status"] == "ok" and not items:
+        meta["status"] = "no_relevant_news"
+    return ok({"instrument_id": instrument_id, "symbol": instrument_id.split(":", 1)[1], "data_source": meta, "items": items})
 
 
 @news_api.post("/analyze")

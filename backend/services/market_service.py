@@ -1,89 +1,81 @@
-"""Market data for the API: provider → validation → cache, with stored-price fallback. Never invents values."""
+"""Market snapshots and history for the API, built on the provider router and database cache.
+
+A snapshot is the latest completed observation of an instrument's own series (daily close/NAV/reference rate),
+its previous observation and a short series for sparklines — all from real provider data. Failures are returned
+as explicit data-availability states; nothing is invented.
+"""
 from __future__ import annotations
 
 import logging
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timedelta, timezone
-
-import pandas as pd
 
 from ml import config
-from ml.data.sessions import is_session_in_progress, to_utc
 from ml.data import cache, store
-from ml.data.assets import all_assets, get_asset
-from ml.data.market_providers import ProviderError, YahooChartProvider, provider_for
-from ml.pipelines.intelligence import load_market
+from ml.data.market_data import load_series
+from ml.instruments import ids
+from ml.pipelines.intelligence import InsufficientHistory, UnknownAsset, resolve_instrument
+from ml.providers import registry
 
 logger = logging.getLogger(__name__)
-QUOTE_WORKERS = 6
+SNAPSHOT_WORKERS = 4
+SPARK_POINTS = 60
 
 
-def _market_state(quote: dict, is_demo: bool) -> str:
-    """OPEN only when the NSE session clock is running AND the provider's last trade is recent (holidays stay CLOSED)."""
-    if is_demo:
-        return "DEMO"
-    now = datetime.now(timezone.utc)
-    if not quote.get("market_time") or not is_session_in_progress(pd.Timestamp(now).tz_convert(config.MARKET_TIMEZONE).date(), now):
-        return "CLOSED"
-    return "OPEN" if now - to_utc(quote["market_time"]) < timedelta(minutes=30) else "CLOSED"
+def _public_instrument(instrument: dict) -> dict:
+    return {k: instrument.get(k) for k in ("instrument_id", "symbol", "name", "asset_class", "exchange", "country", "currency", "timezone", "capabilities")}
 
 
-def _source(provider, stale: bool = False, fetched_at: str | None = None) -> dict:
-    return {"provider": provider.name, "is_demo": provider.is_demo, "stale": stale, "fetched_at": fetched_at or store.now_iso()}
+def snapshot(instrument_id: str) -> dict:
+    def build():
+        instrument = resolve_instrument(instrument_id)
+        bars, source, report = load_series(instrument)
+        last, prev = bars.iloc[-1], (bars.iloc[-2] if len(bars) > 1 else None)
+        change = None if prev is None or not prev["close"] else (last["close"] - prev["close"]) / prev["close"] * 100
+        change_bp = None if prev is None else (last["close"] - prev["close"]) * 100
+        tail = bars.tail(SPARK_POINTS)
+        return {
+            "instrument": _public_instrument(instrument), "as_of": store.iso(last["timestamp"]), "value_kind": source["value_kind"],
+            "last": float(last["close"]), "previous": None if prev is None else float(prev["close"]),
+            "change_pct": None if change is None or source["value_kind"] == "yield" else round(float(change), 4),
+            "change_bp": round(float(change_bp), 3) if source["value_kind"] == "yield" and change_bp is not None else None,
+            "volume": None if last["volume"] != last["volume"] else float(last["volume"]),
+            "series": [{"timestamp": store.iso(ts), "close": round(float(c), 6)} for ts, c in zip(tail["timestamp"], tail["close"])],
+            "interval": "1d", "data_source": {k: source.get(k) for k in ("provider", "provider_symbol", "fetched_at", "stale", "currency", "adjusted", "notes", "attribution")},
+            "quality": {k: report.get(k) for k in ("stale", "age_days", "rows_out")},
+        }
+    return cache.get_or_set(f"snapshot:{instrument_id}", config.QUOTE_CACHE_SECONDS, build)
 
 
-def get_quote(symbol: str) -> dict:
-    provider = provider_for(symbol)
-
-    def fetch():
-        quote = provider.get_quote(symbol)
-        asset = get_asset(symbol)
-        if asset:
-            quote["name"] = asset.name
-        return {**quote, "exchange": asset.exchange if asset else "NSE", "market_state": _market_state(quote, provider.is_demo), "data_source": _source(provider)}
-
-    return cache.get_or_set(f"quote:{symbol}", config.QUOTE_CACHE_SECONDS, fetch)
-
-
-def _quote_or_error(symbol: str) -> dict:
+def _snapshot_or_state(raw_id: str) -> dict:
     try:
-        return {"symbol": symbol, "status": "ok", "quote": get_quote(symbol)}
-    except ProviderError as error:
-        return {"symbol": symbol, "status": "unavailable", "error": str(error), "quote": None}
+        iid = str(ids.parse(raw_id))
+        return {"instrument_id": iid, "status": "ok", "snapshot": snapshot(iid)}
+    except ids.InvalidInstrumentId as error:
+        return {"instrument_id": raw_id, "status": "INVALID_INSTRUMENT_ID", "error": str(error), "snapshot": None}
+    except UnknownAsset as error:
+        return {"instrument_id": raw_id, "status": "INSTRUMENT_NOT_FOUND", "error": str(error), "snapshot": None}
+    except registry.DataUnavailable as error:
+        return {"instrument_id": raw_id, "status": error.code, "error": str(error), "attempts": error.attempts, "snapshot": None}
+    except (InsufficientHistory, ValueError) as error:
+        return {"instrument_id": raw_id, "status": "INSUFFICIENT_SOURCE_DATA", "error": str(error), "snapshot": None}
 
 
-def get_quotes(symbols: list[str]) -> list[dict]:
-    """Batch quotes fetched concurrently (small pool, provider-friendly); a failed symbol is returned
-    with an explicit error instead of values. Order matches the request."""
-    with ThreadPoolExecutor(max_workers=QUOTE_WORKERS) as pool:
-        return list(pool.map(_quote_or_error, symbols))
+def snapshots(instrument_ids: list[str]) -> list[dict]:
+    """Batch snapshots, fetched concurrently (bounded); each item carries its own availability state."""
+    with ThreadPoolExecutor(max_workers=SNAPSHOT_WORKERS) as pool:
+        return list(pool.map(_snapshot_or_state, instrument_ids))
 
 
-def get_history(symbol: str, limit: int) -> dict:
-    def fetch():
-        bars, source, report = load_market(symbol)
-        return bars, source, report
-
-    bars, source, report = cache.get_or_set(f"history:{symbol}", config.HISTORY_CACHE_SECONDS, fetch)
+def history(instrument_id: str, limit: int) -> dict:
+    instrument = resolve_instrument(instrument_id)
+    bars, source, report = load_series(instrument)
     tail = bars.tail(limit)
     return {
-        "symbol": symbol, "interval": "1d", "data_source": source, "validation": report,
-        "bars": [{"timestamp": row.timestamp.strftime("%Y-%m-%dT%H:%M:%SZ"), "open": round(row.open, 4), "high": round(row.high, 4), "low": round(row.low, 4),
-                  "close": round(row.close, 4), "volume": None if row.volume != row.volume else int(row.volume)} for row in tail.itertuples(index=False)],
+        "instrument": _public_instrument(instrument), "interval": "1d", "data_source": source, "validation": report,
+        "bars": [{"timestamp": store.iso(r.timestamp), "open": _f(r.open), "high": _f(r.high), "low": _f(r.low), "close": _f(r.close), "volume": _f(r.volume)}
+                 for r in tail.itertuples(index=False)],
     }
 
 
-def search(query: str) -> list[dict]:
-    lowered = query.lower()
-    local = [asset.to_dict() for asset in all_assets() if lowered in asset.symbol.lower() or lowered in asset.name.lower()]
-    for item in local:
-        item["analysed"] = True
-    if config.data_mode() == "demo":
-        return local
-    try:
-        remote = YahooChartProvider().search(query)
-    except ProviderError:
-        logger.info("Remote symbol search unavailable; returning local matches only")
-        return local
-    known = {item["symbol"] for item in local}
-    return (local + [{**item, "analysed": False} for item in remote if item["symbol"] not in known])[:10]
+def _f(value):
+    return None if value is None or value != value else round(float(value), 6)
