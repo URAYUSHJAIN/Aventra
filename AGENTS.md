@@ -15,7 +15,7 @@ If you find this file out of date with the repository, the repository wins — t
 - **Type:** B.Tech final-year research & development project, ABES Engineering College, Ghaziabad, India.
 - **One-sentence definition (use consistently in code comments, README, UI copy, docs):**
   > Aventra is an explainable financial-intelligence pipeline that combines adaptive behavioural profiling, anomaly detection, financial-news sentiment and cross-source temporal correlation to contextualize unusual market behaviour.
-- **Market focus in the current code:** Indian equities on NSE (`RELIANCE`, `TCS`, `INFY`, `HDFCBANK`, `ICICIBANK`, Yahoo suffix `.NS`). The master docs' `AAPL`/`MSFT` examples are illustrative only.
+- **Market scope in the current code:** any instrument in the Instrument Master (equities, ETFs, REITs, InvITs, bonds, indices, mutual funds, forex, crypto, rates), identified by canonical IDs such as `XNAS:AAPL`, `XNSE:RELIANCE`, `CRYPTO:BTC-USDT`. Analysis is claimed only where a permitted provider supplies real data (docs/06 §0).
 
 ## 2. Project purpose
 
@@ -28,11 +28,12 @@ Aventra is **not**: a price predictor, trading bot, buy/sell recommender, portfo
 | Layer | Actually in the repo | Planned / not present |
 |---|---|---|
 | Frontend | React 19, TypeScript (strict), Vite 8, Tailwind CSS v4 via `@tailwindcss/vite`, `lucide-react`; dev: vitest 5, @testing-library/react, jsdom. `three` + `@types/three` are in `package.json` but **unused** (C14) | React Router, chart library (both deliberately not added — C9, C15) |
-| Styling | `styles/index.css` (original) + `styles/intelligence.css` (dashboard/capability/preview, same palette) | — |
-| Backend | Python 3.12, Flask 3, Flask-Cors, requests; gunicorn in Docker | Pydantic/Marshmallow (C16), PostgreSQL, scheduler |
-| ML | pandas, NumPy (<2), scikit-learn (Isolation Forest, LOF), PyTorch (<2.5; FinBERT + experimental LSTM-AE), Transformers (<4.41), sentence-transformers (MiniLM), ruptures (PELT), NLTK | SHAP, LightGBM/XGBoost (no labelled risk data yet) |
-| Data | Yahoo Finance chart API (server-side), Google News RSS, SQLite (`data/aventra.sqlite3`), synthetic `data/demo/`, `data/reference/assets.json` | Parquet feature store |
-| Deploy | Docker Compose (`backend`, `frontend`; SQLite on a volume), `docker/`, `frontend/vercel.json` | Separate DB container |
+| Styling | `styles/index.css` (original) + `styles/intelligence.css` (dashboard, search, badges, states; same palette) | — |
+| Backend | Python 3.12, Flask 3, Flask-Cors, requests, SQLAlchemy 2 (Core), Alembic, psycopg 3; gunicorn in Docker | Pydantic/Marshmallow (C16) |
+| ML | pandas, NumPy (<2), scikit-learn (Isolation Forest, LOF), PyTorch (<2.5; FinBERT + experimental LSTM-AE), Transformers (<4.41), sentence-transformers (MiniLM), ruptures (PELT), exchange_calendars, NLTK | SHAP, LightGBM/XGBoost (no labelled risk data yet) |
+| Data | Instrument Master (~68,600 instruments from permitted listings); providers in `ml/providers/` (Upstox, Alpha Vantage, Binance, CoinGecko, Frankfurter, ECB, FRED, AMFI, mfapi, OpenFIGI, SEC); PostgreSQL (Docker) or SQLite (local/tests); `data/reference/` seeds; synthetic `data/demo/` for tests only | Parquet feature store |
+| Jobs | PostgreSQL/SQLite `jobs` table (`FOR UPDATE SKIP LOCKED`), `ml/jobs/worker.py` (worker + scheduler) | Redis/Celery (deliberately not used) |
+| Deploy | Docker Compose (`postgres`, `backend`, `worker`, `frontend`), `docker/`, `frontend/vercel.json` | CI |
 
 Do not add a dependency that duplicates one already listed (e.g., a second icon set, a second HTTP client, a second chart library).
 
@@ -44,51 +45,50 @@ Aventra/
 ├── readme.md                     project README (lowercase filename; current)
 ├── .gitignore, .dockerignore, .env.example, docker-compose.yml
 ├── context/                      MASTER DOCUMENTS (read-only for agents unless asked) — untracked in git
-├── docs/                         engineering docs (04 architecture, 05 ML pipeline, 14 API, 17 evaluation, 19 testing, 21 deployment, 25 limitations)
-├── docker/                       backend.Dockerfile, frontend.Dockerfile, nginx.conf
-├── scripts/generate_demo_data.py deterministic synthetic demo dataset (+ cached FinBERT outputs)
+├── docs/                         engineering docs (04 architecture, 05 ML, 06 providers, 14 API, 17 evaluation, 19 testing, 21 deployment, 25 limitations)
+├── docker/                       backend.Dockerfile (API + worker image), frontend.Dockerfile, nginx.conf
+├── scripts/                      verify_providers.py (Phase 0 evidence), generate_demo_data.py (synthetic TEST fixtures)
 ├── data/
-│   ├── reference/assets.json     analysed asset universe + entity aliases (committed)
-│   ├── demo/                     SYNTHETIC demo dataset: market.csv, news.json, sentiment.json, manifest.json (committed)
+│   ├── reference/                assets.json (seed + aliases), provider_verification.json (Phase 0 evidence)
+│   ├── demo/                     SYNTHETIC fixtures for automated tests only (TEST:DEMO); not in the Docker image
 │   └── aventra.sqlite3, processed/, raw/, external/   generated, git-ignored
 ├── artifacts/                    trained model artefacts (git-ignored)
-├── experiments/results/          EXP-01, EXP-02 records (JSON + Markdown, committed)
-├── ml/                           the intelligence package (owns all model/data logic)
-│   ├── config.py                 every threshold/weight/window (uncalibrated defaults)
-│   ├── data/                     assets, market_providers, validation, sessions, store (SQLite), cache
-│   ├── features/engineering.py   past-only features + FEATURE_DEFINITIONS
-│   ├── fingerprint/baseline.py   rolling median/MAD robust baseline, guarded update
-│   ├── anomaly/                  statistical, detectors (IF, LOF), ensemble, changepoint, explain, lstm_autoencoder (experimental)
-│   ├── news/                     finbert (moved from backend), providers, preprocessing, entity, events, ingest
-│   ├── correlation/, temporal/, risk/, evidence/
-│   ├── pipelines/                intelligence (orchestrator), run, batch (CLIs), artifacts
-│   ├── evaluation/               synthetic (EXP-01), run_experiments, finbert_phrasebank (EXP-02)
-│   └── tests/                    35 unittest cases incl. leakage + offline end-to-end demo
+├── experiments/results/          EXP-01 (v0.1, Yahoo-era), EXP-02, EXP-03 records (JSON + Markdown, committed)
+├── ml/
+│   ├── config.py                 thresholds/weights/windows (uncalibrated defaults), env reads
+│   ├── instruments/              ids (canonical IDs), profiles (capabilities per class), master (search, seed, manual NSE import), sync (listing CLI)
+│   ├── providers/                base, http (rate limit/retry/circuit/budget/log), registry (router), upstox, alpha_vantage, crypto, reference_rates, funds_and_reference, synthetic_test
+│   ├── data/                     db (tables), store (upserts/reads), migrate (Alembic), market_data, validation, calendars, sessions, cache
+│   ├── features/                 engineering (past-only), sets (feature sets + versions)
+│   ├── fingerprint/, anomaly/, news/ (Alpha Vantage news, FinBERT, entity, events, ingest), correlation/, temporal/, risk/, evidence/
+│   ├── pipelines/                intelligence (orchestrator), run, batch, artifacts
+│   ├── jobs/                     queue, worker (handlers, scheduler, CLI)
+│   ├── evaluation/               synthetic injection, run_experiments (EXP-03), finbert_phrasebank (EXP-02)
+│   └── tests/                    73 unittest cases (1 PostgreSQL-only, skipped without AVENTRA_TEST_DATABASE_URL)
 ├── backend/
-│   ├── app.py                    app factory; blueprints; JSON error handlers; /api/health
-│   ├── routes/                   news_routes (analyze + GET news), market_routes, intelligence_routes
-│   ├── services/                 market_service, intelligence_service, news_analysis_service (re-export of ml.news.finbert)
-│   ├── utils/responses.py        envelope, ApiError, symbol/int validation
+│   ├── app.py                    app factory; runs migrations; typed error handlers; /api/health
+│   ├── routes/                   instrument_routes, market_routes, intelligence_routes, news_routes
+│   ├── services/                 market_service, intelligence_service (job modes), news_analysis_service (re-export of ml.news.finbert)
+│   ├── utils/responses.py        envelope, ApiError(code), instrument-ID/int/choice validation
+│   ├── migrations/, alembic.ini  Alembic 0001–0004
 │   ├── models/finbert/           FinBERT weights (438 MB, git-ignored)
-│   └── tests/                    test_news_routes (original 4) + test_api_routes (14)
+│   └── tests/                    25 tests (news routes, API routes, jobs)
 └── frontend/
-    ├── vite.config.ts            dev proxy /api → AVENTRA_API_PROXY or 127.0.0.1:5000 (old /market-api Yahoo proxy removed)
-    ├── vitest.config.ts          jsdom test runner; `npm test`, `npm run typecheck`
-    ├── eslint.config.js          NOTE: lints only **/*.{js,jsx} — TS files are NOT linted
+    ├── vite.config.ts            dev proxy /api → AVENTRA_API_PROXY or 127.0.0.1:5000
+    ├── vitest.config.ts, eslint.config.js
     └── src/
-        ├── App.tsx               manual routing + per-route metadata (/, /news-analysis, /intelligence, 4 capability routes)
-        ├── services/             apiClient (envelope, timeout, GET retry, typed errors), marketApi, newsApi, intelligenceApi
+        ├── App.tsx               manual routing + per-route metadata
+        ├── services/             apiClient (envelope, typed ApiError code/attempts), intelligenceApi (search, snapshots, watchlist, job polling), newsApi
         ├── types/api.ts          response types mirroring the backend
-        ├── hooks/useApiResource.ts   loading/success/error + abort + reload
-        ├── utils/format.ts       number/date formatting (UTC → IST display)
+        ├── hooks/useApiResource.ts, utils/format.ts (currency/timezone/value-kind aware)
         ├── pages/                Home, IntelligencePage, CapabilityPage, NewsAnalysisPage, NotFoundPage (+ pages.test.tsx)
-        ├── components/intelligence/  IntelligenceWorkspace, Anomaly/Fingerprint/News/Correlation/Risk/Evidence panels, LineChart, StateViews
-        ├── components/home/      …, LiveMarketData (real batch quotes + linked news), IntelligencePreview
-        ├── styles/               index.css, intelligence.css
-        └── test/                 fetchMock, fixtures/intelligence-demo.json (real pipeline output, trimmed)
+        ├── components/search/    GlobalSearch (+ test)
+        ├── components/intelligence/  IntelligenceWorkspace, panels, LineChart, StateViews (DataUnavailableState)
+        ├── components/home/      …, LiveMarketData (watchlist + snapshots), IntelligencePreview
+        └── test/                 fetchMock, fixtures/intelligence-demo.json (TEST:DEMO pipeline output)
 ```
 
-Still absent: CI, LICENSE, a PostgreSQL container, a scheduler, a cloned `finBERT/` repository (not needed). `App.css`, `react.svg`, `vite.svg`, and the `.demo-visual`/`.neural-*` CSS rules are unused.
+Still absent: CI, LICENSE. `App.css`, `react.svg`, `vite.svg`, and the `.demo-visual`/`.neural-*` CSS rules are unused.
 
 ## 5. Source-of-truth documents and hierarchy
 
@@ -146,32 +146,32 @@ News sentiment is computed on its own branch and joined at temporal alignment (a
 
 ## 7. Current implementation status
 
-Legend: **REAL** = working code exists · **PARTIAL** = works only in some conditions or covers part of the scope · **PLACEHOLDER** = UI with hard-coded/illustrative values · **EXPERIMENTAL** = uncommitted/unreviewed · **PLANNED** = nothing in the repo.
+Legend: **REAL** = working code exists · **PARTIAL** = works only in some conditions or covers part of the scope · **KEY-GATED** = implemented, needs a provider key to return data · **EXPERIMENTAL** = evaluation only · **PLANNED** = nothing in the repo.
 
-| Pipeline stage / component | Status | Evidence in repo |
+| Component | Status | Evidence in repo |
 |---|---|---|
-| Landing page (Hero, About, Services, WhyAventra, Contact, Footer, Navbar) | REAL | `frontend/src/components/**`; Navbar/Footer link to `/intelligence` |
-| `GET /api/health` | REAL | `backend/app.py` (adds data mode, FinBERT file presence, demo dataset presence) |
-| FinBERT sentiment `POST /api/news/analyze` + `/news-analysis` page | REAL | `ml/news/finbert.py` (moved; `backend/services/news_analysis_service.py` re-exports). Response fields only added. EXP-02 run. |
-| Market data | REAL | `ml/data/market_providers.py` (Yahoo chart, server-side, cached, SQLite fallback marked `stale`) → `/api/market/*` → `marketApi.ts`. Works in Docker; on Vercel only with `VITE_API_BASE_URL` + a hosted backend. |
-| Market heat map / "Market News" panel | REAL | Batch quotes for all 20 cells (grey = unavailable, never invented); news panel = `/api/news` with FinBERT labels |
-| Capability pages (fingerprint / anomaly / correlation / risk) | REAL | `CapabilityPage.tsx` (replaced `CapabilityDemoPage.tsx`), API-backed panels, same URLs |
-| Intelligence dashboard `/intelligence` + homepage preview | REAL | `IntelligencePage.tsx`, `IntelligencePreview.tsx` |
-| Data validation / cleaning | REAL | `ml/data/validation.py` (incl. holiday placeholder removal) |
-| Temporal alignment | REAL | `ml/data/sessions.py` (UTC, NSE sessions, news → session) |
-| Feature engineering | REAL | `ml/features/engineering.py` (past-only; leakage test) |
-| Behavioural fingerprinting | REAL | `ml/fingerprint/baseline.py` (median/MAD, guarded update). LSTM embedding fingerprint: PLANNED |
-| Anomaly detection | REAL (statistical + fingerprint + Isolation Forest ensemble); EXPERIMENTAL (LOF, LSTM-AE: EXP-01 only); REAL-retrospective (PELT change points, context only) | `ml/anomaly/` |
-| News ingestion, dedup, entity linking, sentiment storage | REAL | `ml/news/` (Google News RSS; alias-based linking; SQLite) |
-| Cross-source correlation, temporal/lead-lag analysis | REAL | `ml/correlation/`, `ml/temporal/` (lead/lag usually `insufficient_data` with RSS coverage) |
-| Risk scoring, evidence chain | REAL (uncalibrated weights) | `ml/risk/scoring.py` (anomaly-gated), `ml/evidence/chain.py`. SHAP: PLANNED (needs a trained risk model) |
-| Database / persistence | REAL | SQLite via `ml/data/store.py` |
-| Demo dataset `data/demo/` | REAL (synthetic, labelled) | `scripts/generate_demo_data.py` |
-| Evaluation / experiments | PARTIAL | EXP-01 (synthetic injection, baselines + ablations) and EXP-02 (FinBERT/PhraseBank, overlap disclosed) in `experiments/results/`. Known-event benchmark, correlation-quality and risk-calibration evaluations: PLANNED. Only quote numbers from those files. |
-| Docker / Compose | REAL | Verified 2026-09-27: both images built; backend healthy; UI, `/api/*` via nginx, DEMO and live RELIANCE analyses and FinBERT all worked in containers (see §20, docs/21_DEPLOYMENT.md) |
-| Tests | REAL | ML 35, backend 18, frontend 15 (vitest). CI: PLANNED |
-| Contact form | PARTIAL | Opens `mailto:` only if `VITE_CONTACT_EMAIL` is set; otherwise shows "not configured". |
-| 3D "Neural Pipeline" | REMOVED by user | Leftovers: unused `three` deps and `.neural-*` CSS (C14). |
+| Landing page, Navbar (with global search), Footer | REAL | `frontend/src/components/**` |
+| Instrument Master + search (`/api/instruments/search`) | REAL | ~68,600 instruments synced from permitted listings; ranking, filters, cursor pagination |
+| Canonical IDs + capability profiles | REAL | `ml/instruments/ids.py`, `profiles.py` (11 classes) |
+| Provider registry / router / rate limits / circuit breaker / budget | REAL | `ml/providers/`; `GET /api/providers` |
+| Market data: crypto, forex, Indian mutual funds | REAL (keyless) | Binance, CoinGecko, Frankfurter/ECB, AMFI + mfapi |
+| Market data: US/BSE equities & ETFs, NSE equities/ETFs/REITs/InvITs/bonds/indices, rates | KEY-GATED | Alpha Vantage, Upstox, FRED; without keys → `PROVIDER_UNAVAILABLE` with attempts |
+| Yahoo Finance, Google News RSS, automated NSE downloads | REMOVED | terms / robots.txt (docs/06, C22, C23); manual NSE import only |
+| Validation, calendars, UTC alignment | REAL | `ml/data/validation.py` (capability-aware), `calendars.py` (XBOM = NSE proxy) |
+| Feature sets + versions | REAL | `ml/features/sets.py` (`ohlcv`, `ohlcv_continuous`, `close_volume`, `close`, `yield`) |
+| Behavioural fingerprint | REAL | `ml/fingerprint/baseline.py` |
+| Anomaly detection | REAL (statistical + fingerprint + IF ensemble); EXPERIMENTAL (LOF, LSTM-AE); retrospective PELT | `ml/anomaly/` |
+| News + FinBERT + entity linking | KEY-GATED (Alpha Vantage NEWS_SENTIMENT: US tickers, crypto, forex); Indian instruments: no permitted source → `unavailable` | `ml/news/` |
+| Correlation, temporal analysis, risk, evidence (with provenance) | REAL (uncalibrated weights) | `ml/correlation/`, `ml/temporal/`, `ml/risk/`, `ml/evidence/` |
+| Database + migrations | REAL | PostgreSQL (Docker, verified) / SQLite; Alembic 0001–0004 (incl. v0.1 legacy import) |
+| Background jobs (queue, worker, scheduler, async API 202 + polling) | REAL | `ml/jobs/`, `intelligence_service.py`, verified in Docker |
+| Intelligence dashboard, capability pages, homepage monitor + preview | REAL | search-driven, `?id=`; typed unavailable states; dynamic currency/timezone |
+| FinBERT text analysis `POST /api/news/analyze` + `/news-analysis` | REAL | unchanged contract; EXP-02 |
+| Evaluation | PARTIAL | EXP-03 (13 real keyless instruments, per class), EXP-01 (v0.1 Yahoo-era record), EXP-02. Equities, known-event benchmark, correlation quality, risk calibration: PLANNED |
+| Docker / Compose | REAL | Verified 2026-09-27: postgres + backend + worker + frontend; migrations, listing sync, scheduled analyses, nginx |
+| Tests | REAL | ML 73 (1 PostgreSQL-only skipped by default), backend 25, frontend 23. CI: PLANNED |
+| Synthetic data | TEST-ONLY | `TEST:DEMO` only with `AVENTRA_ENABLE_SYNTHETIC_TEST_DATA=1`; never a production fallback |
+| Contact form | PARTIAL | `mailto:` only if `VITE_CONTACT_EMAIL` is set |
 
 ## 8. Core ML pipeline (target) — build order
 
@@ -228,7 +228,7 @@ When extending:
 
 ## 11. Data architecture
 
-Current: no persistence. Target (Final Plan §18, ML §58): SQLite first (migration-friendly for PostgreSQL later), tables `assets, prices, news, news_sentiment, features, fingerprints, anomalies, events, risk_scores, evidence`, plus Parquet/JSON for experiment artefacts.
+Current: SQLAlchemy Core schema in `ml/data/db.py` on PostgreSQL (Docker) or SQLite (local/tests), migrated with Alembic (`backend/migrations/`). Tables: `instruments, instrument_aliases, provider_symbols, listing_snapshots, provider_calls, prices, news, news_links, sentiment, analysis_runs, fingerprints, anomalies, events, risks, evidence, jobs, watchlists` (docs/04). Every price row records provider, currency, timezone, adjustment, quality and retrieval time. Identity is the canonical instrument ID, never a provider symbol.
 
 Directory intent (create only when content exists):
 - `data/raw/` — immutable provider downloads, with provenance (source, fetch time, parameters).
@@ -241,10 +241,10 @@ For **every** data or ML change, explicitly check and handle:
 | Concern | Rule |
 |---|---|
 | Missing values | Detect and report counts. Impute only with past data. Never forward-fill across a gap longer than the configured limit. |
-| Duplicates | Deduplicate on `(symbol, timestamp)` for prices and on URL/normalised headline for news. Log how many were removed. |
+| Duplicates | Deduplicate on `(instrument_id, interval, timestamp, provider)` for prices and on URL/normalised headline for news. Log how many were removed. |
 | Outliers | Do **not** blindly delete. Distinguish a data error (negative price, high < low, zero volume on a trading bar) from a real market anomaly. A real extreme move is the thing Aventra detects. |
-| Timestamps | Store in UTC with timezone awareness. Convert to `Asia/Kolkata` only for display/session logic. |
-| Market sessions | NSE regular session 09:15–15:30 IST. Handle holidays, half days, pre-open. Align news published outside the session to the next session open, and record that you did. |
+| Timestamps | Store in UTC with timezone awareness. Convert to the instrument's exchange timezone only for display/session logic. |
+| Market sessions | Use the instrument's calendar (`ml/data/calendars.py`: exchange_calendars, XBOM as the NSE proxy, 24/7, 24/5). Historical sessions come from observed bars. Align news outside the session to the next session, and record that you did. |
 | Leakage | Features at time *t* use only data < *t* (or ≤ *t* for the current bar's own value). No centred rolling windows. Scalers/detectors are fit on the training split only. |
 | Inference availability | Use a feature only if it is available at inference time with the same definition. Training and inference share one feature function. |
 | Splits | Chronological train/validation/test (e.g. 70/15/15). Never shuffle across time. |
@@ -257,14 +257,14 @@ For **every** data or ML change, explicitly check and handle:
 
 Existing contract (preserve it):
 - Success: `200 {"success": true, "data": {...}}`
-- Failure: `4xx/5xx {"success": false, "error": "<human-readable message>"}`
+- Failure: `4xx/5xx {"success": false, "error": "<human-readable message>", "code": "<TYPED_CODE>", "attempts"?: [...]}` (docs/14)
 - `POST /api/news/analyze` body `{"text": string}` (max 12,000 chars) → `data = {label, positive_probability, neutral_probability, negative_probability, sentiment_score}`. Consumer: `frontend/src/services/newsApi.ts` → `NewsAnalysis.tsx`.
 
 Rules:
 - Before changing any existing endpoint, `grep` the frontend for every consumer (`services/*.ts`, types, components). Only add fields. Do not rename, remove or retype fields without explicit approval. If a breaking change is approved, update the consumers in the same change.
 - New endpoints follow the Final Plan §19 list, prefixed `/api/`. For path shapes that differ between the docs, see C5.
-- Status codes: 400 invalid input/symbol, 404 unknown resource, 413 payload too large, 502 upstream provider failure, 503 local model/service unavailable, 500 unexpected. Never return stack traces or internal paths.
-- Validate every input at the route boundary: type, presence, length, symbol format (whitelist or regex).
+- Status codes: 400 invalid input/ID, 404 unknown resource/instrument, 413 payload too large, 422 no provider / insufficient history or data, 503 provider unavailable or rate-limited / local model unavailable, 202 analysis queued, 500 unexpected. Never return stack traces, SQL or internal paths.
+- Validate every input at the route boundary: type, presence, length, canonical instrument ID (`require_instrument_id`).
 - Timestamps in responses are ISO-8601 UTC strings.
 - Every ML-derived value in a response carries its model name/version, plus a confidence value if the model produces a meaningful one. Label uncalibrated scores as "score", not "probability".
 - Add an API test for every endpoint: valid request, missing input, invalid input, upstream/model failure.
@@ -292,15 +292,16 @@ Priorities, in order: **reproducibility, no leakage, temporal correctness, expla
 Current commands:
 - ML (from repo root): `py -3.12 -m unittest discover -s ml/tests -t .` (offline; includes leakage tests and an end-to-end demo run).
 - Backend (from repo root): `py -3.12 -m unittest discover -s backend/tests -t .`. New modules follow `backend/tests/test_<area>.py`. Providers and FinBERT are mocked.
-- Frontend (from `frontend/`): `npm test` (vitest + jsdom), `npm run typecheck`, `npm run build`. **`build` does not type-check.** `npm run lint` ignores `.ts/.tsx` (C12), so a passing lint is not evidence of TS quality.
-- Experiments (not tests; they write `experiments/results/`): `py -3.12 -m ml.evaluation.run_experiments`, `py -3.12 -m ml.evaluation.finbert_phrasebank`.
+- Frontend (from `frontend/`): `npm test` (vitest + jsdom), `npm run typecheck`, `npm run lint`, `npm run build`. **`build` does not type-check.** `npm run lint` ignores `.ts/.tsx` (C12), so a passing lint is not evidence of TS quality.
+- Optional PostgreSQL check: set `AVENTRA_TEST_DATABASE_URL` to a disposable database before running the ML suite.
+- Experiments (not tests; they write `experiments/results/`): `py -3.12 -m ml.evaluation.run_experiments --instruments ...`, `py -3.12 -m ml.evaluation.finbert_phrasebank`.
 
 Required for every change:
 - **Backend:** tests for valid input, empty/missing input, invalid JSON/type, model-loading failure, inference failure and upstream-provider failure (Final Plan §24).
 - **ML:** unit tests for each feature calculation (use hand-computed expected values on small fixtures), fingerprint deviation, detector score normalisation, ensemble, correlation scoring, risk calculation and evidence construction. Add a **leakage test**: shifting or removing future rows must not change a past feature value.
 - **Integration:** data → ML → Flask (test client) with the demo dataset, no network.
 - **Frontend:** once a test runner is added, cover loading, success, empty, API-error and backend-unavailable states. Until then, verify these manually and report that you did it manually.
-- Tests must not call live external APIs. Mock the providers or use `data/demo/`.
+- Tests must not call live external APIs. Mock the providers or use the synthetic `TEST:DEMO` instrument (tests set `AVENTRA_ENABLE_SYNTHETIC_TEST_DATA=1` themselves).
 - Never delete, skip or weaken a test to make it pass. Never mock the thing under test.
 
 ## 15. Security requirements
@@ -325,7 +326,7 @@ Required for every change:
 
 - Every failure scenario in ML §66 must be handled explicitly: no market data, no news, FinBERT unavailable, invalid symbol, missing timestamps, duplicate news, provider timeout, rate limit, model failure, empty feature set, insufficient history.
 - Partial degradation is fine and must be visible. If news fails, still return the market anomaly with `news: {status: "unavailable"}`, and the UI must say "News context unavailable".
-- Never substitute fabricated or random data on failure. (Existing `fallback()` in `marketApi.ts` returns placeholder chart points while labelled "MARKET DATA UNAVAILABLE". Do not extend this pattern to numeric metrics.)
+- Never substitute fabricated or random data on failure. Return a typed state ("Data unavailable / insufficient source data" + `code` + provider `attempts`). Synthetic data is never a production fallback.
 - Services raise typed domain exceptions. Routes map them to status codes (see §12). Unexpected exceptions are logged with `logger.exception` and returned as a generic 500 message.
 - Frontend service functions throw `Error` with a user-readable message. Components render it in a `role="alert"` element.
 
@@ -339,31 +340,41 @@ Required for every change:
 
 ## 19. Environment-variable rules
 
-Existing variables:
+All backend variables are listed, with comments, in the root `.env.example` (the single reference). Summary:
 
 | Variable | Where | Purpose |
 |---|---|---|
-| `FINBERT_MODEL_PATH` | backend | Override FinBERT directory (default `backend/models/finbert`) |
-| `CORS_ORIGINS` | backend | Comma-separated allowed origins (default `*`) |
-| `VITE_API_BASE_URL` | frontend | Flask origin when not same-origin (empty → `/api` proxy) |
-| `VITE_CONTACT_EMAIL` | frontend | Contact form `mailto:` target |
-| `AVENTRA_DATA_MODE` | backend | `live` (default) or `demo` (only `data/demo`, offline) |
-| `AVENTRA_DB_PATH`, `AVENTRA_ARTIFACT_DIR`, `AVENTRA_DATA_DIR`, `AVENTRA_HISTORY_RANGE`, `AVENTRA_ANOMALY_THRESHOLD`, `AVENTRA_SEMANTIC_MODEL` | backend | Read in `ml/config.py` |
-| `PORT`, `FLASK_DEBUG` | backend | Local dev server only |
-| `AVENTRA_API_PROXY` | frontend dev server | Vite `/api` proxy target (default `http://127.0.0.1:5000`) |
-| `FRONTEND_PORT`, `BACKEND_PORT`, `FINBERT_HOST_PATH` | Docker Compose | See root `.env.example` |
+| `ALPHAVANTAGE_API_KEY`, `UPSTOX_ACCESS_TOKEN`, `FRED_API_KEY` | backend | Provider credentials (optional; missing → `PROVIDER_UNAVAILABLE`) |
+| `COINGECKO_DEMO_API_KEY`, `OPENFIGI_API_KEY` | backend | Optional higher limits |
+| `AVENTRA_ALPHAVANTAGE_DAILY_BUDGET` | backend | Alpha Vantage daily request budget (default 25) |
+| `AVENTRA_SEC_USER_AGENT` | backend | SEC fair-access User-Agent with a real contact |
+| `AVENTRA_DATABASE_URL` / `AVENTRA_DB_PATH` | backend | PostgreSQL URL, else SQLite file |
+| `AVENTRA_JOB_MODE`, `AVENTRA_INLINE_JOB_THREADS`, `AVENTRA_WORKER_POLL_SECONDS` | backend | `inline` (default, local) / `external` (Docker worker) / `sync` (tests) |
+| `AVENTRA_DEFAULT_WATCHLIST` | backend | Canonical IDs for the home page and scheduled analysis (empty by default) |
+| `AVENTRA_ENABLE_SYNTHETIC_TEST_DATA` | backend | Tests only; enables `TEST:DEMO` |
+| `FINBERT_MODEL_PATH`, `CORS_ORIGINS`, `AVENTRA_ARTIFACT_DIR`, `AVENTRA_DATA_DIR`, `AVENTRA_ANOMALY_THRESHOLD`, `AVENTRA_SEMANTIC_MODEL`, `PORT`, `FLASK_DEBUG` | backend | Paths, CORS, pipeline settings, dev server |
+| `POSTGRES_PASSWORD` (required), `POSTGRES_USER`, `POSTGRES_DB`, `FRONTEND_PORT`, `BACKEND_PORT`, `FINBERT_HOST_PATH` | Docker Compose | Stack configuration |
+| `VITE_API_BASE_URL`, `VITE_CONTACT_EMAIL` | frontend | Public build-time values (never secrets) |
+| `AVENTRA_API_PROXY` | frontend dev server | Vite `/api` proxy target |
 
 Rules:
 - Every new variable goes into the relevant `.env.example` with a comment and a safe default, in the same change.
-- Read env vars in one config module per side. Do not scatter `os.getenv` or `import.meta.env` calls.
-- The app must start with no `.env` present (sensible defaults, or a clear error for truly required values).
+- Read env vars in one config module per side where possible. Do not scatter `os.getenv` or `import.meta.env` calls.
+- The app must start with no `.env` present (sensible defaults, or a clear error for truly required values such as `POSTGRES_PASSWORD` in Compose).
 
 ## 20. Docker / deployment rules
 
-- Implemented: `docker compose up --build` starts `backend` (Flask + ML pipeline, gunicorn **1 worker** × 8 threads, because the models and cache live in the process) and `frontend` (nginx + Vite build, proxies `/api`). SQLite, artefacts and the HF cache live on the `aventra-state` volume. There is no DB container until PostgreSQL is justified. ML runs inside the backend container. Do not create one container per model or other microservices. Files: `docker/`, `docker-compose.yml`, `.dockerignore`.
-- Do not bake the 438 MB FinBERT weights into git. Provide them through a mounted volume, or a documented download step, and point `FINBERT_MODEL_PATH` at them.
-- The current Vercel deployment serves only the static frontend. Production news analysis and market data will not work until a backend is deployed and `VITE_API_BASE_URL` is set (C6). Keep `vercel.json` working when making changes.
-- The Docker setup must run on a clean machine with only documented steps. Verify this before calling the Docker work done.
+- Implemented and verified (2026-09-27): `docker compose up --build` starts:
+  - `postgres` (16-alpine, no host port, volume `aventra-pg`);
+  - `backend` (Flask + ML, gunicorn **1 worker** × 8 threads because FinBERT lives in the process; applies migrations on start; `AVENTRA_JOB_MODE=external`);
+  - `worker` (same image, `python -m ml.jobs.worker`; listing sync + scheduled watchlist analysis);
+  - `frontend` (nginx + Vite build, proxies `/api`).
+- Artefacts and the Hugging Face cache live on `aventra-state`. Do not create one container per model or other microservices. Files: `docker/`, `docker-compose.yml`, `.dockerignore`.
+- `POSTGRES_PASSWORD` has no committed default; Compose refuses to start without it.
+- The backend image does not contain `data/demo` (synthetic fixtures are test-only).
+- Do not bake the 438 MB FinBERT weights into git or the image. Mount them and point `FINBERT_MODEL_PATH` at them.
+- Vercel serves only the static frontend; it needs `VITE_API_BASE_URL` and a hosted backend + database + worker. Keep `vercel.json` working.
+- The Docker setup must run on a clean machine with only documented steps. Verify this before calling Docker work done.
 
 ## 21. UI/UX rules
 
@@ -398,7 +409,7 @@ Authority: `context/Aventra_Design_Specification.md`.
 
 ## 24. Git / change-management rules
 
-- Current branch `main`. **Create a feature branch before committing** (`feat/…`, `fix/…`, `docs/…`).
+- Default branch `main`; multi-asset work is on `feat/multi-asset-platform`. **Create a feature branch before committing** (`feat/…`, `fix/…`, `docs/…`).
 - Commit or push only when the user asks. Never force-push. Never rewrite history on `main`.
 - One logical change per commit. Commit messages use the existing style `feat: …`, `fix: …`, `docs: …`.
 - Do not commit: `.env`, model weights (`backend/models/finbert/`), `node_modules/`, `frontend/dist/`, `__pycache__/`, raw data dumps, or experiment binaries.
@@ -438,14 +449,15 @@ Authority: `context/Aventra_Design_Specification.md`.
    - Backend imports need the repo root as the working directory.
    - FinBERT needs the local weights folder.
    - NLTK `punkt` may be missing; the code falls back to a regex splitter.
-   - Yahoo can rate-limit or change its unofficial API without notice.
+   - Providers without credentials report `PROVIDER_UNAVAILABLE` by design; check `/api/providers` before debugging "missing" data.
+   - Behaviour that passes on SQLite can fail on PostgreSQL (e.g. duplicate conflict keys in one upsert). Run the PostgreSQL test variant for store changes.
 
 ## 28. Rules for documentation
 
-- Engineering docs go in a repo `docs/` folder, which is planned (see C2 for the `doc/` vs `docs/` question). Candidate file list: ML §77, and the Final Plan §6 deliverable `docs/current-architecture.md`.
+- Engineering docs live in `docs/` (see docs/README.md). Candidate additional files: ML §77.
 - Update docs in the same change as the code when you change architecture, endpoints, env vars, setup steps, data schema or model behaviour.
 - Keep §7 of this file accurate. When a component changes status, update its row.
-- `readme.md` is currently stale (it says there is no Flask API). Fix it when a task touches setup or status. Do not rename it to `README.md` without asking, because the case-only rename is fragile on Windows/OneDrive.
+- `readme.md` is current (2026-09-27). Do not rename it to `README.md` without asking, because the case-only rename is fragile on Windows/OneDrive.
 - In documentation, clearly separate: *implemented*, *planned*, *assumption* and *experimental result*.
 
 ## 29. Academic / research integrity requirements
@@ -489,14 +501,16 @@ A feature is done only when it is **implemented → integrated → tested → ve
 
 Full list: docs/25_LIMITATIONS.md. The ones agents trip over most:
 
-- Yahoo's chart endpoint is unofficial and may rate-limit. Stored prices are used on failure and marked `stale`.
-- Google News RSS only covers about 30 days of headlines, so older flagged sessions usually show `no_aligned_news`.
-- All thresholds and weights are uncalibrated defaults. EXP-01 shows the ensemble does not beat the statistical baseline on synthetic single-bar anomalies. Do not describe the ensemble as better.
+- Without keys, only crypto, forex and Indian mutual funds return data. Equities, ETFs, indices, rates and all news are KEY-GATED. That is correct behaviour, not a bug.
+- Indian equities have no permitted news source. Alpha Vantage news timestamps are assumed to be UTC.
+- NSE uses the XBOM calendar as a proxy (no XNSE calendar).
+- All thresholds and weights are uncalibrated defaults. In EXP-03 the ensemble is not uniformly best (LOF and ablations win on crypto) and it misses most single-day volume/volatility spikes. Do not describe the ensemble as better. EXP-01 is a v0.1 Yahoo-era record.
+- Classification is rule-based (listing fields, name rules). OpenFIGI refinement has not run over the whole master.
 - FinBERT: 64-token sentence inputs, unweighted sentence mean, English only, about 2 GB RAM together with MiniLM. The PhraseBank result overlaps with its training data.
-- Cold pipeline runs take 9–30 s (up to about 40 s on the first Docker run while MiniLM downloads). The cache is per process, so gunicorn must stay at 1 worker.
 - TypeScript is not linted (C12). Routing is manual, so every navigation is a full page load.
 - Port 5000 may already be taken on a developer machine. Use `PORT` / `AVENTRA_API_PROXY` (docs/21_DEPLOYMENT.md).
-- Unused leftovers: `three`/`@types/three`, `.neural-*` and `.demo-visual` CSS, `App.css`, `react.svg`, `vite.svg`. If a three.js visual returns, it must cancel its `requestAnimationFrame` loop on unmount, honour reduced motion, use the palette and be lazy-loaded.
+- A global `pip install -r backend/requirements.txt` upgraded `packaging`, which conflicts with an unrelated Streamlit install on the development machine. Use a virtual environment.
+- Unused leftovers: `three`/`@types/three`, `.neural-*` and `.demo-visual` CSS, `App.css`, `react.svg`, `vite.svg`.
 
 ## 32. Known conflicts and open questions
 
@@ -509,20 +523,22 @@ Record new conflicts here. On 2026-09-27 the user authorised autonomous decision
 | C3 | Flat backend vs `backend/app/` + `run.py` | **Resolved:** the flat layout was kept (`routes/`, `services/`, `utils/`). There is no `backend/database/`: storage lives in `ml/data/store.py` because the ML CLIs also persist results. |
 | C4 | FinBERT weights location | **Resolved:** kept `backend/models/finbert/` (`FINBERT_MODEL_PATH`). New artefacts go in `artifacts/`. No finBERT clone. |
 | C5 | API paths differ between the docs | **Resolved:** both path styles are served; an `AN-`/`EV-` prefix marks an ID. See docs/14_API_SPECIFICATION.md. |
-| C6 | Market data through Flask | **Resolved:** `/api/market/*`. `marketApi.ts` keeps its exports; the `/market-api` Yahoo proxy was removed. |
+| C6 | Market data through Flask | **Resolved:** `/api/market/*` (snapshots by canonical ID). `marketApi.ts` was removed in Phase 10; market calls live in `intelligenceApi.ts`. |
 | C7 | Anomaly scope and scale | **Resolved:** the production ensemble is statistical + fingerprint + Isolation Forest, scored 0–1 with LOW/MEDIUM/HIGH/CRITICAL. LOF and LSTM-AE appear in EXP-01 only. PELT change points are retrospective context only (they use later bars within the window). |
 | C8 | Risk formula | **Resolved:** the ML Pipeline's six components plus a documented **anomaly gate** (context terms × anomaly score), added after the ungated sum gave ordinary sessions risk ≈ 48 on real data. The Final Plan's price/volume/event-severity/change-point terms are not used. |
 | C9 | Routes / React Router | **Open (design task):** manual routing kept; `/intelligence` added. The design-spec routes (`/about`, `/services`, `/doc`, `/services/*`) are not built. |
 | C10 | Palette | **Open:** the existing palette is kept. `intelligence.css` introduces `--av-*` custom properties with the existing values, which is the first step if a migration is approved. |
 | C11 | Homepage structure vs Design Spec | **Open (design task):** only the Market Intelligence preview was added (after LiveMarketData). WhyAventra, the contact form and CTA labels are unchanged. |
 | C12 | ESLint ignores TS | **Open:** `npm run typecheck` is the gate; `typescript-eslint` not added. |
-| C13 | Asset universe | **Resolved:** the five NSE names plus the synthetic DEMO asset. TATAMOTORS.NS returned "No data found, symbol may be delisted" on 2026-09-27 and was not added. |
+| C13 | Asset universe | **Superseded (Phases 1–12):** the universe is the Instrument Master synced from permitted listings. Support is claimed only where a legitimate provider supplies data (docs/06 §0). The v0.1 five-name registry remains only as a seed. |
 | C14 | Leftover `three` deps / `.neural-*` CSS | **Open, user decision:** still present and unused. |
 | C15 | Chart library | **Resolved:** no library. The dependency-free SVG `LineChart` component follows the existing hand-drawn SVG approach. |
 | C16 | Validation library | **Resolved:** manual validation via `backend/utils/responses.py`; no Pydantic/Marshmallow. |
 | C17 | Sentiment output shape | **Resolved:** additive fields only (`sentiment`, `confidence`, `model`, `model_version`, `timestamp`, `source`, `text`); `label` is unchanged. |
-| C18 | ±15 min window vs available data | **Resolved:** daily bars for analytics (5 years available). The correlation window is session-based ([open − 24 h, close + 12 h], configurable). 5-minute bars are used only for the live quote chart. |
+| C18 | ±15 min window vs available data | **Resolved:** daily observations for analytics. The correlation window is session-based ([open − 24 h, close + 12 h], configurable). No intraday data is used. |
 | C19 | Vercel vs Docker | **Resolved:** both are supported (docs/21_DEPLOYMENT.md). |
 | C20 | Research/patent cards without documents | **Open:** not built; no placeholder patent/paper content. |
-| C22 | **Provider terms (Phase 0, 2026-09-27):** Yahoo's Terms of Service §2.4(i) prohibit automated data collection without permission, and the NSE Terms of Use prohibit automated collection from the NSE website. The shipped pipeline uses Yahoo for prices and search. | **Open — user decision:** see docs/06_DATA_SOURCES_AND_PROVIDERS.md §5. Do not add new Yahoo or NSE-website dependencies until decided. Never schedule NSE website downloads. |
-| C21 | ML Pipeline §77 lists 26 doc files | **Open:** 7 docs with real content exist. The others are added when their subject has content, with no placeholder documents (Final Plan §23). |
+| C22 | **Provider terms (Phase 0, 2026-09-27):** Yahoo's Terms of Service §2.4(i) prohibit automated data collection without permission, and the NSE Terms of Use prohibit automated collection from the NSE website. | **Resolved by the user (master implementation instruction):** Yahoo removed from production (no fallback); legacy Yahoo rows excluded from reads. NSE: no automated download; manual import only (`ml.instruments.sync --import-nse`). |
+| C23 | Google News RSS (v0.1 news source) vs robots.txt: `news.google.com/robots.txt` disallows `/rss/search` | **Resolved 2026-09-27:** removed. News comes only from Alpha Vantage `NEWS_SENTIMENT` (key; US tickers, crypto, forex). Indian equities have no permitted news source and report `unavailable`. Legacy RSS rows are excluded from production reads. |
+| C24 | NSE calendar | **Resolved:** exchange_calendars has no XNSE; XBOM is the proxy for session logic, historical sessions come from observed bars (docs/06 §3). |
+| C21 | ML Pipeline §77 lists 26 doc files | **Open:** 8 docs with real content exist. The others are added when their subject has content, with no placeholder documents (Final Plan §23). |

@@ -165,7 +165,9 @@ def import_nse_listing(path: str | Path) -> dict:
         if not symbol or not ids.CODE_PATTERN.match(symbol):
             continue
         iid = ids.make("XNSE", symbol)
-        asset_class = "etf" if is_etf else ("reit" if re.search(r"\b(REIT|INVIT|INVESTMENT TRUST)\b", name.upper()) else "equity")
+        upper = name.upper()
+        asset_class = ("etf" if is_etf else "invit" if re.search(r"\bINVIT\b|INFRA(STRUCTURE)? INVESTMENT TRUST", upper)
+                       else "reit" if re.search(r"\bREIT\b|REAL ESTATE INVESTMENT TRUST", upper) else "equity")
         rows.append(instrument_row(iid, symbol, name, asset_class, "XNSE", country="IN", currency="INR", isin=(record.get(isin_col) or "").strip() or None,
                                    source="nse_manual_import", class_source="nse_etf_list" if is_etf else "nse_equity_list", class_confidence=1.0 if is_etf else 0.9))
         aliases += alias_rows(iid, strong=name_aliases(name), tickers=[symbol], source="nse_manual_import")

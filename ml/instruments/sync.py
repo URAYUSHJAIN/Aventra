@@ -3,8 +3,9 @@
     py -3.12 -m ml.instruments.sync                  # all configured listing providers + enrichment
     py -3.12 -m ml.instruments.sync binance amfi     # selected providers
     py -3.12 -m ml.instruments.sync --refine 500     # OpenFIGI classification refinement for up to 500 ISINs
+    py -3.12 -m ml.instruments.sync --import-nse EQUITY_L.csv   # manual import of an NSE file YOU downloaded
 
-NSE website files are never downloaded automatically (NSE Terms of Use); use master.import_nse_listing() for a
+NSE website files are never downloaded automatically (NSE Terms of Use); --import-nse (master.import_nse_listing) takes a
 file the user downloaded. Popularity (CoinGecko market-cap rank) only orders search results; it never limits them.
 """
 from __future__ import annotations
@@ -125,6 +126,10 @@ def main(argv: list[str]) -> int:
     migrate.upgrade()
     if argv[:1] == ["--refine"]:
         print(refine_with_openfigi(int(argv[1]) if len(argv) > 1 else 250))
+        return 0
+    if argv[:1] == ["--import-nse"] and len(argv) == 2:
+        from ml.instruments.master import import_nse_listing
+        print(import_nse_listing(argv[1]))
         return 0
     for result in sync_all(argv or None):
         print(result)

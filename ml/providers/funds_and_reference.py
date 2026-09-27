@@ -8,6 +8,7 @@ fair-access policy: ≤ 10 requests/s with a declared User-Agent (verified in Ph
 """
 from __future__ import annotations
 
+import os
 from datetime import datetime, timedelta, timezone
 
 import pandas as pd
@@ -119,6 +120,11 @@ def refine_class_from_figi(records: list[dict], exch_code: str = "IN") -> tuple[
     return None
 
 
+def sec_user_agent() -> str:
+    """SEC fair access asks for a User-Agent naming the organisation and a real contact address (AVENTRA_SEC_USER_AGENT)."""
+    return os.getenv("AVENTRA_SEC_USER_AGENT", "").strip() or "Aventra B.Tech research prototype (ABES Engineering College; contact not configured)"
+
+
 class SecListingProvider(Provider):
     name = "sec"
     capability = ProviderCapability(asset_classes=(), fields=(), history=False, listing=True, rate_limit_per_minute=300,
@@ -127,7 +133,7 @@ class SecListingProvider(Provider):
 
     def list_instruments(self):
         response = http.request(self.name, "company_tickers_exchange", SEC_TICKERS, per_minute=60, timeout=60,
-                                headers={"User-Agent": "Aventra B.Tech research prototype (ABES Engineering College) aventra-research@example.invalid"})
+                                headers={"User-Agent": sec_user_agent()})
         payload = http.json_or_raise(response, self.name)
         fields = payload.get("fields") or []
         if fields[:4] != ["cik", "name", "ticker", "exchange"]:

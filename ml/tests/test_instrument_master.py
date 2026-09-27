@@ -145,6 +145,33 @@ class StoreAndSearchTests(TempDatabase):
         self.assertIn("Reliance Power", [a["alias"] for a in master.get("XNSE:RELIANCE")["aliases"] if a["kind"] == "exclude"])
 
 
+class ManualNseImportTests(TempDatabase):
+    def test_user_downloaded_equity_file_is_imported_and_classified(self):
+        migrate.upgrade()
+        csv_path = Path(self.tmp.name) / "EQUITY_L.csv"
+        csv_path.write_text("SYMBOL,NAME OF COMPANY, SERIES, DATE OF LISTING, PAID UP VALUE, MARKET LOT, ISIN NUMBER, FACE VALUE\n"
+                            "RELIANCE,Reliance Industries Limited,EQ,29-NOV-1995,10,1,INE002A01018,10\n"
+                            "EMBASSY,Embassy Office Parks REIT,RR,01-APR-2019,300,1,INE041025011,300\n"
+                            "INDIGRID,IndiGrid Infrastructure Trust InvIT,IV,06-JUN-2017,100,1,INE219X23014,100\n"
+                            "BAD SYMBOL,Ignored Ltd,EQ,01-JAN-2000,10,1,INE000000000,10\n", encoding="utf-8")
+        self.assertEqual(master.import_nse_listing(csv_path), {"imported": 3, "kind": "equity"})
+        self.assertEqual(master.get("XNSE:RELIANCE")["isin"], "INE002A01018")
+        self.assertEqual(master.get("XNSE:EMBASSY")["asset_class"], "reit")
+        self.assertEqual(master.get("XNSE:INDIGRID")["asset_class"], "invit")
+        self.assertEqual(store.last_listing_snapshot("nse_manual_import")["status"], "ok")
+
+    def test_rejects_non_csv_and_unknown_formats(self):
+        migrate.upgrade()
+        other = Path(self.tmp.name) / "listing.txt"
+        other.write_text("x", encoding="utf-8")
+        with self.assertRaises(ValueError):
+            master.import_nse_listing(other)
+        wrong = Path(self.tmp.name) / "wrong.csv"
+        wrong.write_text("A,B\n1,2\n", encoding="utf-8")
+        with self.assertRaises(ValueError):
+            master.import_nse_listing(wrong)
+
+
 class DuplicateKeyUpsertTests(TempDatabase):
     """A listing batch may repeat an instrument (e.g. one symbol in two segments). PostgreSQL rejects a statement that
     updates the same key twice, so the store keeps the last row per key on every backend. Set AVENTRA_TEST_DATABASE_URL

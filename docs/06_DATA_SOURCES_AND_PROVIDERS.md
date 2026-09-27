@@ -1,4 +1,48 @@
-# 06 — Data Sources and Providers (Phase 0 verification, 2026-09-27)
+# 06 — Data Sources and Providers
+
+## 0. What is implemented (Phases 1–12, 2026-09-27)
+
+The §5 decisions were settled in the master implementation instruction:
+- Yahoo is **removed from production**, with no fallback of any kind.
+- NSE files are **never fetched automatically**; the manual import is `py -3.12 -m ml.instruments.sync --import-nse <file you downloaded>`.
+- Optional keys: a missing key gives `PROVIDER_UNAVAILABLE`; nothing stops.
+
+The live matrix is served at `GET /api/providers`.
+
+| Provider (`ml/providers/`) | Role in Aventra | Credential | Limits enforced in code |
+|---|---|---|---|
+| `upstox` | Listing (public instrument file, keyless): NSE/BSE equities, ETFs (name rule), REITs (`RR`), InvITs (`IV`), government bonds (`GS/SG/TB/GB/N*`), indices. **Daily candles need a token.** | `UPSTOX_ACCESS_TOKEN` (personal use only per Upstox) | 300/min |
+| `alpha_vantage` | US/BSE equity & ETF daily history, `LISTING_STATUS`, `SYMBOL_SEARCH`, **`NEWS_SENTIMENT` (the only news source)** | `ALPHAVANTAGE_API_KEY` | 5/min, 25/day budget (`AVENTRA_ALPHAVANTAGE_DAILY_BUDGET`) |
+| `binance` | Crypto listing (`exchangeInfo`) and daily OHLCV (1,000 per request, paginated) | none | 600/min, honours `Retry-After` |
+| `coingecko` | Coin listing with clean names, market-cap popularity (search ordering only), daily close + volume (365 days keyless) | optional `COINGECKO_DEMO_API_KEY` | 5/min keyless |
+| `frankfurter` | FX listing (870 pairs from ECB currencies) and daily reference rates | none | 60/min |
+| `ecb` | FX cross rates (fallback to Frankfurter) | none | 30/min |
+| `fred` | Interest rates / yields, commodity spot; `POST /api/instruments/resolve` creates series on demand; attribution shown | `FRED_API_KEY` | 60/min |
+| `amfi` | Mutual-fund listing + latest NAV (schemes with NAV older than 30 days marked inactive) | none | 6/min |
+| `mfapi` | Mutual-fund NAV history (community-run; codes verified equal to AMFI codes) | none | 60/min |
+| `openfigi` | ISIN → security type, refining equity/ETF classification (`--refine`) | optional `OPENFIGI_API_KEY` | 20/min |
+| `sec` | US issuer listing (Nasdaq/NYSE/CBOE); ETF by name rule | none; set `AVENTRA_SEC_USER_AGENT` to an organisation + real contact address (SEC fair access) | 60/min (SEC allows 10/s) |
+| `synthetic_test` | `TEST:DEMO` only when `AVENTRA_ENABLE_SYNTHETIC_TEST_DATA=1` (automated tests) | — | — |
+
+Router behaviour:
+- A provider is a candidate only when its capability matches the instrument's class and exchange.
+- Candidates are tried in priority order.
+- Every attempt is returned with the typed error.
+- Stored observations are reused (marked `stale`) when the provider fails.
+- Rows from removed providers (`yahoo_finance_chart`, `google_news_rss`, and the v0.1 demo dataset) are excluded from production reads.
+
+News (added after Phase 0): Google News RSS was removed because `news.google.com/robots.txt` disallows `/rss/search` (AGENTS.md C23). News now comes only from Alpha Vantage `NEWS_SENTIMENT`, which covers US tickers, crypto and forex. **Indian equities have no permitted news source.**
+
+Classes not claimed:
+- US mutual funds (no permitted listing or prices);
+- futures and MCX;
+- Indian corporate bonds beyond the Upstox listing.
+
+The sections below are the unchanged Phase 0 verification record.
+
+---
+
+# Phase 0 verification (2026-09-27)
 
 Evidence: `py -3.12 -m scripts.verify_providers` → `data/reference/provider_verification.json` (raw status codes, counts, date ranges). Terms and limits come from the providers' own pages, fetched on 2026-09-27 (links at the end). **Re-verify before relying on any row: availability, limits and terms change.**
 

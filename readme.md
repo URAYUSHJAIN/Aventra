@@ -2,86 +2,116 @@
 
 > **Detect Hidden Patterns. Understand Market Risk.**
 
-Aventra is an explainable financial-intelligence pipeline that combines adaptive behavioural profiling, anomaly detection, financial-news sentiment and cross-source temporal correlation to contextualise unusual market behaviour. For a selected NSE asset it answers: *what changed, how unusual it is, what else was happening at the same time, and why it was flagged.*
+Aventra is an explainable financial-intelligence platform. It combines adaptive behavioural profiling, anomaly detection, financial-news sentiment and cross-source temporal correlation to put unusual market behaviour in context. For any instrument it can obtain real data for, it answers: *what changed, how unusual it is, what else was happening at the same time, and why it was flagged.*
 
-Aventra does not predict prices, recommend trades or provide financial advice. Correlated signals are reported as temporally aligned, never as causes.
+Aventra does not predict prices, recommend trades or provide financial advice. Signals that line up in time are reported as temporally associated, never as causes. **Aventra never fabricates financial data.** When no permitted provider can supply real data, the API and UI say so: "Data unavailable / insufficient source data", with the providers that were tried.
 
 B.Tech final-year research and development project — ABES Engineering College, Ghaziabad, Uttar Pradesh, India.
 
-## What is implemented
+## What works, and what needs a key
 
-| Stage | Implementation | Status |
-|---|---|---|
-| Market data | Provider abstraction: Yahoo Finance chart API (server-side, cached, stored fallback) and a synthetic demo provider | Implemented |
-| Validation & alignment | Duplicates, invalid OHLC, holiday placeholder bars; UTC storage; NSE session alignment | Implemented |
-| Feature engineering | 12 past-only features (returns, volatility, volume ratio/z, gap, range, MA distance, RSI, NIFTY-relative return) | Implemented |
-| Behavioural fingerprint | Rolling median/MAD robust baseline per asset with guarded adaptive update | Implemented |
-| Anomaly detection | Statistical z-score + fingerprint + Isolation Forest ensemble; LOF and LSTM autoencoder evaluated experimentally; PELT change points as retrospective context | Implemented / experimental parts marked |
-| News & sentiment | Google News RSS, de-duplication, alias-based entity linking, existing FinBERT model, rule-based event categories | Implemented |
-| Cross-source correlation | Time-window alignment, entity match, sentiment, anomaly strength, semantic relevance (MiniLM) | Implemented |
-| Temporal analysis | Ordered timelines, session-relative timing, lead/lag (when data suffices) | Implemented |
-| Risk scoring | Transparent weighted formula with anomaly gate and exact per-component contributions | Implemented (uncalibrated) |
-| Evidence chain | Time-ordered, source-attributed evidence + plain-language explanation | Implemented |
-| Flask API | Health, assets, market, news, sentiment, fingerprint, anomaly, events, risk, evidence, intelligence | Implemented |
-| React dashboard | `/intelligence`, four capability pages, homepage market panel and intelligence preview, FinBERT text analysis | Implemented |
-| Storage | SQLite (prices, news, sentiment, runs, anomalies, events, risk, evidence); versioned model artefacts | Implemented |
-| Evaluation | EXP-01 synthetic injection (baselines + ablations), EXP-02 FinBERT on PhraseBank | Run; results in `experiments/results/` |
-| Docker | Compose: backend (Flask + ML) and frontend (nginx), SQLite volume | Implemented |
+The Instrument Master is synced from permitted listings: about 68,600 instruments on 2026-09-27. Search covers all of them. Analysis runs only where a legitimate provider supplies history.
 
-Details: [docs/](docs/README.md). Limitations and open research questions: [docs/25_LIMITATIONS.md](docs/25_LIMITATIONS.md).
+| Asset class | Price/value source | Needs | Feature set |
+|---|---|---|---|
+| Crypto (Binance pairs) | Binance public API, daily OHLCV | nothing | `ohlcv_continuous` |
+| Crypto (other coins) | CoinGecko, daily close + volume (365 days keyless) | nothing (`COINGECKO_DEMO_API_KEY` optional) | `close_volume` |
+| Forex reference rates | Frankfurter (ECB), daily close | nothing | `close` |
+| Indian mutual funds | AMFI listing + mfapi.in NAV history | nothing | `close` (NAV) |
+| US equities / ETFs | Alpha Vantage daily | `ALPHAVANTAGE_API_KEY` | `ohlcv` |
+| Indian equities / ETFs / REITs / InvITs / bonds / indices | Upstox daily candles (listing is keyless) | `UPSTOX_ACCESS_TOKEN` (personal use per Upstox) | `ohlcv` |
+| BSE equities | Alpha Vantage `<SYM>.BSE` | `ALPHAVANTAGE_API_KEY` | `ohlcv` |
+| Interest rates, commodity spot | FRED | `FRED_API_KEY` | `yield` / `close` |
+| News + sentiment | Alpha Vantage NEWS_SENTIMENT (US equities, crypto, forex) + local FinBERT | `ALPHAVANTAGE_API_KEY` | — |
+
+Removed or never used in production:
+- **Yahoo Finance** was removed: its terms prohibit automated collection.
+- **Google News RSS** was removed: robots.txt disallows `/rss/search`.
+- **NSE files** are never downloaded automatically. An optional manual import of files you download yourself is supported.
+
+Indian-equity news has no permitted provider. Evidence and terms for every provider: [docs/06](docs/06_DATA_SOURCES_AND_PROVIDERS.md).
+
+## Pipeline
+
+```text
+Instrument Master (search) → provider router (capability, rate limits, circuit breaker, budget) → validation (capability-aware)
+→ features (set chosen from what the data provides) → behavioural fingerprint → anomaly ensemble (statistical + fingerprint + Isolation Forest)
+→ news (permitted provider) → entity linking → FinBERT → correlation → risk → evidence chain with provenance → API → React
+```
+
+Analyses run as background jobs in a PostgreSQL table (no Redis). The API returns `202` with a job while an analysis runs, and the UI polls the job. Everything is keyed by canonical instrument IDs (`XNAS:AAPL`, `CRYPTO:BTC-USDT`, `FX:USDINR`, `MF-IN:122639`). The ML layer never sees provider symbols. Details: [docs/04](docs/04_SYSTEM_ARCHITECTURE.md), [docs/05](docs/05_ML_PIPELINE.md), [docs/14](docs/14_API_SPECIFICATION.md).
 
 ## Evaluation at a glance
 
-Measured on 2026-09-27 (full tables and protocol in [docs/17_MODEL_EVALUATION.md](docs/17_MODEL_EVALUATION.md)):
+Full tables and protocol: [docs/17_MODEL_EVALUATION.md](docs/17_MODEL_EVALUATION.md).
 
-- **EXP-01** (synthetic anomalies injected into 5 years of real NSE data for five assets, chronological split): the production ensemble reached PR-AUC 0.670 ± 0.130; the simple statistical baseline reached 0.713 ± 0.090. The ensemble does **not** outperform the baseline on these single-bar synthetic anomalies — calibration and richer benchmarks are future work.
-- **EXP-02** FinBERT on Financial PhraseBank (AllAgree, 2,264 sentences): accuracy 0.9717, macro-F1 0.9625 — **overlaps with FinBERT's training data**, so it validates the integration, not generalisation.
+- **EXP-03** (2026-09-27): synthetic anomalies injected into real data for 13 instruments (5 Binance crypto, 4 forex, 4 Indian mutual funds). Chronological split, one seed each, LSTM excluded.
+  - The production ensemble reached PR-AUC 0.671 ± 0.096 (crypto), 0.893 ± 0.139 (forex) and 0.917 ± 0.121 (mutual funds).
+  - For crypto, LOF (0.724) and the ensemble without the Isolation Forest (0.698) scored higher.
+  - The ensemble is **not** consistently the best detector. These are synthetic anomalies, not a measure of real-world detection.
+- **EXP-01** (v0.1 record): the same protocol on five NSE stocks, using Yahoo-era data that is no longer a permitted source. The statistical baseline beat the ensemble.
+- **EXP-02**: FinBERT on Financial PhraseBank reached accuracy 0.9717. This overlaps with FinBERT's training data, so it validates the integration only.
 
 ## Run it
 
 **Docker (recommended):**
 
 ```bash
-docker compose up --build        # UI http://localhost:8080 · API http://localhost:5050/api/health
+cp .env.example .env              # set POSTGRES_PASSWORD; add provider keys you have; optionally AVENTRA_DEFAULT_WATCHLIST
+docker compose up --build         # UI http://localhost:8080 · API http://localhost:5050/api/health
 ```
 
-**Local development:**
+Services:
+- `postgres`: database and job queue.
+- `backend`: Flask API; applies migrations on start.
+- `worker`: background jobs, listing sync, scheduled watchlist analysis.
+- `frontend`: nginx serving the build.
+
+On first start the worker syncs the keyless listings, which takes about 2 minutes.
+
+**Local development** (SQLite, jobs run in API threads):
 
 ```powershell
 py -3.12 -m pip install -r backend/requirements.txt
-py -3.12 -m backend.app                              # API on http://127.0.0.1:5000
-cd frontend; npm install; npm run dev                # UI on http://localhost:5173
+py -3.12 -m ml.instruments.sync                     # build the Instrument Master from permitted listings
+py -3.12 -m backend.app                             # API on http://127.0.0.1:5000
+cd frontend; npm install; npm run dev               # UI on http://localhost:5173
 ```
 
-FinBERT weights must be present in `backend/models/finbert/` (git-ignored). Offline demo: set `AVENTRA_DATA_MODE=demo` and open `/intelligence?symbol=DEMO` (synthetic data, clearly labelled). Full instructions, port overrides and Vercel notes: [docs/21_DEPLOYMENT.md](docs/21_DEPLOYMENT.md).
+The FinBERT weights must be in `backend/models/finbert/` (git-ignored). Everything else: [docs/21_DEPLOYMENT.md](docs/21_DEPLOYMENT.md).
 
 ## Tests
 
 ```bash
-py -3.12 -m unittest discover -s ml/tests -t .         # 35 tests
-py -3.12 -m unittest discover -s backend/tests -t .    # 18 tests
-cd frontend && npm test && npm run typecheck && npm run build   # 15 tests
+py -3.12 -m unittest discover -s ml/tests -t .         # 73 tests (1 PostgreSQL test skipped unless AVENTRA_TEST_DATABASE_URL is set)
+py -3.12 -m unittest discover -s backend/tests -t .    # 25 tests
+cd frontend && npm test && npm run typecheck && npm run lint && npm run build   # 23 tests
 ```
+
+Automated tests use a synthetic `TEST:DEMO` instrument. It exists only when `AVENTRA_ENABLE_SYNTHETIC_TEST_DATA=1`, which the tests set themselves. It is never a production fallback.
 
 ## Repository structure
 
 ```text
 Aventra/
 ├── AGENTS.md, CLAUDE.md          agent instructions (status table, conflicts, rules)
-├── context/                      master design / implementation / ML documents
 ├── docs/                         engineering documentation
-├── backend/                      Flask app: app.py, routes/, services/, utils/, tests/, models/finbert (weights, ignored)
-├── ml/                           data/, features/, fingerprint/, anomaly/, news/, correlation/, temporal/, risk/, evidence/, pipelines/, evaluation/, tests/
+├── backend/                      Flask: app.py, routes/, services/, utils/, migrations/ (Alembic), tests/
+├── ml/                           instruments/ (IDs, master, sync), providers/ (registry, adapters), data/ (db, store, calendars, validation),
+│                                 features/, fingerprint/, anomaly/, news/, correlation/, temporal/, risk/, evidence/, pipelines/, jobs/, evaluation/, tests/
 ├── frontend/                     React + TypeScript + Vite + Tailwind; src/{components,pages,services,types,hooks,utils,styles}
-├── data/reference/               asset registry and aliases      data/demo/  synthetic demo dataset
+├── data/reference/               seeds, aliases, Phase 0 provider evidence      data/demo/  synthetic fixtures (tests only)
 ├── experiments/results/          experiment records (JSON + Markdown)
-├── scripts/generate_demo_data.py
+├── scripts/                      verify_providers.py, generate_demo_data.py (test fixtures)
 ├── docker/, docker-compose.yml, .env.example
 ```
 
 ## Technology
 
-React 19, TypeScript, Vite 8, Tailwind CSS v4, lucide-react · Flask 3, Flask-CORS · pandas, NumPy, scikit-learn, PyTorch, Transformers (FinBERT), sentence-transformers, ruptures · SQLite · Docker Compose, nginx, gunicorn.
+- Frontend: React 19, TypeScript, Vite 8, Tailwind CSS v4.
+- Backend: Flask 3, SQLAlchemy 2 Core, Alembic, PostgreSQL 16 / SQLite, exchange_calendars.
+- ML: pandas, NumPy, scikit-learn, PyTorch, Transformers (FinBERT), sentence-transformers, ruptures.
+- Deployment: Docker Compose, nginx, gunicorn.
 
 ## Research integrity
 
@@ -89,4 +119,4 @@ Every metric in this repository was produced by a committed command and is store
 
 ## License
 
-To be determined. Financial PhraseBank (used only for evaluation, not committed) is CC BY-NC-SA 3.0.
+To be determined. Financial PhraseBank (used only for evaluation, not committed) is CC BY-NC-SA 3.0. Provider data remains under each provider's terms (see docs/06).
