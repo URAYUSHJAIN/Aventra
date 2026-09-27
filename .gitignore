@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# Secrets / local configuration
+.env
+
+# Local tool state (headless-browser QA)
+.gstack/
+
+# Generated data and model artefacts (reproducible from code; see README)
+data/aventra.sqlite3*
+data/processed/
+data/raw/
+data/external/
+artifacts/
+
+# Committed on purpose: data/reference/ (asset registry), data/demo/ (synthetic demo dataset),
+# experiments/results/ (small JSON/Markdown experiment records).

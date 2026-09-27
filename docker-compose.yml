@@ -1,0 +1,33 @@
+# Local Aventra stack:  docker compose up --build   →  http://localhost:${FRONTEND_PORT:-8080}
+# Storage is SQLite on the aventra-state volume (Final Plan §4: SQLite first; no separate DB container yet).
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      AVENTRA_DATA_MODE: ${AVENTRA_DATA_MODE:-live}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8080}
+    volumes:
+      - ${FINBERT_HOST_PATH:-./backend/models/finbert}:/models/finbert:ro
+      - aventra-state:/app/state
+    ports:
+      - "${BACKEND_PORT:-5050}:5000"   # optional direct API access; the frontend uses the internal network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend.Dockerfile
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+    restart: unless-stopped
+
+volumes:
+  aventra-state:

@@ -1,0 +1,59 @@
+{
+  "experiment_id": "EXP-02_finbert_phrasebank",
+  "generated_at": "2026-09-27T15:06:03Z",
+  "dataset": "Financial PhraseBank v1.0, Sentences_AllAgree (sha256 0e1a06c4900fdae4\u2026)",
+  "n_sentences": 2264,
+  "model": "ProsusAI/finBERT (local weights)",
+  "model_version": "config-sha1:a182af27c725",
+  "inference": "Aventra analyze_many (64-token sentence inputs)",
+  "accuracy": 0.9717314487632509,
+  "macro_precision": 0.9505230688525549,
+  "macro_recall": 0.9758738660956036,
+  "macro_f1": 0.962503461452302,
+  "per_class": {
+    "positive": {
+      "precision": 0.9472789115646258,
+      "recall": 0.9771929824561404,
+      "f1": 0.9620034542314335,
+      "support": 570
+    },
+    "negative": {
+      "precision": 0.9057750759878419,
+      "recall": 0.9834983498349835,
+      "f1": 0.9430379746835443,
+      "support": 303
+    },
+    "neutral": {
+      "precision": 0.9985152190051967,
+      "recall": 0.9669302659956865,
+      "f1": 0.9824689554419284,
+      "support": 1391
+    }
+  },
+  "confusion_matrix": {
+    "labels": [
+      "positive",
+      "negative",
+      "neutral"
+    ],
+    "rows_true_cols_pred": [
+      [
+        557,
+        12,
+        1
+      ],
+      [
+        4,
+        298,
+        1
+      ],
+      [
+        27,
+        19,
+        1345
+      ]
+    ]
+  },
+  "inference_seconds_cpu": 125.2,
+  "disclosure": "FinBERT was fine-tuned on Financial PhraseBank; these numbers overlap with its training data and are not a generalisation estimate."
+}

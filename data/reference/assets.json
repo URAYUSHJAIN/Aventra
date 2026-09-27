@@ -1,0 +1,18 @@
+{
+  "_comment": "Analysed asset universe. provider_symbol is the Yahoo Finance symbol. Aliases drive entity linking: 'strong' aliases give confidence 0.95, 'weak' aliases 0.7 unless an 'exclude' phrase (a different company sharing the name) is present. TATAMOTORS (Final Plan §26) was not added: TATAMOTORS.NS returned 'No data found, symbol may be delisted' on 2026-09-27 after the Tata Motors demerger.",
+  "benchmark": {"symbol": "NIFTY50", "provider_symbol": "^NSEI", "name": "NIFTY 50"},
+  "assets": [
+    {"symbol": "RELIANCE", "provider_symbol": "RELIANCE.NS", "name": "Reliance Industries", "exchange": "NSE", "sector": "Energy",
+     "aliases": {"strong": ["Reliance Industries", "RIL"], "weak": ["Reliance"], "exclude": ["Reliance Power", "Reliance Infrastructure", "Reliance Infra", "Reliance Capital", "Reliance Home Finance", "Reliance Communications", "Reliance General Insurance", "Reliance Nippon"]}},
+    {"symbol": "TCS", "provider_symbol": "TCS.NS", "name": "Tata Consultancy Services", "exchange": "NSE", "sector": "Information Technology",
+     "aliases": {"strong": ["Tata Consultancy Services", "TCS"], "weak": [], "exclude": []}},
+    {"symbol": "INFY", "provider_symbol": "INFY.NS", "name": "Infosys", "exchange": "NSE", "sector": "Information Technology",
+     "aliases": {"strong": ["Infosys", "INFY"], "weak": [], "exclude": []}},
+    {"symbol": "HDFCBANK", "provider_symbol": "HDFCBANK.NS", "name": "HDFC Bank", "exchange": "NSE", "sector": "Financials",
+     "aliases": {"strong": ["HDFC Bank", "HDFCBANK"], "weak": ["HDFC"], "exclude": ["HDFC Life", "HDFC AMC", "HDFC Asset Management", "HDFC ERGO", "HDFC Securities", "HDFC Mutual Fund"]}},
+    {"symbol": "ICICIBANK", "provider_symbol": "ICICIBANK.NS", "name": "ICICI Bank", "exchange": "NSE", "sector": "Financials",
+     "aliases": {"strong": ["ICICI Bank", "ICICIBANK"], "weak": ["ICICI"], "exclude": ["ICICI Prudential", "ICICI Lombard", "ICICI Securities", "ICICI Direct"]}},
+    {"symbol": "DEMO", "provider_symbol": null, "name": "Aventra Synthetic Demo Asset", "exchange": "DEMO", "sector": "Synthetic", "is_demo": true,
+     "aliases": {"strong": ["Aventra Demo Asset", "DEMO"], "weak": [], "exclude": []}}
+  ]
+}

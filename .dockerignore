@@ -1,0 +1,13 @@
+.git
+**/__pycache__
+**/*.pyc
+**/node_modules
+frontend/dist
+backend/models
+data/aventra.sqlite3*
+data/processed
+data/raw
+data/external
+artifacts
+context
+.env

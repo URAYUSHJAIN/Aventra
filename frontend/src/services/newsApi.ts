@@ -1,3 +1,5 @@
+import { ApiError, apiPost } from './apiClient'
+
 export interface NewsAnalysisRequest { text: string }
 export interface NewsAnalysisResult {
   label: 'positive' | 'neutral' | 'negative'
@@ -5,21 +7,22 @@ export interface NewsAnalysisResult {
   neutral_probability: number
   negative_probability: number
   sentiment_score: number
+  // Additive fields returned by the API since pipeline v0.1.0.
+  sentiment?: 'positive' | 'neutral' | 'negative'
+  confidence?: number
+  model?: string
+  model_version?: string | null
+  timestamp?: string
+  source?: string
 }
 
-interface ApiResponse { success: boolean; data?: NewsAnalysisResult; error?: string }
-
 export async function analyzeNews({ text }: NewsAnalysisRequest): Promise<NewsAnalysisResult> {
-  // Empty uses Vite's /api proxy locally; set VITE_API_BASE_URL to the Flask
-  // origin in deployment, for example https://api.example.com.
-  const baseUrl = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/$/, '')
-  let response: Response
   try {
-    response = await fetch(`${baseUrl}/api/news/analyze`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) })
-  } catch {
-    throw new Error('News analysis service is currently unavailable.')
+    return await apiPost<NewsAnalysisResult>('/api/news/analyze', { text }, { timeoutMs: 60_000 })
+  } catch (error) {
+    if (error instanceof ApiError && error.kind === 'client') throw new Error(error.message)
+    if (error instanceof ApiError && error.status === 503) throw new Error(error.message)
+    if (error instanceof ApiError && (error.kind === 'unavailable' || error.kind === 'timeout')) throw new Error('News analysis service is currently unavailable.')
+    throw new Error(error instanceof Error && error.message ? error.message : 'Unable to analyse the text. Please try again.')
   }
-  const payload = await response.json().catch(() => ({})) as ApiResponse
-  if (!response.ok || !payload.success || !payload.data) throw new Error(payload.error ?? 'Unable to analyse the text. Please try again.')
-  return payload.data
 }

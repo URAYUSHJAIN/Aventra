@@ -1,0 +1,137 @@
+{
+  "is_synthetic": true,
+  "items": [
+    {
+      "news_id": "N3ad039dae89dc36",
+      "headline": "Aventra Demo Asset reports quarterly revenue in line with estimates",
+      "summary": null,
+      "source": "Aventra Demo Newswire (synthetic)",
+      "url": null,
+      "published_at": "2024-12-02T05:50:00Z",
+      "symbols": [
+        "DEMO"
+      ],
+      "is_demo": true
+    },
+    {
+      "news_id": "N746f55041724f37",
+      "headline": "Aventra Demo Asset announces interim dividend for shareholders",
+      "summary": null,
+      "source": "Aventra Demo Newswire (synthetic)",
+      "url": null,
+      "published_at": "2025-02-24T11:15:00Z",
+      "symbols": [
+        "DEMO"
+      ],
+      "is_demo": true
+    },
+    {
+      "news_id": "N79c54967896502a",
+      "headline": "Aventra Demo Asset opens new logistics facility in Pune",
+      "summary": null,
+      "source": "Aventra Demo Newswire (synthetic)",
+      "url": null,
+      "published_at": "2025-05-19T04:20:00Z",
+      "symbols": [
+        "DEMO"
+      ],
+      "is_demo": true
+    },
+    {
+      "news_id": "Nc73055de5286419",
+      "headline": "Aventra Demo Asset quarterly profit rises on steady demand",
+      "summary": null,
+      "source": "Aventra Demo Newswire (synthetic)",
+      "url": null,
+      "published_at": "2025-08-25T12:00:00Z",
+      "symbols": [
+        "DEMO"
+      ],
+      "is_demo": true
+    },
+    {
+      "news_id": "Nc1db3b3dcdacd47",
+      "headline": "Aventra Demo Asset appoints new chief financial officer",
+      "summary": null,
+      "source": "Aventra Demo Newswire (synthetic)",
+      "url": null,
+      "published_at": "2025-11-17T06:35:00Z",
+      "symbols": [
+        "DEMO"
+      ],
+      "is_demo": true
+    },
+    {
+      "news_id": "N771c9861466b805",
+      "headline": "Aventra Demo Asset signs supply agreement with regional distributor",
+      "summary": null,
+      "source": "Aventra Demo Newswire (synthetic)",
+      "url": null,
+      "published_at": "2026-02-02T12:40:00Z",
+      "symbols": [
+        "DEMO"
+      ],
+      "is_demo": true
+    },
+    {
+      "news_id": "N4ed91ab9322c9d5",
+      "headline": "Aventra Demo Asset maintains full-year guidance",
+      "summary": null,
+      "source": "Aventra Demo Newswire (synthetic)",
+      "url": null,
+      "published_at": "2026-03-23T05:10:00Z",
+      "symbols": [
+        "DEMO"
+      ],
+      "is_demo": true
+    },
+    {
+      "news_id": "Nce316d44317bd6b",
+      "headline": "Aventra Demo Asset completes planned plant maintenance on schedule",
+      "summary": null,
+      "source": "Aventra Demo Newswire (synthetic)",
+      "url": null,
+      "published_at": "2026-05-04T10:25:00Z",
+      "symbols": [
+        "DEMO"
+      ],
+      "is_demo": true
+    },
+    {
+      "news_id": "N0825d5e0a9bfcb0",
+      "headline": "Aventra Demo Asset shares fall sharply after regulator opens investigation into accounting practices",
+      "summary": null,
+      "source": "Aventra Demo Newswire (synthetic)",
+      "url": null,
+      "published_at": "2026-06-15T04:35:00Z",
+      "symbols": [
+        "DEMO"
+      ],
+      "is_demo": true
+    },
+    {
+      "news_id": "N74ee3b288183f5f",
+      "headline": "Aventra Demo Asset says it will cooperate fully with regulator's probe",
+      "summary": null,
+      "source": "Aventra Demo Newswire (synthetic)",
+      "url": null,
+      "published_at": "2026-06-15T08:10:00Z",
+      "symbols": [
+        "DEMO"
+      ],
+      "is_demo": true
+    },
+    {
+      "news_id": "Ne05c527267e6db6",
+      "headline": "Brokerages cut Aventra Demo Asset price targets, citing uncertainty from the accounting investigation",
+      "summary": null,
+      "source": "Aventra Demo Newswire (synthetic)",
+      "url": null,
+      "published_at": "2026-06-16T03:00:00Z",
+      "symbols": [
+        "DEMO"
+      ],
+      "is_demo": true
+    }
+  ]
+}

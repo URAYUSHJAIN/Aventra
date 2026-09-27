@@ -1,0 +1,127 @@
+{
+  "generated_at": "2026-09-27T14:31:01Z",
+  "note": "Cached outputs of the local FinBERT model on the synthetic demo headlines.",
+  "items": [
+    {
+      "news_id": "N3ad039dae89dc36",
+      "label": "positive",
+      "positive_probability": 0.951227,
+      "neutral_probability": 0.028508,
+      "negative_probability": 0.020265,
+      "sentiment_score": 0.930962,
+      "confidence": 0.951227,
+      "model": "ProsusAI/finBERT",
+      "model_version": "config-sha1:a182af27c725"
+    },
+    {
+      "news_id": "N746f55041724f37",
+      "label": "neutral",
+      "positive_probability": 0.038729,
+      "neutral_probability": 0.701834,
+      "negative_probability": 0.259436,
+      "sentiment_score": -0.220707,
+      "confidence": 0.701834,
+      "model": "ProsusAI/finBERT",
+      "model_version": "config-sha1:a182af27c725"
+    },
+    {
+      "news_id": "N79c54967896502a",
+      "label": "positive",
+      "positive_probability": 0.557796,
+      "neutral_probability": 0.431074,
+      "negative_probability": 0.01113,
+      "sentiment_score": 0.546666,
+      "confidence": 0.557796,
+      "model": "ProsusAI/finBERT",
+      "model_version": "config-sha1:a182af27c725"
+    },
+    {
+      "news_id": "Nc73055de5286419",
+      "label": "positive",
+      "positive_probability": 0.911952,
+      "neutral_probability": 0.024994,
+      "negative_probability": 0.063055,
+      "sentiment_score": 0.848897,
+      "confidence": 0.911952,
+      "model": "ProsusAI/finBERT",
+      "model_version": "config-sha1:a182af27c725"
+    },
+    {
+      "news_id": "Nc1db3b3dcdacd47",
+      "label": "neutral",
+      "positive_probability": 0.061338,
+      "neutral_probability": 0.875562,
+      "negative_probability": 0.0631,
+      "sentiment_score": -0.001762,
+      "confidence": 0.875562,
+      "model": "ProsusAI/finBERT",
+      "model_version": "config-sha1:a182af27c725"
+    },
+    {
+      "news_id": "N771c9861466b805",
+      "label": "positive",
+      "positive_probability": 0.922542,
+      "neutral_probability": 0.067808,
+      "negative_probability": 0.00965,
+      "sentiment_score": 0.912892,
+      "confidence": 0.922542,
+      "model": "ProsusAI/finBERT",
+      "model_version": "config-sha1:a182af27c725"
+    },
+    {
+      "news_id": "N4ed91ab9322c9d5",
+      "label": "neutral",
+      "positive_probability": 0.441115,
+      "neutral_probability": 0.519626,
+      "negative_probability": 0.039259,
+      "sentiment_score": 0.401856,
+      "confidence": 0.519626,
+      "model": "ProsusAI/finBERT",
+      "model_version": "config-sha1:a182af27c725"
+    },
+    {
+      "news_id": "Nce316d44317bd6b",
+      "label": "neutral",
+      "positive_probability": 0.04092,
+      "neutral_probability": 0.914108,
+      "negative_probability": 0.044972,
+      "sentiment_score": -0.004052,
+      "confidence": 0.914108,
+      "model": "ProsusAI/finBERT",
+      "model_version": "config-sha1:a182af27c725"
+    },
+    {
+      "news_id": "N0825d5e0a9bfcb0",
+      "label": "negative",
+      "positive_probability": 0.009378,
+      "neutral_probability": 0.019174,
+      "negative_probability": 0.971447,
+      "sentiment_score": -0.962069,
+      "confidence": 0.971447,
+      "model": "ProsusAI/finBERT",
+      "model_version": "config-sha1:a182af27c725"
+    },
+    {
+      "news_id": "N74ee3b288183f5f",
+      "label": "positive",
+      "positive_probability": 0.793581,
+      "neutral_probability": 0.199078,
+      "negative_probability": 0.007341,
+      "sentiment_score": 0.78624,
+      "confidence": 0.793581,
+      "model": "ProsusAI/finBERT",
+      "model_version": "config-sha1:a182af27c725"
+    },
+    {
+      "news_id": "Ne05c527267e6db6",
+      "label": "negative",
+      "positive_probability": 0.00847,
+      "neutral_probability": 0.02308,
+      "negative_probability": 0.96845,
+      "sentiment_score": -0.95998,
+      "confidence": 0.96845,
+      "model": "ProsusAI/finBERT",
+      "model_version": "config-sha1:a182af27c725"
+    }
+  ]
+}

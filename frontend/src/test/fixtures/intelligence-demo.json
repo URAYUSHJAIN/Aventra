@@ -1,0 +1,2473 @@
+{
+ "run_id": "RUN-DEMO-20260927T143805178460",
+ "symbol": "DEMO",
+ "asset": {
+  "symbol": "DEMO",
+  "name": "Aventra Synthetic Demo Asset",
+  "exchange": "DEMO",
+  "sector": "Synthetic",
+  "is_demo": true
+ },
+ "generated_at": "2026-09-27T14:38:05Z",
+ "pipeline_version": "0.1.0",
+ "data_source": {
+  "market": {
+   "provider": "aventra_demo_dataset",
+   "is_demo": true,
+   "stale": false,
+   "notes": [],
+   "fetched_at": "2026-09-27T14:37:52Z"
+  },
+  "benchmark": null,
+  "news": {
+   "provider": "aventra_demo_dataset",
+   "is_demo": true,
+   "fetched_at": "2026-09-27T14:37:53Z",
+   "status": "ok",
+   "message": null,
+   "duplicates_removed": 0,
+   "unlinked_dropped": 0,
+   "sentiment_status": "ok",
+   "fresh_count": 11,
+   "stored_history_count": 0
+  }
+ },
+ "validation": {
+  "symbol": "DEMO",
+  "rows_in": 620,
+  "missing_values": {
+   "timestamp": 0,
+   "open": 0,
+   "high": 0,
+   "low": 0,
+   "close": 0,
+   "volume": 0
+  },
+  "out_of_order": false,
+  "duplicates_removed": 0,
+  "invalid_rows_removed": {
+   "missing_price": 0,
+   "non_positive_price": 0,
+   "impossible_ohlc": 0
+  },
+  "holiday_placeholders_removed": 0,
+  "negative_volume_set_missing": 0,
+  "zero_volume_bars": 0,
+  "large_moves_flagged": [],
+  "calendar_gaps_over_5_days": 0,
+  "rows_out": 620
+ },
+ "market": {
+  "latest": {
+   "trading_date": "2026-06-30",
+   "open": 1751.84,
+   "high": 1766.21,
+   "low": 1731.83,
+   "close": 1746.15,
+   "volume": 1050837.0,
+   "return_1": -0.000955,
+   "volatility_20": 0.02164,
+   "volume_ratio": 0.756
+  },
+  "series": [
+   {
+    "date": "2026-05-20",
+    "open": 1806.57,
+    "high": 1832.83,
+    "low": 1796.37,
+    "close": 1822.54,
+    "volume": 1278334.0,
+    "anomaly_score": 0.0,
+    "is_anomaly": false,
+    "severity": "LOW"
+   },
+   {
+    "date": "2026-05-21",
+    "open": 1823.32,
+    "high": 1851.64,
+    "low": 1813.55,
+    "close": 1841.78,
+    "volume": 909383.0,
+    "anomaly_score": 0.0,
+    "is_anomaly": false,
+    "severity": "LOW"
+   },
+   {
+    "date": "2026-05-22",
+    "open": 1841.26,
+    "high": 1859.1,
+    "low": 1800.39,
+    "close": 1818.01,
+    "volume": 1204352.0,
+    "anomaly_score": 0.0,
+    "is_anomaly": false,
+    "severity": "LOW"
+   },
+   {
+    "date": "2026-05-25",
+    "open": 1811.45,
+    "high": 1867.11,
+    "low": 1801.39,
+    "close": 1856.8,
+    "volume": 1335038.0,
+    "anomaly_score": 0.0233,
+    "is_anomaly": false,
+    "severity": "LOW"
+   },
+   {
+    "date": "2026-05-26",
+    "open": 1856.08,
+    "high": 1866.59,
+    "low": 1833.89,
+    "close": 1844.34,
+    "volume": 965520.0,
+    "anomaly_score": 0.0,
+    "is_anomaly": false,
+    "severity": "LOW"
+   },
+   {
+    "date": "2026-05-27",
+    "open": 1848.67,
+    "high": 1864.98,
+    "low": 1789.66,
+    "close": 1805.59,
+    "volume": 1139229.0,
+    "anomaly_score": 0.0426,
+    "is_anomaly": false,
+    "severity": "LOW"
+   },
+   {
+    "date": "2026-05-28",
+    "open": 1818.55,
+    "high": 1829.15,
+    "low": 1787.26,
+    "close": 1797.74,
+    "volume": 1185466.0,
+    "anomaly_score": 0.0,
+    "is_anomaly": false,
+    "severity": "LOW"
+   },
+   {
+    "date": "2026-05-29",
+    "open": 1799.53,
+    "high": 1814.61,
+    "low": 1783.81,
+    "close": 1798.89,
+    "volume": 1226799.0,
+    "anomaly_score": 0.0,
+    "is_anomaly": false,
+    "severity": "LOW"
+   },
+   {
+    "date": "2026-06-01",
+    "open": 1795.03,
+    "high": 1808.65,
+    "low": 1741.5,
+    "close": 1754.81,
+    "volume": 1006573.0,
+    "anomaly_score": 0.04,
+    "is_anomaly": false,
+    "severity": "LOW"
+   },
+   {
+    "date": "2026-06-02",
+    "open": 1747.36,
+    "high": 1758.37,
+    "low": 1731.89,
+    "close": 1742.88,
+    "volume": 1162256.0,
+    "anomaly_score": 0.0,
+    "is_anomaly": false,
+    "severity": "LOW"
+   },
+   {
+    "date": "2026-06-03",
+    "open": 1753.1,
+    "high": 1790.54,
+    "low": 1743.44,
+    "close": 1780.73,
+    "volume": 1393568.0,
+    "anomaly_score": 0.0179,
+    "is_anomaly": false,
+    "severity": "LOW"
+   },
+   {
+    "date": "2026-06-04",
+    "open": 1783.61,
+    "high": 1792.49,
+    "low": 1771.23,
+    "close": 1780.09,
+    "volume": 1045935.0,
+    "anomaly_score": 0.0174,
+    "is_anomaly": false,
+    "severity": "LOW"
+   },
+   {
+    "date": "2026-06-05",
+    "open": 1777.93,
+    "high": 1802.5,
+    "low": 1767.67,
+    "close": 1792.16,
+    "volume": 663190.0,
+    "anomaly_score": 0.1596,
+    "is_anomaly": false,
+    "severity": "LOW"
+   },
+   {
+    "date": "2026-06-08",
+    "open": 1787.87,
+    "high": 1824.62,
+    "low": 1773.77,
+    "close": 1810.34,
+    "volume": 912230.0,
+    "anomaly_score": 0.0029,
+    "is_anomaly": false,
+    "severity": "LOW"
+   },
+   {
+    "date": "2026-06-09",
+    "open": 1807.82,
+    "high": 1830.22,
+    "low": 1799.75,
+    "close": 1822.09,
+    "volume": 854730.0,
+    "anomaly_score": 0.0,
+    "is_anomaly": false,
+    "severity": "LOW"
+   },
+   {
+    "date": "2026-06-10",
+    "open": 1826.76,
+    "high": 1832.62,
+    "low": 1812.47,
+    "close": 1818.3,
+    "volume": 924919.0,
+    "anomaly_score": 0.0,
+    "is_anomaly": false,
+    "severity": "LOW"
+   },
+   {
+    "date": "2026-06-11",
+    "open": 1816.78,
+    "high": 1833.37,
+    "low": 1807.77,
+    "close": 1824.33,
+    "volume": 856183.0,
+    "anomaly_score": 0.0,
+    "is_anomaly": false,
+    "severity": "LOW"
+   },
+   {
+    "date": "2026-06-12",
+    "open": 1821.82,
+    "high": 1867.33,
+    "low": 1809.61,
+    "close": 1854.9,
+    "volume": 852569.0,
+    "anomaly_score": 0.0,
+    "is_anomaly": false,
+    "severity": "LOW"
+   },
+   {
+    "date": "2026-06-15",
+    "open": 1832.65,
+    "high": 1902.74,
+    "low": 1662.65,
+    "close": 1728.77,
+    "volume": 5378183.0,
+    "anomaly_score": 0.9405,
+    "is_anomaly": true,
+    "severity": "CRITICAL"
+   },
+   {
+    "date": "2026-06-16",
+    "open": 1725.83,
+    "high": 1760.78,
+    "low": 1658.19,
+    "close": 1692.47,
+    "volume": 2674247.0,
+    "anomaly_score": 0.4608,
+    "is_anomaly": false,
+    "severity": "MEDIUM"
+   },
+   {
+    "date": "2026-06-17",
+    "open": 1689.55,
+    "high": 1697.49,
+    "low": 1667.65,
+    "close": 1675.53,
+    "volume": 1326304.0,
+    "anomaly_score": 0.2071,
+    "is_anomaly": false,
+    "severity": "LOW"
+   },
+   {
+    "date": "2026-06-18",
+    "open": 1679.81,
+    "high": 1702.06,
+    "low": 1652.62,
+    "close": 1674.79,
+    "volume": 912047.0,
+    "anomaly_score": 0.2243,
+    "is_anomaly": false,
+    "severity": "LOW"
+   },
+   {
+    "date": "2026-06-19",
+    "open": 1671.61,
+    "high": 1691.77,
+    "low": 1616.04,
+    "close": 1635.78,
+    "volume": 1140657.0,
+    "anomaly_score": 0.3691,
+    "is_anomaly": false,
+    "severity": "LOW"
+   },
+   {
+    "date": "2026-06-22",
+    "open": 1642.47,
+    "high": 1685.12,
+    "low": 1628.49,
+    "close": 1670.9,
+    "volume": 844519.0,
+    "anomaly_score": 0.3357,
+    "is_anomaly": false,
+    "severity": "LOW"
+   },
+   {
+    "date": "2026-06-23",
+    "open": 1672.16,
+    "high": 1695.0,
+    "low": 1659.65,
+    "close": 1682.42,
+    "volume": 1527724.0,
+    "anomaly_score": 0.07,
+    "is_anomaly": false,
+    "severity": "LOW"
+   },
+   {
+    "date": "2026-06-24",
+    "open": 1682.57,
+    "high": 1689.89,
+    "low": 1653.51,
+    "close": 1660.74,
+    "volume": 1211120.0,
+    "anomaly_score": 0.07,
+    "is_anomaly": false,
+    "severity": "LOW"
+   },
+   {
+    "date": "2026-06-25",
+    "open": 1659.64,
+    "high": 1676.02,
+    "low": 1653.12,
+    "close": 1669.46,
+    "volume": 1014767.0,
+    "anomaly_score": 0.07,
+    "is_anomaly": false,
+    "severity": "LOW"
+   },
+   {
+    "date": "2026-06-26",
+    "open": 1675.04,
+    "high": 1703.74,
+    "low": 1665.28,
+    "close": 1693.86,
+    "volume": 1431450.0,
+    "anomaly_score": 0.07,
+    "is_anomaly": false,
+    "severity": "LOW"
+   },
+   {
+    "date": "2026-06-29",
+    "open": 1699.87,
+    "high": 1758.61,
+    "low": 1689.38,
+    "close": 1747.82,
+    "volume": 1671639.0,
+    "anomaly_score": 0.2938,
+    "is_anomaly": false,
+    "severity": "LOW"
+   },
+   {
+    "date": "2026-06-30",
+    "open": 1751.84,
+    "high": 1766.21,
+    "low": 1731.83,
+    "close": 1746.15,
+    "volume": 1050837.0,
+    "anomaly_score": 0.07,
+    "is_anomaly": false,
+    "severity": "LOW"
+   }
+  ]
+ },
+ "fingerprint": {
+  "as_of": "2026-06-30",
+  "score": 0.2,
+  "level": "normal",
+  "status": "ok",
+  "dimensions": [
+   {
+    "feature": "return_1",
+    "label": "Daily return",
+    "unit": "fraction",
+    "value": -0.000955,
+    "baseline_median": 0.000471,
+    "p05": -0.020998,
+    "p95": 0.019594,
+    "robust_z": -0.099,
+    "deviation_score": 0.0,
+    "weight": 1.0
+   },
+   {
+    "feature": "log_volume",
+    "label": "Trading volume",
+    "unit": "shares",
+    "value": 1050836.475566,
+    "baseline_median": 1204400.11336,
+    "p05": 854666.254857,
+    "p95": 1686853.645927,
+    "robust_z": -0.585,
+    "deviation_score": 0.0,
+    "weight": 1.0
+   },
+   {
+    "feature": "volatility_20",
+    "label": "20-day volatility",
+    "unit": "fraction",
+    "value": 0.02164,
+    "baseline_median": 0.011514,
+    "p05": 0.010344,
+    "p95": 0.014911,
+    "robust_z": 12.452,
+    "deviation_score": 1.0,
+    "weight": 1.0
+   },
+   {
+    "feature": "range_pct",
+    "label": "Intraday range",
+    "unit": "fraction",
+    "value": 0.01967,
+    "baseline_median": 0.022601,
+    "p05": 0.012467,
+    "p95": 0.037859,
+    "robust_z": -0.352,
+    "deviation_score": 0.0,
+    "weight": 1.0
+   },
+   {
+    "feature": "gap_pct",
+    "label": "Opening gap",
+    "unit": "fraction",
+    "value": 0.0023,
+    "baseline_median": 0.000201,
+    "p05": -0.003737,
+    "p95": 0.004969,
+    "robust_z": 0.603,
+    "deviation_score": 0.0,
+    "weight": 1.0
+   }
+  ],
+  "series": {
+   "return_1": [
+    {
+     "date": "2026-05-20",
+     "value": 0.008332,
+     "median": 0.000167,
+     "lower": -0.026751,
+     "upper": 0.027084,
+     "robust_z": 0.607
+    },
+    {
+     "date": "2026-05-21",
+     "value": 0.010557,
+     "median": 0.000167,
+     "lower": -0.026067,
+     "upper": 0.0264,
+     "robust_z": 0.792
+    },
+    {
+     "date": "2026-05-22",
+     "value": -0.012906,
+     "median": 0.000167,
+     "lower": -0.026067,
+     "upper": 0.0264,
+     "robust_z": -0.997
+    },
+    {
+     "date": "2026-05-25",
+     "value": 0.021337,
+     "median": 0.000167,
+     "lower": -0.026751,
+     "upper": 0.027084,
+     "robust_z": 1.573
+    },
+    {
+     "date": "2026-05-26",
+     "value": -0.00671,
+     "median": 0.000481,
+     "lower": -0.026719,
+     "upper": 0.02768,
+     "robust_z": -0.529
+    },
+    {
+     "date": "2026-05-27",
+     "value": -0.02101,
+     "median": 0.000167,
+     "lower": -0.026751,
+     "upper": 0.027084,
+     "robust_z": -1.573
+    },
+    {
+     "date": "2026-05-28",
+     "value": -0.004348,
+     "median": 0.000167,
+     "lower": -0.027395,
+     "upper": 0.027728,
+     "robust_z": -0.328
+    },
+    {
+     "date": "2026-05-29",
+     "value": 0.00064,
+     "median": -0.000257,
+     "lower": -0.027219,
+     "upper": 0.026706,
+     "robust_z": 0.066
+    },
+    {
+     "date": "2026-06-01",
+     "value": -0.024504,
+     "median": -0.000257,
+     "lower": -0.027047,
+     "upper": 0.026533,
+     "robust_z": -1.81
+    },
+    {
+     "date": "2026-06-02",
+     "value": -0.006798,
+     "median": -0.000257,
+     "lower": -0.027047,
+     "upper": 0.026533,
+     "robust_z": -0.488
+    },
+    {
+     "date": "2026-06-03",
+     "value": 0.021717,
+     "median": -0.000257,
+     "lower": -0.027047,
+     "upper": 0.026533,
+     "robust_z": 1.64
+    },
+    {
+     "date": "2026-06-04",
+     "value": -0.000359,
+     "median": 0.000167,
+     "lower": -0.026751,
+     "upper": 0.027084,
+     "robust_z": -0.039
+    },
+    {
+     "date": "2026-06-05",
+     "value": 0.006781,
+     "median": 0.000167,
+     "lower": -0.026751,
+     "upper": 0.027084,
+     "robust_z": 0.491
+    },
+    {
+     "date": "2026-06-08",
+     "value": 0.010144,
+     "median": 0.000167,
+     "lower": -0.026751,
+     "upper": 0.027084,
+     "robust_z": 0.741
+    },
+    {
+     "date": "2026-06-09",
+     "value": 0.00649,
+     "median": 0.000167,
+     "lower": -0.027395,
+     "upper": 0.027728,
+     "robust_z": 0.459
+    },
+    {
+     "date": "2026-06-10",
+     "value": -0.00208,
+     "median": 0.000471,
+     "lower": -0.026769,
+     "upper": 0.027712,
+     "robust_z": -0.187
+    },
+    {
+     "date": "2026-06-11",
+     "value": 0.003316,
+     "median": 0.000471,
+     "lower": -0.026638,
+     "upper": 0.027581,
+     "robust_z": 0.21
+    },
+    {
+     "date": "2026-06-12",
+     "value": 0.016757,
+     "median": 0.000649,
+     "lower": -0.026314,
+     "upper": 0.027612,
+     "robust_z": 1.195
+    },
+    {
+     "date": "2026-06-15",
+     "value": -0.067998,
+     "median": 0.000692,
+     "lower": -0.026823,
+     "upper": 0.028207,
+     "robust_z": -4.993
+    },
+    {
+     "date": "2026-06-16",
+     "value": -0.020998,
+     "median": 0.000649,
+     "lower": -0.026738,
+     "upper": 0.028036,
+     "robust_z": -1.581
+    },
+    {
+     "date": "2026-06-17",
+     "value": -0.010009,
+     "median": 0.000649,
+     "lower": -0.026738,
+     "upper": 0.028036,
+     "robust_z": -0.778
+    },
+    {
+     "date": "2026-06-18",
+     "value": -0.000442,
+     "median": 0.000471,
+     "lower": -0.026769,
+     "upper": 0.027712,
+     "robust_z": -0.067
+    },
+    {
+     "date": "2026-06-19",
+     "value": -0.023292,
+     "median": 0.000167,
+     "lower": -0.027719,
+     "upper": 0.028052,
+     "robust_z": -1.683
+    },
+    {
+     "date": "2026-06-22",
+     "value": 0.02147,
+     "median": -0.000165,
+     "lower": -0.028099,
+     "upper": 0.027769,
+     "robust_z": 1.549
+    },
+    {
+     "date": "2026-06-23",
+     "value": 0.006894,
+     "median": -0.000165,
+     "lower": -0.028914,
+     "upper": 0.028585,
+     "robust_z": 0.491
+    },
+    {
+     "date": "2026-06-24",
+     "value": -0.012886,
+     "median": 0.000167,
+     "lower": -0.027999,
+     "upper": 0.028332,
+     "robust_z": -0.927
+    },
+    {
+     "date": "2026-06-25",
+     "value": 0.005251,
+     "median": -0.000165,
+     "lower": -0.029145,
+     "upper": 0.028816,
+     "robust_z": 0.374
+    },
+    {
+     "date": "2026-06-26",
+     "value": 0.014616,
+     "median": 0.000167,
+     "lower": -0.028578,
+     "upper": 0.028911,
+     "robust_z": 1.005
+    },
+    {
+     "date": "2026-06-29",
+     "value": 0.031856,
+     "median": 0.000471,
+     "lower": -0.028055,
+     "upper": 0.028998,
+     "robust_z": 2.2
+    },
+    {
+     "date": "2026-06-30",
+     "value": -0.000955,
+     "median": 0.000471,
+     "lower": -0.028428,
+     "upper": 0.029371,
+     "robust_z": -0.099
+    }
+   ],
+   "log_volume": [
+    {
+     "date": "2026-05-20",
+     "value": 1278334.0,
+     "median": 1202330.637133,
+     "lower": 804069.717251,
+     "upper": 1797852.515412,
+     "robust_z": 0.305
+    },
+    {
+     "date": "2026-05-21",
+     "value": 909383.0,
+     "median": 1202330.637133,
+     "lower": 804191.709163,
+     "upper": 1797579.79025,
+     "robust_z": -1.389
+    },
+    {
+     "date": "2026-05-22",
+     "value": 1204352.0,
+     "median": 1202330.637133,
+     "lower": 804191.709163,
+     "upper": 1797579.79025,
+     "robust_z": 0.008
+    },
+    {
+     "date": "2026-05-25",
+     "value": 1335038.0,
+     "median": 1204400.499023,
+     "lower": 811979.282198,
+     "upper": 1786474.611112,
+     "robust_z": 0.522
+    },
+    {
+     "date": "2026-05-26",
+     "value": 965520.0,
+     "median": 1204400.499023,
+     "lower": 811979.282198,
+     "upper": 1786474.611112,
+     "robust_z": -1.121
+    },
+    {
+     "date": "2026-05-27",
+     "value": 1139229.0,
+     "median": 1204400.499023,
+     "lower": 811979.282198,
+     "upper": 1786474.611112,
+     "robust_z": -0.282
+    },
+    {
+     "date": "2026-05-28",
+     "value": 1185466.0,
+     "median": 1202282.221459,
+     "lower": 814517.657782,
+     "upper": 1774648.273888,
+     "robust_z": -0.072
+    },
+    {
+     "date": "2026-05-29",
+     "value": 1226799.0,
+     "median": 1199997.980198,
+     "lower": 811804.650742,
+     "upper": 1773819.558112,
+     "robust_z": 0.113
+    },
+    {
+     "date": "2026-06-01",
+     "value": 1006573.0,
+     "median": 1202282.221459,
+     "lower": 814517.657782,
+     "upper": 1774648.273888,
+     "robust_z": -0.913
+    },
+    {
+     "date": "2026-06-02",
+     "value": 1162256.0,
+     "median": 1202282.221459,
+     "lower": 814517.657782,
+     "upper": 1774648.273888,
+     "robust_z": -0.174
+    },
+    {
+     "date": "2026-06-03",
+     "value": 1393568.0,
+     "median": 1202282.221459,
+     "lower": 814517.657782,
+     "upper": 1774648.273888,
+     "robust_z": 0.758
+    },
+    {
+     "date": "2026-06-04",
+     "value": 1045935.0,
+     "median": 1204400.499023,
+     "lower": 811979.282198,
+     "upper": 1786474.611112,
+     "robust_z": -0.716
+    },
+    {
+     "date": "2026-06-05",
+     "value": 663190.0,
+     "median": 1202282.221459,
+     "lower": 804255.352731,
+     "upper": 1797292.785361,
+     "robust_z": -2.959
+    },
+    {
+     "date": "2026-06-08",
+     "value": 912230.0,
+     "median": 1202282.221459,
+     "lower": 804255.352731,
+     "upper": 1797292.785361,
+     "robust_z": -1.373
+    },
+    {
+     "date": "2026-06-09",
+     "value": 854730.0,
+     "median": 1202282.221459,
+     "lower": 804037.338809,
+     "upper": 1797780.119172,
+     "robust_z": -1.696
+    },
+    {
+     "date": "2026-06-10",
+     "value": 924919.0,
+     "median": 1202282.221459,
+     "lower": 804037.338809,
+     "upper": 1797780.119172,
+     "robust_z": -1.304
+    },
+    {
+     "date": "2026-06-11",
+     "value": 856183.0,
+     "median": 1202282.221459,
+     "lower": 800594.759943,
+     "upper": 1805510.616379,
+     "robust_z": -1.67
+    },
+    {
+     "date": "2026-06-12",
+     "value": 852569.0,
+     "median": 1202282.221459,
+     "lower": 796583.591626,
+     "upper": 1814602.194434,
+     "robust_z": -1.67
+    },
+    {
+     "date": "2026-06-15",
+     "value": 5378183.0,
+     "median": 1199997.980198,
+     "lower": 794580.391369,
+     "upper": 1812270.931005,
+     "robust_z": 7.277
+    },
+    {
+     "date": "2026-06-16",
+     "value": 2674247.0,
+     "median": 1199997.980198,
+     "lower": 784938.432683,
+     "upper": 1834532.331514,
+     "robust_z": 3.776
+    },
+    {
+     "date": "2026-06-17",
+     "value": 1326304.0,
+     "median": 1199997.980198,
+     "lower": 778441.43626,
+     "upper": 1849843.619719,
+     "robust_z": 0.462
+    },
+    {
+     "date": "2026-06-18",
+     "value": 912047.0,
+     "median": 1199997.980198,
+     "lower": 778441.43626,
+     "upper": 1849843.619719,
+     "robust_z": -1.268
+    },
+    {
+     "date": "2026-06-19",
+     "value": 1140657.0,
+     "median": 1199997.980198,
+     "lower": 774244.624897,
+     "upper": 1859870.733429,
+     "robust_z": -0.231
+    },
+    {
+     "date": "2026-06-22",
+     "value": 844519.0,
+     "median": 1197340.018919,
+     "lower": 769339.25339,
+     "upper": 1863446.946821,
+     "robust_z": -1.578
+    },
+    {
+     "date": "2026-06-23",
+     "value": 1527724.0,
+     "median": 1197340.018919,
+     "lower": 765465.694228,
+     "upper": 1872876.718123,
+     "robust_z": 1.089
+    },
+    {
+     "date": "2026-06-24",
+     "value": 1211120.0,
+     "median": 1199997.980198,
+     "lower": 762137.287964,
+     "upper": 1889416.675528,
+     "robust_z": 0.041
+    },
+    {
+     "date": "2026-06-25",
+     "value": 1014767.0,
+     "median": 1202282.221459,
+     "lower": 759294.284921,
+     "upper": 1903718.110743,
+     "robust_z": -0.738
+    },
+    {
+     "date": "2026-06-26",
+     "value": 1431450.0,
+     "median": 1199997.980198,
+     "lower": 762137.287964,
+     "upper": 1889416.675528,
+     "robust_z": 0.777
+    },
+    {
+     "date": "2026-06-29",
+     "value": 1671639.0,
+     "median": 1202282.221459,
+     "lower": 759294.284921,
+     "upper": 1903718.110743,
+     "robust_z": 1.434
+    },
+    {
+     "date": "2026-06-30",
+     "value": 1050837.0,
+     "median": 1204400.499023,
+     "lower": 755666.009909,
+     "upper": 1919605.059056,
+     "robust_z": -0.585
+    }
+   ],
+   "volatility_20": [
+    {
+     "date": "2026-05-20",
+     "value": 0.010599,
+     "median": 0.011117,
+     "lower": 0.009377,
+     "upper": 0.012857,
+     "robust_z": -0.595
+    },
+    {
+     "date": "2026-05-21",
+     "value": 0.010979,
+     "median": 0.011117,
+     "lower": 0.009383,
+     "upper": 0.012851,
+     "robust_z": -0.159
+    },
+    {
+     "date": "2026-05-22",
+     "value": 0.01104,
+     "median": 0.011117,
+     "lower": 0.009396,
+     "upper": 0.012838,
+     "robust_z": -0.089
+    },
+    {
+     "date": "2026-05-25",
+     "value": 0.012031,
+     "median": 0.011117,
+     "lower": 0.009416,
+     "upper": 0.012818,
+     "robust_z": 1.075
+    },
+    {
+     "date": "2026-05-26",
+     "value": 0.012046,
+     "median": 0.011139,
+     "lower": 0.009484,
+     "upper": 0.012795,
+     "robust_z": 1.096
+    },
+    {
+     "date": "2026-05-27",
+     "value": 0.012509,
+     "median": 0.011165,
+     "lower": 0.009518,
+     "upper": 0.012813,
+     "robust_z": 1.631
+    },
+    {
+     "date": "2026-05-28",
+     "value": 0.012387,
+     "median": 0.011174,
+     "lower": 0.009501,
+     "upper": 0.012848,
+     "robust_z": 1.449
+    },
+    {
+     "date": "2026-05-29",
+     "value": 0.01238,
+     "median": 0.01118,
+     "lower": 0.009507,
+     "upper": 0.012853,
+     "robust_z": 1.435
+    },
+    {
+     "date": "2026-06-01",
+     "value": 0.013095,
+     "median": 0.011191,
+     "lower": 0.009511,
+     "upper": 0.012872,
+     "robust_z": 2.266
+    },
+    {
+     "date": "2026-06-02",
+     "value": 0.012641,
+     "median": 0.0112,
+     "lower": 0.009511,
+     "upper": 0.012889,
+     "robust_z": 1.707
+    },
+    {
+     "date": "2026-06-03",
+     "value": 0.013738,
+     "median": 0.01121,
+     "lower": 0.009521,
+     "upper": 0.012899,
+     "robust_z": 2.994
+    },
+    {
+     "date": "2026-06-04",
+     "value": 0.01374,
+     "median": 0.011228,
+     "lower": 0.00955,
+     "upper": 0.012905,
+     "robust_z": 2.996
+    },
+    {
+     "date": "2026-06-05",
+     "value": 0.013012,
+     "median": 0.011268,
+     "lower": 0.009545,
+     "upper": 0.012991,
+     "robust_z": 2.024
+    },
+    {
+     "date": "2026-06-08",
+     "value": 0.013197,
+     "median": 0.011328,
+     "lower": 0.009603,
+     "upper": 0.013053,
+     "robust_z": 2.166
+    },
+    {
+     "date": "2026-06-09",
+     "value": 0.012272,
+     "median": 0.011367,
+     "lower": 0.009596,
+     "upper": 0.013137,
+     "robust_z": 1.023
+    },
+    {
+     "date": "2026-06-10",
+     "value": 0.01224,
+     "median": 0.011388,
+     "lower": 0.009623,
+     "upper": 0.013154,
+     "robust_z": 0.965
+    },
+    {
+     "date": "2026-06-11",
+     "value": 0.012216,
+     "median": 0.011412,
+     "lower": 0.009651,
+     "upper": 0.013173,
+     "robust_z": 0.913
+    },
+    {
+     "date": "2026-06-12",
+     "value": 0.012652,
+     "median": 0.011426,
+     "lower": 0.009687,
+     "upper": 0.013166,
+     "robust_z": 1.41
+    },
+    {
+     "date": "2026-06-15",
+     "value": 0.020561,
+     "median": 0.01143,
+     "lower": 0.00969,
+     "upper": 0.013169,
+     "robust_z": 10.499
+    },
+    {
+     "date": "2026-06-16",
+     "value": 0.020656,
+     "median": 0.011445,
+     "lower": 0.009686,
+     "upper": 0.013205,
+     "robust_z": 10.469
+    },
+    {
+     "date": "2026-06-17",
+     "value": 0.020522,
+     "median": 0.01146,
+     "lower": 0.009704,
+     "upper": 0.013216,
+     "robust_z": 10.322
+    },
+    {
+     "date": "2026-06-18",
+     "value": 0.020253,
+     "median": 0.011462,
+     "lower": 0.009706,
+     "upper": 0.013217,
+     "robust_z": 10.015
+    },
+    {
+     "date": "2026-06-19",
+     "value": 0.020615,
+     "median": 0.011464,
+     "lower": 0.009708,
+     "upper": 0.01322,
+     "robust_z": 10.423
+    },
+    {
+     "date": "2026-06-22",
+     "value": 0.020624,
+     "median": 0.011466,
+     "lower": 0.009714,
+     "upper": 0.013217,
+     "robust_z": 10.458
+    },
+    {
+     "date": "2026-06-23",
+     "value": 0.020797,
+     "median": 0.011472,
+     "lower": 0.009734,
+     "upper": 0.013209,
+     "robust_z": 10.734
+    },
+    {
+     "date": "2026-06-24",
+     "value": 0.020529,
+     "median": 0.011486,
+     "lower": 0.009776,
+     "upper": 0.013195,
+     "robust_z": 10.579
+    },
+    {
+     "date": "2026-06-25",
+     "value": 0.020636,
+     "median": 0.011494,
+     "lower": 0.00981,
+     "upper": 0.013178,
+     "robust_z": 10.857
+    },
+    {
+     "date": "2026-06-26",
+     "value": 0.021019,
+     "median": 0.011496,
+     "lower": 0.009816,
+     "upper": 0.013175,
+     "robust_z": 11.342
+    },
+    {
+     "date": "2026-06-29",
+     "value": 0.021695,
+     "median": 0.011499,
+     "lower": 0.009827,
+     "upper": 0.01317,
+     "robust_z": 12.202
+    },
+    {
+     "date": "2026-06-30",
+     "value": 0.02164,
+     "median": 0.011514,
+     "lower": 0.009887,
+     "upper": 0.01314,
+     "robust_z": 12.452
+    }
+   ],
+   "range_pct": [
+    {
+     "date": "2026-05-20",
+     "value": 0.020172,
+     "median": 0.021905,
+     "lower": 0.006599,
+     "upper": 0.037211,
+     "robust_z": -0.226
+    },
+    {
+     "date": "2026-05-21",
+     "value": 0.020899,
+     "median": 0.021905,
+     "lower": 0.006599,
+     "upper": 0.037211,
+     "robust_z": -0.131
+    },
+    {
+     "date": "2026-05-22",
+     "value": 0.031877,
+     "median": 0.021895,
+     "lower": 0.006589,
+     "upper": 0.037201,
+     "robust_z": 1.304
+    },
+    {
+     "date": "2026-05-25",
+     "value": 0.036149,
+     "median": 0.021895,
+     "lower": 0.006589,
+     "upper": 0.037201,
+     "robust_z": 1.863
+    },
+    {
+     "date": "2026-05-26",
+     "value": 0.017611,
+     "median": 0.021895,
+     "lower": 0.006352,
+     "upper": 0.037438,
+     "robust_z": -0.551
+    },
+    {
+     "date": "2026-05-27",
+     "value": 0.040838,
+     "median": 0.021892,
+     "lower": 0.006586,
+     "upper": 0.037198,
+     "robust_z": 2.476
+    },
+    {
+     "date": "2026-05-28",
+     "value": 0.0232,
+     "median": 0.021895,
+     "lower": 0.006589,
+     "upper": 0.037201,
+     "robust_z": 0.171
+    },
+    {
+     "date": "2026-05-29",
+     "value": 0.017133,
+     "median": 0.021905,
+     "lower": 0.006956,
+     "upper": 0.036854,
+     "robust_z": -0.638
+    },
+    {
+     "date": "2026-06-01",
+     "value": 0.037329,
+     "median": 0.021905,
+     "lower": 0.006956,
+     "upper": 0.036854,
+     "robust_z": 2.064
+    },
+    {
+     "date": "2026-06-02",
+     "value": 0.01509,
+     "median": 0.021905,
+     "lower": 0.006956,
+     "upper": 0.036854,
+     "robust_z": -0.912
+    },
+    {
+     "date": "2026-06-03",
+     "value": 0.027024,
+     "median": 0.021905,
+     "lower": 0.006956,
+     "upper": 0.036854,
+     "robust_z": 0.685
+    },
+    {
+     "date": "2026-06-04",
+     "value": 0.011939,
+     "median": 0.021905,
+     "lower": 0.006741,
+     "upper": 0.037069,
+     "robust_z": -1.314
+    },
+    {
+     "date": "2026-06-05",
+     "value": 0.019566,
+     "median": 0.021905,
+     "lower": 0.006741,
+     "upper": 0.037069,
+     "robust_z": -0.308
+    },
+    {
+     "date": "2026-06-08",
+     "value": 0.028374,
+     "median": 0.021905,
+     "lower": 0.006956,
+     "upper": 0.036854,
+     "robust_z": 0.865
+    },
+    {
+     "date": "2026-06-09",
+     "value": 0.016831,
+     "median": 0.021969,
+     "lower": 0.006836,
+     "upper": 0.037101,
+     "robust_z": -0.679
+    },
+    {
+     "date": "2026-06-10",
+     "value": 0.011059,
+     "median": 0.021969,
+     "lower": 0.006856,
+     "upper": 0.037081,
+     "robust_z": -1.444
+    },
+    {
+     "date": "2026-06-11",
+     "value": 0.014079,
+     "median": 0.021905,
+     "lower": 0.006808,
+     "upper": 0.037001,
+     "robust_z": -1.037
+    },
+    {
+     "date": "2026-06-12",
+     "value": 0.031639,
+     "median": 0.021895,
+     "lower": 0.006828,
+     "upper": 0.036962,
+     "robust_z": 1.293
+    },
+    {
+     "date": "2026-06-15",
+     "value": 0.129436,
+     "median": 0.021905,
+     "lower": 0.006741,
+     "upper": 0.037069,
+     "robust_z": 14.182
+    },
+    {
+     "date": "2026-06-16",
+     "value": 0.059343,
+     "median": 0.021905,
+     "lower": 0.006741,
+     "upper": 0.037069,
+     "robust_z": 4.938
+    },
+    {
+     "date": "2026-06-17",
+     "value": 0.017631,
+     "median": 0.021969,
+     "lower": 0.006663,
+     "upper": 0.037274,
+     "robust_z": -0.567
+    },
+    {
+     "date": "2026-06-18",
+     "value": 0.029507,
+     "median": 0.021969,
+     "lower": 0.006663,
+     "upper": 0.037274,
+     "robust_z": 0.985
+    },
+    {
+     "date": "2026-06-19",
+     "value": 0.045218,
+     "median": 0.02207,
+     "lower": 0.006247,
+     "upper": 0.037892,
+     "robust_z": 2.926
+    },
+    {
+     "date": "2026-06-22",
+     "value": 0.03462,
+     "median": 0.02207,
+     "lower": 0.006247,
+     "upper": 0.037892,
+     "robust_z": 1.586
+    },
+    {
+     "date": "2026-06-23",
+     "value": 0.021156,
+     "median": 0.022186,
+     "lower": 0.006244,
+     "upper": 0.038128,
+     "robust_z": -0.129
+    },
+    {
+     "date": "2026-06-24",
+     "value": 0.021624,
+     "median": 0.022186,
+     "lower": 0.006454,
+     "upper": 0.037918,
+     "robust_z": -0.072
+    },
+    {
+     "date": "2026-06-25",
+     "value": 0.013789,
+     "median": 0.022186,
+     "lower": 0.006454,
+     "upper": 0.037918,
+     "robust_z": -1.068
+    },
+    {
+     "date": "2026-06-26",
+     "value": 0.023037,
+     "median": 0.022186,
+     "lower": 0.006244,
+     "upper": 0.038128,
+     "robust_z": 0.107
+    },
+    {
+     "date": "2026-06-29",
+     "value": 0.040871,
+     "median": 0.022186,
+     "lower": 0.006244,
+     "upper": 0.038128,
+     "robust_z": 2.344
+    },
+    {
+     "date": "2026-06-30",
+     "value": 0.01967,
+     "median": 0.022601,
+     "lower": 0.005939,
+     "upper": 0.039262,
+     "robust_z": -0.352
+    }
+   ],
+   "gap_pct": [
+    {
+     "date": "2026-05-20",
+     "value": -0.000503,
+     "median": 0.00015,
+     "lower": -0.00725,
+     "upper": 0.007551,
+     "robust_z": -0.177
+    },
+    {
+     "date": "2026-05-21",
+     "value": 0.000428,
+     "median": 0.000115,
+     "lower": -0.007197,
+     "upper": 0.007428,
+     "robust_z": 0.085
+    },
+    {
+     "date": "2026-05-22",
+     "value": -0.000282,
+     "median": 0.000115,
+     "lower": -0.00714,
+     "upper": 0.007371,
+     "robust_z": -0.11
+    },
+    {
+     "date": "2026-05-25",
+     "value": -0.003608,
+     "median": 9.3e-05,
+     "lower": -0.007097,
+     "upper": 0.007283,
+     "robust_z": -1.03
+    },
+    {
+     "date": "2026-05-26",
+     "value": -0.000388,
+     "median": 9.3e-05,
+     "lower": -0.007144,
+     "upper": 0.00733,
+     "robust_z": -0.133
+    },
+    {
+     "date": "2026-05-27",
+     "value": 0.002348,
+     "median": 9.1e-05,
+     "lower": -0.007146,
+     "upper": 0.007328,
+     "robust_z": 0.624
+    },
+    {
+     "date": "2026-05-28",
+     "value": 0.007178,
+     "median": 9.3e-05,
+     "lower": -0.007097,
+     "upper": 0.007283,
+     "robust_z": 1.971
+    },
+    {
+     "date": "2026-05-29",
+     "value": 0.000996,
+     "median": 9.3e-05,
+     "lower": -0.007097,
+     "upper": 0.007283,
+     "robust_z": 0.251
+    },
+    {
+     "date": "2026-06-01",
+     "value": -0.002146,
+     "median": 9.3e-05,
+     "lower": -0.007013,
+     "upper": 0.007199,
+     "robust_z": -0.63
+    },
+    {
+     "date": "2026-06-02",
+     "value": -0.004245,
+     "median": 9.1e-05,
+     "lower": -0.007008,
+     "upper": 0.00719,
+     "robust_z": -1.222
+    },
+    {
+     "date": "2026-06-03",
+     "value": 0.005864,
+     "median": 9.1e-05,
+     "lower": -0.007008,
+     "upper": 0.00719,
+     "robust_z": 1.626
+    },
+    {
+     "date": "2026-06-04",
+     "value": 0.001617,
+     "median": 9.3e-05,
+     "lower": -0.007013,
+     "upper": 0.007199,
+     "robust_z": 0.429
+    },
+    {
+     "date": "2026-06-05",
+     "value": -0.001213,
+     "median": 0.000115,
+     "lower": -0.006849,
+     "upper": 0.007079,
+     "robust_z": -0.382
+    },
+    {
+     "date": "2026-06-08",
+     "value": -0.002394,
+     "median": 0.000115,
+     "lower": -0.006849,
+     "upper": 0.007079,
+     "robust_z": -0.721
+    },
+    {
+     "date": "2026-06-09",
+     "value": -0.001392,
+     "median": 0.000115,
+     "lower": -0.007038,
+     "upper": 0.007269,
+     "robust_z": -0.421
+    },
+    {
+     "date": "2026-06-10",
+     "value": 0.002563,
+     "median": 0.000115,
+     "lower": -0.006849,
+     "upper": 0.007079,
+     "robust_z": 0.703
+    },
+    {
+     "date": "2026-06-11",
+     "value": -0.000836,
+     "median": 0.000115,
+     "lower": -0.007038,
+     "upper": 0.007269,
+     "robust_z": -0.266
+    },
+    {
+     "date": "2026-06-12",
+     "value": -0.001376,
+     "median": 9.3e-05,
+     "lower": -0.006805,
+     "upper": 0.006991,
+     "robust_z": -0.426
+    },
+    {
+     "date": "2026-06-15",
+     "value": -0.011995,
+     "median": 9.3e-05,
+     "lower": -0.006614,
+     "upper": 0.0068,
+     "robust_z": -3.605
+    },
+    {
+     "date": "2026-06-16",
+     "value": -0.001701,
+     "median": 9.3e-05,
+     "lower": -0.006805,
+     "upper": 0.006991,
+     "robust_z": -0.52
+    },
+    {
+     "date": "2026-06-17",
+     "value": -0.001725,
+     "median": 9.3e-05,
+     "lower": -0.006805,
+     "upper": 0.006991,
+     "robust_z": -0.527
+    },
+    {
+     "date": "2026-06-18",
+     "value": 0.002554,
+     "median": 9.1e-05,
+     "lower": -0.0068,
+     "upper": 0.006982,
+     "robust_z": 0.715
+    },
+    {
+     "date": "2026-06-19",
+     "value": -0.001899,
+     "median": 9.3e-05,
+     "lower": -0.007013,
+     "upper": 0.007199,
+     "robust_z": -0.561
+    },
+    {
+     "date": "2026-06-22",
+     "value": 0.00409,
+     "median": 9.3e-05,
+     "lower": -0.006805,
+     "upper": 0.006991,
+     "robust_z": 1.159
+    },
+    {
+     "date": "2026-06-23",
+     "value": 0.000754,
+     "median": 0.000115,
+     "lower": -0.006849,
+     "upper": 0.007079,
+     "robust_z": 0.183
+    },
+    {
+     "date": "2026-06-24",
+     "value": 8.9e-05,
+     "median": 0.00015,
+     "lower": -0.006723,
+     "upper": 0.007023,
+     "robust_z": -0.018
+    },
+    {
+     "date": "2026-06-25",
+     "value": -0.000662,
+     "median": 0.00015,
+     "lower": -0.006723,
+     "upper": 0.007023,
+     "robust_z": -0.236
+    },
+    {
+     "date": "2026-06-26",
+     "value": 0.003342,
+     "median": 0.000115,
+     "lower": -0.006609,
+     "upper": 0.00684,
+     "robust_z": 0.96
+    },
+    {
+     "date": "2026-06-29",
+     "value": 0.003548,
+     "median": 0.00015,
+     "lower": -0.006678,
+     "upper": 0.006978,
+     "robust_z": 0.995
+    },
+    {
+     "date": "2026-06-30",
+     "value": 0.0023,
+     "median": 0.000201,
+     "lower": -0.006768,
+     "upper": 0.007169,
+     "robust_z": 0.603
+    }
+   ]
+  },
+  "method": {
+   "baseline": "rolling median / MAD of prior bars (robust z-score)",
+   "window": 120,
+   "min_history": 60,
+   "guarded_update_z": 4.0,
+   "score_mapping": "linear from |z|=2.0 (0) to |z|=6.0 (1)",
+   "weights": {
+    "return_1": 1.0,
+    "log_volume": 1.0,
+    "volatility_20": 1.0,
+    "range_pct": 1.0,
+    "gap_pct": 1.0
+   }
+  }
+ },
+ "anomaly": {
+  "current": {
+   "anomaly_id": "AN-DEMO-20260630",
+   "trading_date": "2026-06-30",
+   "timestamp": "2026-06-30T03:45:00Z",
+   "anomaly_score": 0.07,
+   "severity": "LOW",
+   "is_anomaly": false,
+   "scores": {
+    "statistical": 0.0,
+    "fingerprint": 0.2,
+    "isolation_forest": 0.0
+   },
+   "model_agreement": 0.8,
+   "contributing_features": [
+    {
+     "feature": "volatility_20",
+     "label": "20-day volatility",
+     "value": 0.02164,
+     "baseline_median": 0.011514,
+     "robust_z": 12.452,
+     "direction": "above",
+     "deviation_score": 1.0,
+     "explanation": "20-day volatility 2.16% versus a baseline of 1.15%; robust z = +12.5."
+    }
+   ],
+   "explanation": [
+    "20-day volatility 2.16% versus a baseline of 1.15%; robust z = +12.5."
+   ]
+  },
+  "threshold": 0.65,
+  "flagged_count": 1,
+  "window": {
+   "start": "2025-07-16",
+   "end": "2026-06-30",
+   "bars": 250
+  },
+  "ensemble_weights": {
+   "statistical": 0.35,
+   "fingerprint": 0.35,
+   "isolation_forest": 0.3
+  },
+  "severity_bands": [
+   {
+    "min": 0.85,
+    "label": "CRITICAL"
+   },
+   {
+    "min": 0.65,
+    "label": "HIGH"
+   },
+   {
+    "min": 0.4,
+    "label": "MEDIUM"
+   },
+   {
+    "min": 0.0,
+    "label": "LOW"
+   }
+  ],
+  "change_points": {
+   "status": "ok",
+   "method": "ruptures.Pelt(model='l2')",
+   "penalty": 12.0,
+   "signals": [
+    "log_return",
+    "log_volume"
+   ],
+   "retrospective": true,
+   "change_points": []
+  }
+ },
+ "news": {
+  "status": "ok",
+  "message": null,
+  "items": [
+   {
+    "news_id": "Ne05c527267e6db6",
+    "headline": "Brokerages cut Aventra Demo Asset price targets, citing uncertainty from the accounting investigation",
+    "source": "Aventra Demo Newswire (synthetic)",
+    "url": null,
+    "published_at": "2026-06-16T03:00:00Z",
+    "is_demo": true,
+    "sentiment": {
+     "label": "negative",
+     "positive_probability": 0.00847,
+     "neutral_probability": 0.02308,
+     "negative_probability": 0.96845,
+     "sentiment_score": -0.95998,
+     "confidence": 0.96845,
+     "model": "ProsusAI/finBERT",
+     "model_version": "config-sha1:a182af27c725"
+    },
+    "entity": {
+     "symbol": "DEMO",
+     "entity_match_confidence": 1.0,
+     "mapping_method": "explicit_metadata"
+    }
+   },
+   {
+    "news_id": "N74ee3b288183f5f",
+    "headline": "Aventra Demo Asset says it will cooperate fully with regulator's probe",
+    "source": "Aventra Demo Newswire (synthetic)",
+    "url": null,
+    "published_at": "2026-06-15T08:10:00Z",
+    "is_demo": true,
+    "sentiment": {
+     "label": "positive",
+     "positive_probability": 0.793581,
+     "neutral_probability": 0.199078,
+     "negative_probability": 0.007341,
+     "sentiment_score": 0.78624,
+     "confidence": 0.793581,
+     "model": "ProsusAI/finBERT",
+     "model_version": "config-sha1:a182af27c725"
+    },
+    "entity": {
+     "symbol": "DEMO",
+     "entity_match_confidence": 1.0,
+     "mapping_method": "explicit_metadata"
+    }
+   },
+   {
+    "news_id": "N0825d5e0a9bfcb0",
+    "headline": "Aventra Demo Asset shares fall sharply after regulator opens investigation into accounting practices",
+    "source": "Aventra Demo Newswire (synthetic)",
+    "url": null,
+    "published_at": "2026-06-15T04:35:00Z",
+    "is_demo": true,
+    "sentiment": {
+     "label": "negative",
+     "positive_probability": 0.009378,
+     "neutral_probability": 0.019174,
+     "negative_probability": 0.971447,
+     "sentiment_score": -0.962069,
+     "confidence": 0.971447,
+     "model": "ProsusAI/finBERT",
+     "model_version": "config-sha1:a182af27c725"
+    },
+    "entity": {
+     "symbol": "DEMO",
+     "entity_match_confidence": 1.0,
+     "mapping_method": "explicit_metadata"
+    }
+   }
+  ],
+  "sentiment_summary": {
+   "count": 11,
+   "scored": 11,
+   "labels": {
+    "positive": 5,
+    "neutral": 4,
+    "negative": 2
+   },
+   "mean_score": 0.2072
+  }
+ },
+ "current_assessment": {
+  "event_id": "EV-DEMO-20260630",
+  "trading_date": "2026-06-30",
+  "anomaly": {
+   "anomaly_id": "AN-DEMO-20260630",
+   "trading_date": "2026-06-30",
+   "timestamp": "2026-06-30T03:45:00Z",
+   "anomaly_score": 0.07,
+   "severity": "LOW",
+   "is_anomaly": false,
+   "scores": {
+    "statistical": 0.0,
+    "fingerprint": 0.2,
+    "isolation_forest": 0.0
+   },
+   "model_agreement": 0.8,
+   "contributing_features": [
+    {
+     "feature": "volatility_20",
+     "label": "20-day volatility",
+     "value": 0.02164,
+     "baseline_median": 0.011514,
+     "robust_z": 12.452,
+     "direction": "above",
+     "deviation_score": 1.0,
+     "explanation": "20-day volatility 2.16% versus a baseline of 1.15%; robust z = +12.5."
+    }
+   ],
+   "explanation": [
+    "20-day volatility 2.16% versus a baseline of 1.15%; robust z = +12.5."
+   ]
+  },
+  "correlation": {
+   "status": "no_aligned_news",
+   "window": {
+    "start": "2026-06-29T03:45:00Z",
+    "end": "2026-06-30T22:00:00Z",
+    "session_open": "2026-06-30T03:45:00Z",
+    "session_close": "2026-06-30T10:00:00Z"
+   },
+   "best_score": 0.0,
+   "matches": []
+  },
+  "risk": {
+   "score": 6.3,
+   "level": "LOW",
+   "basis": "market_only_no_aligned_news",
+   "components": [
+    {
+     "name": "anomaly",
+     "description": "Ensemble anomaly score of the bar",
+     "value": 0.07,
+     "weight": 0.25,
+     "gate": 1.0,
+     "contribution": 1.75,
+     "available": true
+    },
+    {
+     "name": "fingerprint",
+     "description": "Deviation from the asset's behavioural fingerprint",
+     "value": 0.2,
+     "weight": 0.2,
+     "gate": 1.0,
+     "contribution": 4.0,
+     "available": true
+    },
+    {
+     "name": "sentiment",
+     "description": "Strength of financial-news sentiment of the best-aligned article",
+     "value": 0.0,
+     "weight": 0.15,
+     "gate": 0.07,
+     "contribution": 0.0,
+     "available": true
+    },
+    {
+     "name": "correlation",
+     "description": "Cross-source correlation score of the best-aligned article",
+     "value": 0.0,
+     "weight": 0.2,
+     "gate": 0.07,
+     "contribution": 0.0,
+     "available": true
+    },
+    {
+     "name": "temporal",
+     "description": "Temporal proximity of the best-aligned article to the session",
+     "value": 0.0,
+     "weight": 0.1,
+     "gate": 0.07,
+     "contribution": 0.0,
+     "available": true
+    },
+    {
+     "name": "confidence",
+     "description": "Agreement between anomaly detectors",
+     "value": 0.8,
+     "weight": 0.1,
+     "gate": 0.07,
+     "contribution": 0.56,
+     "available": true
+    }
+   ],
+   "method": "weighted sum with context terms gated by the anomaly score (ML Pipeline \u00a727 + documented gate); weights are uncalibrated defaults",
+   "disclaimer": "Analytical signal only; not a price prediction or financial advice."
+  },
+  "fingerprint_score": 0.2,
+  "window": {
+   "start": "2026-06-29T03:45:00Z",
+   "end": "2026-06-30T22:00:00Z"
+  },
+  "evidence": [
+   {
+    "timestamp": "2026-06-30T10:00:00Z",
+    "type": "volatility",
+    "signal": "volatility_20",
+    "description": "20-day volatility 2.16% versus a baseline of 1.15%; robust z = +12.5.",
+    "value": 12.452,
+    "source": "market:aventra_demo_dataset",
+    "gap_minutes_from_previous": null
+   },
+   {
+    "timestamp": "2026-06-30T10:00:00Z",
+    "type": "anomaly",
+    "signal": "anomaly_ensemble",
+    "description": "Ensemble anomaly score 0.07 (LOW); detectors: statistical 0.00, fingerprint 0.20, isolation forest 0.00; agreement 0.80.",
+    "value": 0.07,
+    "source": "aventra:anomaly_ensemble",
+    "gap_minutes_from_previous": 0.0
+   },
+   {
+    "timestamp": "2026-06-30T10:00:00Z",
+    "type": "risk",
+    "signal": "risk_score",
+    "description": "Risk signal 6/100 (LOW), basis: market only no aligned news.",
+    "value": 6.3,
+    "source": "aventra:risk_model",
+    "gap_minutes_from_previous": 0.0
+   }
+  ],
+  "explanation": {
+   "what": "Aventra Synthetic Demo Asset showed behaviour that deviated from its own historical baseline on 2026-06-30.",
+   "when": "Trading session 2026-06-30 (2026-06-30T03:45:00Z \u2013 2026-06-30T10:00:00Z UTC).",
+   "how_unusual": "Ensemble anomaly score 0.07 (LOW); fingerprint deviation 0.20.",
+   "signals": [
+    "20-day volatility 2.16% versus a baseline of 1.15%; robust z = +12.5."
+   ],
+   "news": "No asset-linked news was found inside the analysis window.",
+   "timing": "Not applicable.",
+   "why": "Risk 6/100 (LOW); largest contributions: fingerprint 4.0, anomaly 1.8, confidence 0.6.",
+   "caveat": "Signals are temporally aligned; this does not show that any article caused the price movement."
+  }
+ },
+ "events": [
+  {
+   "event_id": "EV-DEMO-20260615",
+   "trading_date": "2026-06-15",
+   "anomaly": {
+    "anomaly_id": "AN-DEMO-20260615",
+    "trading_date": "2026-06-15",
+    "timestamp": "2026-06-15T03:45:00Z",
+    "anomaly_score": 0.9405,
+    "severity": "CRITICAL",
+    "is_anomaly": true,
+    "scores": {
+     "statistical": 1.0,
+     "fingerprint": 0.8299,
+     "isolation_forest": 1.0
+    },
+    "model_agreement": 0.8299,
+    "contributing_features": [
+     {
+      "feature": "range_pct",
+      "label": "Intraday range",
+      "value": 0.129436,
+      "baseline_median": 0.021905,
+      "robust_z": 14.182,
+      "direction": "above",
+      "deviation_score": 1.0,
+      "explanation": "Intraday range 12.94% of the previous close versus a typical 2.19%; robust z = +14.2."
+     },
+     {
+      "feature": "volatility_20",
+      "label": "20-day volatility",
+      "value": 0.020561,
+      "baseline_median": 0.01143,
+      "robust_z": 10.499,
+      "direction": "above",
+      "deviation_score": 1.0,
+      "explanation": "20-day volatility 2.06% versus a baseline of 1.14%; robust z = +10.5."
+     },
+     {
+      "feature": "log_volume",
+      "label": "Trading volume",
+      "value": 15.497861,
+      "baseline_median": 13.997831,
+      "robust_z": 7.277,
+      "direction": "above",
+      "deviation_score": 1.0,
+      "explanation": "Volume 5,378,183 was 4.5\u00d7 the baseline median (1,199,998); robust z = +7.3."
+     },
+     {
+      "feature": "return_1",
+      "label": "Daily return",
+      "value": -0.067998,
+      "baseline_median": 0.000692,
+      "robust_z": -4.993,
+      "direction": "below",
+      "deviation_score": 0.7482,
+      "explanation": "Daily return -6.80% versus a typical +0.07%; robust z = -5.0."
+     }
+    ],
+    "explanation": [
+     "Intraday range 12.94% of the previous close versus a typical 2.19%; robust z = +14.2.",
+     "20-day volatility 2.06% versus a baseline of 1.14%; robust z = +10.5.",
+     "Volume 5,378,183 was 4.5\u00d7 the baseline median (1,199,998); robust z = +7.3.",
+     "Daily return -6.80% versus a typical +0.07%; robust z = -5.0."
+    ]
+   },
+   "correlation": {
+    "status": "aligned_news_found",
+    "window": {
+     "start": "2026-06-14T03:45:00Z",
+     "end": "2026-06-15T22:00:00Z",
+     "session_open": "2026-06-15T03:45:00Z",
+     "session_close": "2026-06-15T10:00:00Z"
+    },
+    "best_score": 0.9775,
+    "matches": [
+     {
+      "news_id": "N0825d5e0a9bfcb0",
+      "headline": "Aventra Demo Asset shares fall sharply after regulator opens investigation into accounting practices",
+      "source": "Aventra Demo Newswire (synthetic)",
+      "url": null,
+      "published_at": "2026-06-15T04:35:00Z",
+      "sentiment": {
+       "label": "negative",
+       "positive_probability": 0.009378,
+       "neutral_probability": 0.019174,
+       "negative_probability": 0.971447,
+       "sentiment_score": -0.962069,
+       "confidence": 0.971447,
+       "model": "ProsusAI/finBERT",
+       "model_version": "config-sha1:a182af27c725"
+      },
+      "entity": {
+       "confidence": 1.0,
+       "method": "explicit_metadata"
+      },
+      "category": {
+       "category": "Fraud / Investigation",
+       "matched_keywords": [
+        "investigation"
+       ],
+       "method": "keyword_rules"
+      },
+      "relation": "published_during_session",
+      "hours_from_session": 0.0,
+      "components": {
+       "temporal_proximity": 1.0,
+       "asset_match": 1.0,
+       "sentiment_strength": 0.9621,
+       "anomaly_strength": 0.9405
+      },
+      "weights": {
+       "temporal_proximity": 0.3,
+       "asset_match": 0.25,
+       "sentiment_strength": 0.2,
+       "anomaly_strength": 0.25
+      },
+      "correlation_score": 0.9775,
+      "semantic_relevance": 0.5297,
+      "sentiment_available": true
+     },
+     {
+      "news_id": "N74ee3b288183f5f",
+      "headline": "Aventra Demo Asset says it will cooperate fully with regulator's probe",
+      "source": "Aventra Demo Newswire (synthetic)",
+      "url": null,
+      "published_at": "2026-06-15T08:10:00Z",
+      "sentiment": {
+       "label": "positive",
+       "positive_probability": 0.793581,
+       "neutral_probability": 0.199078,
+       "negative_probability": 0.007341,
+       "sentiment_score": 0.78624,
+       "confidence": 0.793581,
+       "model": "ProsusAI/finBERT",
+       "model_version": "config-sha1:a182af27c725"
+      },
+      "entity": {
+       "confidence": 1.0,
+       "method": "explicit_metadata"
+      },
+      "category": {
+       "category": "Fraud / Investigation",
+       "matched_keywords": [
+        "probe"
+       ],
+       "method": "keyword_rules"
+      },
+      "relation": "published_during_session",
+      "hours_from_session": 0.0,
+      "components": {
+       "temporal_proximity": 1.0,
+       "asset_match": 1.0,
+       "sentiment_strength": 0.7862,
+       "anomaly_strength": 0.9405
+      },
+      "weights": {
+       "temporal_proximity": 0.3,
+       "asset_match": 0.25,
+       "sentiment_strength": 0.2,
+       "anomaly_strength": 0.25
+      },
+      "correlation_score": 0.9424,
+      "semantic_relevance": 0.306,
+      "sentiment_available": true
+     }
+    ],
+    "event_description": "Unusual trading behaviour in Aventra Synthetic Demo Asset: intraday range higher, 20-day volatility higher, trading volume higher",
+    "semantic_model": {
+     "model": "sentence-transformers/all-MiniLM-L6-v2",
+     "status": "loaded"
+    },
+    "interpretation": "Scores measure temporal alignment and asset match between signals; they do not establish causation."
+   },
+   "risk": {
+    "score": 89.3,
+    "level": "HIGH",
+    "basis": "market_and_news",
+    "components": [
+     {
+      "name": "anomaly",
+      "description": "Ensemble anomaly score of the bar",
+      "value": 0.9405,
+      "weight": 0.25,
+      "gate": 1.0,
+      "contribution": 23.51,
+      "available": true
+     },
+     {
+      "name": "fingerprint",
+      "description": "Deviation from the asset's behavioural fingerprint",
+      "value": 0.8299,
+      "weight": 0.2,
+      "gate": 1.0,
+      "contribution": 16.6,
+      "available": true
+     },
+     {
+      "name": "sentiment",
+      "description": "Strength of financial-news sentiment of the best-aligned article",
+      "value": 0.9621,
+      "weight": 0.15,
+      "gate": 0.9405,
+      "contribution": 13.57,
+      "available": true
+     },
+     {
+      "name": "correlation",
+      "description": "Cross-source correlation score of the best-aligned article",
+      "value": 0.9775,
+      "weight": 0.2,
+      "gate": 0.9405,
+      "contribution": 18.39,
+      "available": true
+     },
+     {
+      "name": "temporal",
+      "description": "Temporal proximity of the best-aligned article to the session",
+      "value": 1.0,
+      "weight": 0.1,
+      "gate": 0.9405,
+      "contribution": 9.41,
+      "available": true
+     },
+     {
+      "name": "confidence",
+      "description": "Agreement between anomaly detectors",
+      "value": 0.8299,
+      "weight": 0.1,
+      "gate": 0.9405,
+      "contribution": 7.81,
+      "available": true
+     }
+    ],
+    "method": "weighted sum with context terms gated by the anomaly score (ML Pipeline \u00a727 + documented gate); weights are uncalibrated defaults",
+    "disclaimer": "Analytical signal only; not a price prediction or financial advice."
+   },
+   "fingerprint_score": 0.8299,
+   "window": {
+    "start": "2026-06-14T03:45:00Z",
+    "end": "2026-06-15T22:00:00Z"
+   },
+   "evidence": [
+    {
+     "timestamp": "2026-06-15T04:35:00Z",
+     "type": "news",
+     "signal": "news_article",
+     "description": "Aventra Demo Asset shares fall sharply after regulator opens investigation into accounting practices \u2014 Aventra Demo Newswire (synthetic) (published during the trading session; category: Fraud / Investigation).",
+     "value": 1.0,
+     "source": "news:Aventra Demo Newswire (synthetic)",
+     "url": null,
+     "gap_minutes_from_previous": null
+    },
+    {
+     "timestamp": "2026-06-15T04:35:00Z",
+     "type": "sentiment",
+     "signal": "finbert",
+     "description": "FinBERT classified the headline as negative (score -0.96, confidence 0.97).",
+     "value": -0.962069,
+     "source": "model:finbert",
+     "gap_minutes_from_previous": 0.0
+    },
+    {
+     "timestamp": "2026-06-15T04:35:00Z",
+     "type": "correlation",
+     "signal": "cross_source_correlation",
+     "description": "Temporally aligned with the market anomaly: correlation score 0.98 (entity match explicit_metadata).",
+     "value": 0.9775,
+     "source": "aventra:correlation",
+     "gap_minutes_from_previous": 0.0
+    },
+    {
+     "timestamp": "2026-06-15T08:10:00Z",
+     "type": "news",
+     "signal": "news_article",
+     "description": "Aventra Demo Asset says it will cooperate fully with regulator's probe \u2014 Aventra Demo Newswire (synthetic) (published during the trading session; category: Fraud / Investigation).",
+     "value": 1.0,
+     "source": "news:Aventra Demo Newswire (synthetic)",
+     "url": null,
+     "gap_minutes_from_previous": 215.0
+    },
+    {
+     "timestamp": "2026-06-15T08:10:00Z",
+     "type": "sentiment",
+     "signal": "finbert",
+     "description": "FinBERT classified the headline as positive (score +0.79, confidence 0.79).",
+     "value": 0.78624,
+     "source": "model:finbert",
+     "gap_minutes_from_previous": 0.0
+    },
+    {
+     "timestamp": "2026-06-15T08:10:00Z",
+     "type": "correlation",
+     "signal": "cross_source_correlation",
+     "description": "Temporally aligned with the market anomaly: correlation score 0.94 (entity match explicit_metadata).",
+     "value": 0.9424,
+     "source": "aventra:correlation",
+     "gap_minutes_from_previous": 0.0
+    },
+    {
+     "timestamp": "2026-06-15T10:00:00Z",
+     "type": "volatility",
+     "signal": "range_pct",
+     "description": "Intraday range 12.94% of the previous close versus a typical 2.19%; robust z = +14.2.",
+     "value": 14.182,
+     "source": "market:aventra_demo_dataset",
+     "gap_minutes_from_previous": 110.0
+    },
+    {
+     "timestamp": "2026-06-15T10:00:00Z",
+     "type": "volatility",
+     "signal": "volatility_20",
+     "description": "20-day volatility 2.06% versus a baseline of 1.14%; robust z = +10.5.",
+     "value": 10.499,
+     "source": "market:aventra_demo_dataset",
+     "gap_minutes_from_previous": 0.0
+    },
+    {
+     "timestamp": "2026-06-15T10:00:00Z",
+     "type": "volume",
+     "signal": "log_volume",
+     "description": "Volume 5,378,183 was 4.5\u00d7 the baseline median (1,199,998); robust z = +7.3.",
+     "value": 7.277,
+     "source": "market:aventra_demo_dataset",
+     "gap_minutes_from_previous": 0.0
+    },
+    {
+     "timestamp": "2026-06-15T10:00:00Z",
+     "type": "price",
+     "signal": "return_1",
+     "description": "Daily return -6.80% versus a typical +0.07%; robust z = -5.0.",
+     "value": -4.993,
+     "source": "market:aventra_demo_dataset",
+     "gap_minutes_from_previous": 0.0
+    },
+    {
+     "timestamp": "2026-06-15T10:00:00Z",
+     "type": "anomaly",
+     "signal": "anomaly_ensemble",
+     "description": "Ensemble anomaly score 0.94 (CRITICAL); detectors: statistical 1.00, fingerprint 0.83, isolation forest 1.00; agreement 0.83.",
+     "value": 0.9405,
+     "source": "aventra:anomaly_ensemble",
+     "gap_minutes_from_previous": 0.0
+    },
+    {
+     "timestamp": "2026-06-15T10:00:00Z",
+     "type": "risk",
+     "signal": "risk_score",
+     "description": "Risk signal 89/100 (HIGH), basis: market and news.",
+     "value": 89.3,
+     "source": "aventra:risk_model",
+     "gap_minutes_from_previous": 0.0
+    }
+   ],
+   "explanation": {
+    "what": "Aventra Synthetic Demo Asset showed behaviour that deviated from its own historical baseline on 2026-06-15.",
+    "when": "Trading session 2026-06-15 (2026-06-15T03:45:00Z \u2013 2026-06-15T10:00:00Z UTC).",
+    "how_unusual": "Ensemble anomaly score 0.94 (CRITICAL); fingerprint deviation 0.83.",
+    "signals": [
+     "Intraday range 12.94% of the previous close versus a typical 2.19%; robust z = +14.2.",
+     "20-day volatility 2.06% versus a baseline of 1.14%; robust z = +10.5.",
+     "Volume 5,378,183 was 4.5\u00d7 the baseline median (1,199,998); robust z = +7.3.",
+     "Daily return -6.80% versus a typical +0.07%; robust z = -5.0."
+    ],
+    "news": "2 article(s) about the asset were published inside the analysis window; the best-aligned was \u201cAventra Demo Asset shares fall sharply after regulator opens investigation into accounting practices\u201d.",
+    "timing": "The best-aligned article was published during the trading session.",
+    "why": "Risk 89/100 (HIGH); largest contributions: anomaly 23.5, correlation 18.4, fingerprint 16.6.",
+    "caveat": "Signals are temporally aligned; this does not show that any article caused the price movement."
+   }
+  }
+ ],
+ "lead_lag": {
+  "status": "insufficient_data",
+  "days_with_news": 10,
+  "required": 20,
+  "lags": []
+ },
+ "models": {
+  "isolation_forest": {
+   "model_name": "isolation_forest",
+   "model_version": "0.1.0+2025-07-15",
+   "symbol": "DEMO",
+   "training_date": "2026-09-27T14:37:53Z",
+   "trained_through": "2025-07-15",
+   "dataset_version": "aventra_demo_dataset/sha1:ec6e84135261bf62",
+   "training_data_hash": "sha1:ec6e84135261bf62",
+   "random_seed": 42,
+   "model": "isolation_forest",
+   "features": [
+    "return_1",
+    "log_return",
+    "return_5",
+    "volatility_20",
+    "volume_ratio",
+    "gap_pct",
+    "range_pct",
+    "ma20_distance",
+    "rsi_14"
+   ],
+   "n_train": 350,
+   "parameters": {
+    "n_estimators": 200,
+    "contamination": "auto",
+    "random_state": 42
+   },
+   "score_normalisation": "training-ECDF, floor percentile 0.9",
+   "status": "ok",
+   "loaded_from_artifact": false
+  },
+  "finbert": {
+   "model": "ProsusAI/finBERT",
+   "status": "ok"
+  },
+  "semantic": {
+   "model": "sentence-transformers/all-MiniLM-L6-v2",
+   "status": "loaded"
+  }
+ },
+ "parameters": {
+  "scoring_window": 250,
+  "anomaly_threshold": 0.65,
+  "correlation_weights": {
+   "temporal_proximity": 0.3,
+   "asset_match": 0.25,
+   "sentiment_strength": 0.2,
+   "anomaly_strength": 0.25
+  },
+  "risk_weights": {
+   "anomaly": 0.25,
+   "fingerprint": 0.2,
+   "sentiment": 0.15,
+   "correlation": 0.2,
+   "temporal": 0.1,
+   "confidence": 0.1
+  },
+  "correlation_lookback_hours": 24,
+  "correlation_lookahead_hours": 12,
+  "random_seed": 42,
+  "calibration_status": "uncalibrated defaults"
+ },
+ "feature_definitions": {
+  "return_1": "Close-to-close return versus the previous bar.",
+  "log_return": "Natural log of close / previous close.",
+  "return_5": "Return over the last 5 bars.",
+  "volatility_20": "Standard deviation of log returns over the last 20 bars (including the current bar).",
+  "log_volume": "log(1 + volume).",
+  "volume_ratio": "Volume divided by the mean volume of the previous 20 bars.",
+  "volume_zscore": "(Volume - mean of previous 20 bars) / std of previous 20 bars.",
+  "gap_pct": "Open versus previous close.",
+  "range_pct": "(High - low) divided by previous close.",
+  "ma20_distance": "Close versus the mean close of the previous 20 bars.",
+  "rsi_14": "Wilder RSI over 14 bars (causal exponential smoothing).",
+  "relative_return": "Return minus the NIFTY 50 return for the same trading date (NaN when the benchmark is unavailable)."
+ },
+ "timings_ms": {
+  "market_data": 20.6,
+  "features": 51.2,
+  "fingerprint": 105.5,
+  "anomaly_detection": 374.3,
+  "news_and_sentiment": 25.9,
+  "correlation_risk_evidence": 10816.4,
+  "total": 12502.6
+ },
+ "disclaimer": "Aventra provides analytical signals and evidence, not financial advice or guaranteed predictions."
+}

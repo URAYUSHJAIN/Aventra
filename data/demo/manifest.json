@@ -1,0 +1,20 @@
+{
+  "is_synthetic": true,
+  "asset": "DEMO (Aventra Synthetic Demo Asset \u2014 fictional)",
+  "seed": 20260927,
+  "sessions": 620,
+  "date_range": [
+    "2024-02-14",
+    "2026-06-30"
+  ],
+  "scenario_session": "2026-06-15",
+  "scenario": [
+    "normal behaviour before the scenario session",
+    "volume \u22484.6\u00d7 typical and a \u22126.8% close-to-close move on the scenario session",
+    "negative synthetic headline published 10:05 IST during that session",
+    "follow-up headlines at 13:40 IST and the next morning",
+    "elevated volume/volatility for the following sessions"
+  ],
+  "generator": "scripts/generate_demo_data.py",
+  "warning": "Synthetic data for demonstration and pipeline testing only. It is not market data and must not be used for performance claims."
+}

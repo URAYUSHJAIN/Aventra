@@ -4,7 +4,7 @@ import shortLogo from '../../assets/short-logo.png'
 import { Button } from './Button'
 import { services } from '../../data/services'
 
-const links = [{ label:'Home',href:'/#home' },{ label:'About Us',href:'/#about' },{ label:'Contact',href:'/#contact' }]
+const links = [{ label:'Home',href:'/#home' },{ label:'About Us',href:'/#about' },{ label:'Intelligence',href:'/intelligence' },{ label:'Contact',href:'/#contact' }]
 
 export function Navbar() {
   const [open,setOpen]=useState(false); const [servicesOpen,setServicesOpen]=useState(false)
