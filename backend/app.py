@@ -8,6 +8,7 @@ from backend.routes.instrument_routes import instrument_api
 from backend.routes.intelligence_routes import intelligence_api
 from backend.routes.market_routes import market_api
 from backend.routes.news_routes import news_api
+from backend.services.intelligence_service import AnalysisFailed, AnalysisPending
 from backend.utils.responses import ApiError
 from ml import config as ml_config
 from ml.data import migrate, store
@@ -54,6 +55,7 @@ def create_app(test_config=None):
             "finbert_model_files": "present" if os.path.isfile(os.path.join(model_path, "pytorch_model.bin")) else "missing",
             "synthetic_test_data": ml_config.synthetic_test_data_enabled(),
             "pipeline_version": ml_config.PIPELINE_VERSION,
+            "job_mode": os.getenv("AVENTRA_JOB_MODE", "inline"),
         })
 
     return app
@@ -65,6 +67,17 @@ def _register_error_handlers(app: Flask) -> None:
     @app.errorhandler(ApiError)
     def api_error(error: ApiError):
         return jsonify(success=False, error=error.message, code=error.code), error.status
+
+    @app.errorhandler(AnalysisPending)
+    def analysis_pending(pending: AnalysisPending):
+        # 202: analysis runs in the background; `previous_result` is an older stored run, clearly labelled as such.
+        return jsonify(success=True, data={"status": pending.job["status"], "job": pending.job, "previous_result": pending.previous,
+                                           "message": "Analysis queued; poll /api/jobs/<id>."}), 202
+
+    @app.errorhandler(AnalysisFailed)
+    def analysis_failed(error: AnalysisFailed):
+        status = DATA_STATUS.get(error.code, 422 if error.code.startswith("INSUFFICIENT") else 503)
+        return jsonify(success=False, error=f"Data unavailable / insufficient source data. {error}", code=error.code), status
 
     @app.errorhandler(ids.InvalidInstrumentId)
     def invalid_id(error):

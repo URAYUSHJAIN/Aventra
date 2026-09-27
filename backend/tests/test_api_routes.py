@@ -32,7 +32,7 @@ class ApiTestCase(unittest.TestCase):
         http.reset_state()
         intelligence_service._cache.clear()
         self.patches = [patch.dict(os.environ, {"AVENTRA_ENABLE_SYNTHETIC_TEST_DATA": "1", "ALPHAVANTAGE_API_KEY": "", "UPSTOX_ACCESS_TOKEN": "",
-                                                "AVENTRA_DEFAULT_WATCHLIST": "FX:USDINR,XNAS:AAPL"}),
+                                                "AVENTRA_DEFAULT_WATCHLIST": "FX:USDINR,XNAS:AAPL", "AVENTRA_JOB_MODE": "sync"}),
                         patch.object(config, "DB_PATH", Path(self.tmp.name) / "api.sqlite3"), patch.object(config, "ARTIFACT_DIR", Path(self.tmp.name) / "artifacts"),
                         patch("time.sleep")]
         for p in self.patches:

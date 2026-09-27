@@ -20,6 +20,24 @@ def _result(raw: str) -> dict:
     return svc.get_intelligence(require_instrument_id(raw), refresh=_refresh())
 
 
+@intelligence_api.post("/intelligence/<instrument_id>/runs")
+def start_run(instrument_id: str):
+    """Queue a fresh analysis (202 + job). Poll GET /api/jobs/<id>, then GET /api/intelligence/<id>."""
+    iid = require_instrument_id(instrument_id)
+    svc.resolve_instrument(iid)
+    job = svc.queue.enqueue("analyze", iid, {"refresh": True}, dedupe_key=f"analyze:{iid}", priority=10)
+    svc.dispatch()
+    return ok({"status": job["status"], "job": job}, 202)
+
+
+@intelligence_api.get("/jobs/<int:job_id>")
+def job_status(job_id: int):
+    job = svc.queue.get(job_id)
+    if job is None:
+        raise ApiError("Job not found.", 404, "NOT_FOUND")
+    return ok(job)
+
+
 @intelligence_api.get("/intelligence/<instrument_id>")
 def intelligence(instrument_id: str):
     return ok(_result(instrument_id))
