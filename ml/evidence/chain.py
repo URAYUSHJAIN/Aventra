@@ -8,41 +8,48 @@ from __future__ import annotations
 from ml.data.sessions import iso
 from ml.temporal.analysis import build_timeline, session_relation_text
 
-FEATURE_TYPES = {"return_1": "price", "gap_pct": "price", "relative_return": "price", "log_volume": "volume", "volatility_20": "volatility", "range_pct": "volatility"}
+FEATURE_TYPES = {"return_1": "price", "gap_pct": "price", "relative_return": "price", "drawdown": "price", "ma20_distance": "price", "log_volume": "volume",
+                 "volatility_20": "volatility", "range_pct": "volatility", "change_bp": "rate", "volatility_bp_20": "rate", "level_distance_bp": "rate"}
 
 
-def build_evidence(assessment: dict, market_source: str, change_points: list[str]) -> list[dict]:
+def build_evidence(assessment: dict, market_source: dict | str, change_points: list[str]) -> list[dict]:
+    """Time-ordered evidence. Every item carries `provenance` (where the underlying data came from)."""
+    source = market_source if isinstance(market_source, dict) else {"provider": market_source}
+    market_provenance = {k: source.get(k) for k in ("provider", "provider_symbol", "fetched_at", "currency", "adjusted", "value_kind", "stale")}
     anomaly, correlation, risk = assessment["anomaly"], assessment["correlation"], assessment["risk"]
     session_open, session_close = correlation["window"]["session_open"], correlation["window"]["session_close"]
     items: list[dict] = []
     for feature in anomaly["contributing_features"]:
         items.append({"timestamp": session_close, "type": FEATURE_TYPES.get(feature["feature"], "market"), "signal": feature["feature"],
-                      "description": feature["explanation"], "value": feature["robust_z"], "source": f"market:{market_source}"})
+                      "description": feature["explanation"], "value": feature["robust_z"], "source": f"market:{source['provider']}",
+                      "provenance": {**market_provenance, "derived": "robust z-score vs the instrument's own behavioural baseline"}})
     scores = anomaly["scores"]
     detector_text = ", ".join(f"{name.replace('_', ' ')} {value:.2f}" for name, value in scores.items() if value is not None)
     items.append({"timestamp": session_close, "type": "anomaly", "signal": "anomaly_ensemble",
                   "description": f"Ensemble anomaly score {anomaly['anomaly_score']:.2f} ({anomaly['severity']}); detectors: {detector_text}; agreement {anomaly['model_agreement']:.2f}.",
-                  "value": anomaly["anomaly_score"], "source": "aventra:anomaly_ensemble"})
+                  "value": anomaly["anomaly_score"], "source": "aventra:anomaly_ensemble", "provenance": {**market_provenance, "derived": "heuristic ensemble (not a probability)"}})
     for match in correlation.get("matches", []):
+        news_provenance = {"publisher": match.get("source"), "url": match.get("url"), "published_at": match["published_at"], "news_id": match["news_id"]}
         items.append({"timestamp": match["published_at"], "type": "news", "signal": "news_article",
                       "description": f"{match['headline']} — {match.get('source') or 'unknown source'} ({session_relation_text(match['hours_from_session'], match['relation'])}; category: {match['category']['category']}).",
-                      "value": match["entity"]["confidence"], "source": f"news:{match.get('source') or 'unknown'}", "url": match.get("url")})
+                      "value": match["entity"]["confidence"], "source": f"news:{match.get('source') or 'unknown'}", "url": match.get("url"), "provenance": news_provenance})
         if match["sentiment"]:
             s = match["sentiment"]
             items.append({"timestamp": match["published_at"], "type": "sentiment", "signal": "finbert",
                           "description": f"FinBERT classified the headline as {s['label']} (score {s['sentiment_score']:+.2f}, confidence {s['confidence']:.2f}).",
-                          "value": s["sentiment_score"], "source": "model:finbert"})
+                          "value": s["sentiment_score"], "source": "model:finbert",
+                          "provenance": {**news_provenance, "model": s.get("model"), "model_version": s.get("model_version")}})
         items.append({"timestamp": match["published_at"], "type": "correlation", "signal": "cross_source_correlation",
-                      "description": f"Temporally aligned with the market anomaly: correlation score {match['correlation_score']:.2f} (entity match {match['entity']['method']}).",
-                      "value": match["correlation_score"], "source": "aventra:correlation"})
+                      "description": f"Temporally associated with the market anomaly: correlation score {match['correlation_score']:.2f} (entity match {match['entity']['method']}).",
+                      "value": match["correlation_score"], "source": "aventra:correlation", "provenance": {**news_provenance, "components": match["components"]}})
     nearby = [cp for cp in change_points if cp == assessment["trading_date"]]
     for cp in nearby:
         items.append({"timestamp": session_open, "type": "regime", "signal": "change_point",
                       "description": f"Retrospective change-point analysis (PELT) places a behaviour regime boundary on {cp}. Retrospective context only.",
-                      "value": None, "source": "model:ruptures_pelt"})
+                      "value": None, "source": "model:ruptures_pelt", "provenance": market_provenance})
     items.append({"timestamp": session_close, "type": "risk", "signal": "risk_score",
                   "description": f"Risk signal {risk['score']:.0f}/100 ({risk['level']}), basis: {risk['basis'].replace('_', ' ')}.",
-                  "value": risk["score"], "source": "aventra:risk_model"})
+                  "value": risk["score"], "source": "aventra:risk_model", "provenance": {"method": risk["method"], "components": [c["name"] for c in risk["components"]]}})
     return build_timeline(items)
 
 

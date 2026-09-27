@@ -37,15 +37,16 @@ def event_description(asset_name: str, contributing: list[dict]) -> str:
     return f"Unusual trading behaviour in {asset_name}: " + (", ".join(parts) if parts else "deviation from normal behaviour")
 
 
-def correlate(trading_date, anomaly_score: float, contributing: list[dict], news_items: list[dict], symbol: str, asset_name: str) -> dict:
-    open_utc, close_utc = session_bounds(trading_date)
+def correlate(trading_date, anomaly_score: float, contributing: list[dict], news_items: list[dict], instrument_id: str, asset_name: str,
+              calendar_code: str | None = "XBOM") -> dict:
+    open_utc, close_utc = session_bounds(trading_date, calendar_code)
     start = open_utc - pd.Timedelta(hours=config.CORRELATION_LOOKBACK_HOURS)
     end = close_utc + pd.Timedelta(hours=config.CORRELATION_LOOKAHEAD_HOURS)
     window = {"start": iso(start), "end": iso(end), "session_open": iso(open_utc), "session_close": iso(close_utc)}
 
     candidates = []
     for item in news_items:
-        link = next((l for l in item.get("links", []) if l["symbol"] == symbol), None)
+        link = next((l for l in item.get("links", []) if l["instrument_id"] == instrument_id), None)
         if link is None or link["entity_match_confidence"] < config.ENTITY_MIN_CONFIDENCE:
             continue
         published = to_utc(item["published_at"])

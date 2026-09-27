@@ -91,12 +91,12 @@ npm run typecheck            # the real type gate — `npm run build` does NOT t
 npm run build
 npm run lint                 # note: currently lints only .js/.jsx (AGENTS.md C12)
 
-# Pipeline smoke run (offline, synthetic demo asset)
-py -3.12 -m ml.pipelines.run --symbol DEMO
+# Pipeline smoke run on real keyless data (network)
+py -3.12 -m ml.pipelines.run --instrument FX:EURUSD --no-persist
 ```
 
 - Write the tests along with the code: API cases, ML unit tests with hand-computed expected values, and leakage tests for features (AGENTS.md §14).
-- Tests must not call live providers. Mock them or use `data/demo/`.
+- Tests must not call live providers. Mock them or use the synthetic `TEST:DEMO` instrument (tests enable it with `AVENTRA_ENABLE_SYNTHETIC_TEST_DATA=1`; it is never a production fallback).
 - If a test fails, fix the cause. Never skip, delete or weaken a test.
 
 ### VERIFY
@@ -104,7 +104,7 @@ Tests passing isn't the whole job. Verify the real integration path for whatever
 
 - **Backend endpoint:** call it through the Flask test client or a short-lived local run and inspect the actual JSON, including the error paths.
 - **Frontend ↔ backend:** confirm that the service function hits the right path with `VITE_API_BASE_URL` empty (dev proxy), that the response type matches the backend JSON field by field, and that the component renders each state. If you cannot run a browser, say so explicitly and describe what was verified statically.
-- **ML pipeline:** run the stage on the demo dataset (or a small real sample) end to end. Check output shapes, ranges and NaNs. Check that past values don't change when future rows are removed. Check that the Flask payload contains the ML output unchanged.
+- **ML pipeline:** run the stage on `TEST:DEMO` in tests and on a small real keyless sample (crypto, forex or a mutual fund) end to end. Check output shapes, ranges and NaNs. Check that past values don't change when future rows are removed. Check that the Flask payload contains the ML output unchanged.
 - **UI:** check the AGENTS.md §22 widths for overflow, reduced-motion behaviour and keyboard focus.
 - Stop any server you started once verification is done.
 
@@ -121,20 +121,23 @@ Tests passing isn't the whole job. Verify the real integration path for whatever
 |---|---|
 | Sentiment, FinBERT, news analysis | `ml/news/finbert.py` (`get_news_analysis_service()`, `analyze`, `analyze_many`), `POST /api/news/analyze`, `frontend/src/services/newsApi.ts`, `components/news/NewsAnalysis.tsx` |
 | News ingestion, entity linking, event categories | `ml/news/ingest.py`, `providers.py`, `entity.py`, `events.py`; `GET /api/news` |
-| Market quotes, history, search | `ml/data/market_providers.py` → `backend/services/market_service.py` → `/api/market/*` → `frontend/src/services/marketApi.ts` |
-| Validation, sessions/timezones, SQLite | `ml/data/validation.py`, `sessions.py`, `store.py` |
+| Instrument search, IDs, listings | `ml/instruments/{ids,master,sync,profiles}.py`, `/api/instruments/*`, `frontend/src/components/search/GlobalSearch.tsx` |
+| Providers, rate limits, fallback | `ml/providers/` (`registry.py` router, `http.py`), `GET /api/providers` |
+| Market snapshots, history, watchlist | `ml/data/market_data.py` → `backend/services/market_service.py` → `/api/market/*`, `/api/watchlists/default` → `frontend/src/services/intelligenceApi.ts` |
+| Background jobs | `ml/jobs/{queue,worker}.py`, `POST /api/intelligence/<id>/runs`, `GET /api/jobs/<id>` |
+| Validation, calendars/timezones, database | `ml/data/validation.py`, `calendars.py`, `db.py`, `store.py`, `migrate.py`, `backend/migrations/` |
 | Features, fingerprint, detectors, ensemble | `ml/features/engineering.py`, `ml/fingerprint/baseline.py`, `ml/anomaly/*` |
 | Correlation, risk, evidence | `ml/correlation/correlate.py`, `ml/risk/scoring.py`, `ml/evidence/chain.py` |
-| The whole pipeline for one asset | `ml/pipelines/intelligence.py::run_intelligence`, `GET /api/intelligence/<symbol>`, `frontend/src/components/intelligence/IntelligenceWorkspace.tsx` |
+| The whole pipeline for one instrument | `ml/pipelines/intelligence.py::run_intelligence`, `GET /api/intelligence/<id>`, `frontend/src/components/intelligence/IntelligenceWorkspace.tsx` |
 | Experiments / metrics | `ml/evaluation/*`, `experiments/results/`, `docs/17_MODEL_EVALUATION.md` |
-| Frontend API calls, loading/error states | `services/apiClient.ts`, `hooks/useApiResource.ts`, `components/intelligence/StateViews.tsx` |
+| Frontend API calls, loading/error/unavailable states | `services/apiClient.ts`, `hooks/useApiResource.ts`, `components/intelligence/StateViews.tsx` (`DataUnavailableState`) |
 | Health check | `GET /api/health` in `backend/app.py` |
 | Service list and links | `frontend/src/data/services.ts` (used by `Navbar`, `Services`, `ServiceCard`) |
 | Fingerprint, anomaly, correlation and risk pages | `frontend/src/pages/CapabilityPage.tsx` (API-backed panels) and the route map in `App.tsx` |
 | Page titles and SEO | the `metadata` map in `App.tsx` |
 | Buttons and headings | `components/common/Button.tsx`, `SectionHeading.tsx` |
 | Pipeline diagram (How It Works) | `components/home/HowItWorks.tsx` (the `steps` array); see AGENTS.md C14 about the removed 3D version |
-| CORS and env config | `backend/app.py`, `backend/.env.example`, `frontend/.env.example` |
+| CORS and env config | `backend/app.py`, root `.env.example` (all backend variables), `frontend/.env.example` |
 
 Also search before creating anything new:
 ```text
@@ -150,7 +153,7 @@ If similar code exists, extend it. Create a new module only if the existing one 
 - Most frontend components are written as **dense single-line JSX**. When you edit one, change only the part you need and keep that style. Don't reformat the whole file; that makes the diff unreadable to the user.
 - `index.css` is one large file with long single-line rule groups. Add new rules in a new block near related rules, or at the end under a comment header. Don't reflow existing lines.
 - Keep exported names, props, CSS class names, URLs and JSON field names stable. If one must change, update every consumer in the same change and say so in the report.
-- `marketApi.ts` has consumers that depend on the `MarketData` shape (`metrics[0]` = Price, `metrics[1]` = Daily Change, looked up by label). Preserve this when you change its data source.
+- Currency, timezone and value kind always come from the API (`asset`, `capabilities`); never hard-code ₹, IST or an instrument list in the UI.
 - Replacing a PLACEHOLDER with real data is encouraged. Keep the layout and styling, change the data source, and add the unavailable/empty states.
 - Before deleting anything (including the known dead files `App.css`, `react.svg`, `vite.svg`), confirm it has zero references and get the user's OK.
 
@@ -183,7 +186,7 @@ Before you say an ML change is done, confirm each item. Say which ones you check
 - [ ] Features use only past data (no centred windows); scalers and models are fit on the train split only.
 - [ ] Split is chronological; boundaries are recorded.
 - [ ] The same feature function serves training and inference.
-- [ ] Missing values, duplicates, outliers vs data errors, UTC timestamps and NSE session alignment are handled explicitly (AGENTS.md §11).
+- [ ] Missing values, duplicates, outliers vs data errors, UTC timestamps and calendar/session alignment are handled explicitly (AGENTS.md §11).
 - [ ] A baseline is included for comparison.
 - [ ] Seed, parameters, data version and feature list are saved with the artefact and results.
 - [ ] Metrics suit the problem (PR-AUC, precision@k, FPR for rare anomalies); they are produced by a command you actually ran and saved to disk.

@@ -15,4 +15,4 @@ export function mockFetch(route: Route) {
 }
 
 export const ok = (data: unknown) => ({ status: 200, body: { success: true, data } })
-export const fail = (status: number, error: string) => ({ status, body: { success: false, error } })
+export const fail = (status: number, error: string, code?: string, attempts?: unknown[]) => ({ status, body: { success: false, error, ...(code ? { code } : {}), ...(attempts ? { attempts } : {}) } })

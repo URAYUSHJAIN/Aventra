@@ -1,10 +1,16 @@
-"""News → asset linking (ML Pipeline §9). Low-confidence matches are never linked."""
+"""News → instrument linking (ML Pipeline §9). Low-confidence matches are never linked.
+
+Aliases come from the Instrument Master (curated seed aliases, listing names with legal suffixes removed,
+tickers). Matching is done only against the candidate instruments of a request, so it does not scale with the
+size of the universe and never links an article to an unrelated instrument.
+"""
 from __future__ import annotations
 
 import re
 
 from ml import config
-from ml.data.assets import Asset, all_assets
+from ml.data import store
+from ml.instruments.master import name_aliases
 
 CONFIDENCE = {"explicit_metadata": 1.0, "strong_alias": 0.95, "weak_alias": 0.7}
 
@@ -15,28 +21,51 @@ def _contains(text: str, alias: str) -> bool:
     return re.search(rf"(?<![A-Za-z0-9]){re.escape(alias)}(?![A-Za-z0-9])", text, flags) is not None
 
 
-def match_asset(text: str, asset: Asset) -> tuple[float, str] | None:
+def alias_profile(instrument: dict) -> dict:
+    """strong/weak/exclude alias lists for one master row (falls back to name + ticker when none are stored)."""
+    stored = instrument.get("aliases") or []
+    profile = {"strong": [], "weak": [], "exclude": []}
+    for alias in stored:
+        kind = "strong" if alias["kind"] in {"strong", "ticker"} else alias["kind"]
+        profile.setdefault(kind, []).append(alias["alias"])
+    if not profile["strong"]:
+        profile["strong"] = name_aliases(instrument.get("name", ""))
+        symbol = instrument.get("symbol") or ""
+        if len(symbol) >= 3 and symbol.isupper():   # very short tickers produce false matches in prose
+            profile["strong"].append(symbol)
+    return profile
+
+
+def match_instrument(text: str, profile: dict) -> tuple[float, str] | None:
     scrubbed = text
-    for phrase in asset.exclude_phrases:   # remove mentions of different companies sharing the name
+    for phrase in profile.get("exclude", []):   # remove mentions of different companies sharing the name
         scrubbed = re.sub(re.escape(phrase), " ", scrubbed, flags=re.IGNORECASE)
-    if any(_contains(scrubbed, alias) for alias in asset.strong_aliases):
+    if any(_contains(scrubbed, alias) for alias in profile.get("strong", [])):
         return CONFIDENCE["strong_alias"], "strong_alias"
-    if any(_contains(scrubbed, alias) for alias in asset.weak_aliases):
+    if any(_contains(scrubbed, alias) for alias in profile.get("weak", [])):
         return CONFIDENCE["weak_alias"], "weak_alias"
     return None
 
 
-def link_entities(headline: str, summary: str = "", explicit_symbols: list[str] | None = None) -> list[dict]:
-    """Return [{symbol, entity_match_confidence, mapping_method}] for matches at/above ENTITY_MIN_CONFIDENCE."""
+def link_entities(headline: str, summary: str = "", explicit_ids: list[str] | None = None, candidates: list[str] | None = None,
+                  profiles: dict[str, dict] | None = None) -> list[dict]:
+    """Return [{instrument_id, entity_match_confidence, mapping_method}] at/above ENTITY_MIN_CONFIDENCE.
+
+    `candidates`: instrument IDs to test (their aliases are loaded from the master unless `profiles` is given).
+    """
     text = f"{headline} {summary}"
-    links = {symbol: (CONFIDENCE["explicit_metadata"], "explicit_metadata") for symbol in (explicit_symbols or [])}
-    for asset in all_assets():
-        if asset.symbol in links:
+    links = {iid: (CONFIDENCE["explicit_metadata"], "explicit_metadata") for iid in (explicit_ids or [])}
+    for iid in candidates or []:
+        if iid in links:
             continue
-        match = match_asset(text, asset)
+        profile = (profiles or {}).get(iid)
+        if profile is None:
+            row = store.get_instrument(iid)
+            if row is None:
+                continue
+            profile = alias_profile(row)
+        match = match_instrument(text, profile)
         if match:
-            links[asset.symbol] = match
-    return [
-        {"symbol": symbol, "entity_match_confidence": confidence, "mapping_method": method}
-        for symbol, (confidence, method) in links.items() if confidence >= config.ENTITY_MIN_CONFIDENCE
-    ]
+            links[iid] = match
+    return [{"instrument_id": iid, "entity_match_confidence": confidence, "mapping_method": method}
+            for iid, (confidence, method) in links.items() if confidence >= config.ENTITY_MIN_CONFIDENCE]

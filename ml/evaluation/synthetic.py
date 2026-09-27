@@ -30,6 +30,7 @@ from ml.anomaly.ensemble import combine
 from ml.anomaly.lstm_autoencoder import LstmAutoencoderDetector
 from ml.anomaly.statistical import statistical_scores
 from ml.features.engineering import compute_features
+from ml.features.sets import FEATURE_SETS, select_set
 from ml.fingerprint.baseline import compute_fingerprint
 
 TYPES = ("price_jump_up", "price_jump_down", "volume_spike", "volatility_spike", "combined")
@@ -41,16 +42,33 @@ def split_bounds(n: int) -> tuple[int, int]:
     return int(n * 0.70), int(n * 0.85)
 
 
-def inject(bars: pd.DataFrame, positions: list[int], kinds: list[str], sigma: float) -> pd.DataFrame:
+def injection_types(profile: dict) -> tuple[str, ...]:
+    """Only anomaly types the instrument's data can express (no volume spikes in a NAV series, no range spikes without OHLC)."""
+    if profile.get("value_kind") == "yield":
+        return ("level_shift_up", "level_shift_down")
+    types = ["price_jump_up", "price_jump_down"]
+    if profile.get("has_volume"):
+        types += ["volume_spike", "combined"]
+    if profile.get("has_ohlc"):
+        types.append("volatility_spike")
+    return tuple(types)
+
+
+def inject(bars: pd.DataFrame, positions: list[int], kinds: list[str], sigma: float, has_ohlc: bool = True) -> pd.DataFrame:
     out = bars.copy().reset_index(drop=True)
     for t, kind in zip(positions, kinds):
+        if kind in ("level_shift_up", "level_shift_down"):   # yields: persistent shift of ±5σ basis-point changes
+            out.loc[t:, "close"] += (5 if kind == "level_shift_up" else -5) * sigma / 100
+            continue
         if kind in ("price_jump_up", "price_jump_down", "combined"):
             m = {"price_jump_up": 5 * sigma, "price_jump_down": -5 * sigma, "combined": -4 * sigma}[kind]
             factor = 1 + m
-            out.loc[t:, ["high", "low", "close"]] *= factor
-            out.loc[t + 1:, "open"] *= factor
-            out.loc[t, "high"] = max(out.loc[t, "high"], out.loc[t, "open"], out.loc[t, "close"])
-            out.loc[t, "low"] = min(out.loc[t, "low"], out.loc[t, "open"], out.loc[t, "close"])
+            out.loc[t:, "close"] *= factor
+            if has_ohlc:
+                out.loc[t:, ["high", "low"]] *= factor
+                out.loc[t + 1:, "open"] *= factor
+                out.loc[t, "high"] = max(out.loc[t, "high"], out.loc[t, "open"], out.loc[t, "close"])
+                out.loc[t, "low"] = min(out.loc[t, "low"], out.loc[t, "open"], out.loc[t, "close"])
         if kind in ("volume_spike", "combined"):
             out.loc[t, "volume"] *= 4 if kind == "volume_spike" else 3
         if kind == "volatility_spike":
@@ -107,27 +125,30 @@ def evaluate_scores(scores: np.ndarray, labels: np.ndarray, val_mask: np.ndarray
     }
 
 
-def run_symbol(bars: pd.DataFrame, benchmark: pd.DataFrame | None, seed: int, include_lstm: bool = True) -> dict:
+def run_symbol(bars: pd.DataFrame, benchmark: pd.DataFrame | None, seed: int, include_lstm: bool = True, profile: dict | None = None) -> dict:
+    profile = profile or {"has_ohlc": True, "has_volume": True, "value_kind": "price"}
+    feature_set = FEATURE_SETS[select_set(profile)]
+    types = injection_types(profile)
     rng = np.random.default_rng(seed)
     n = len(bars)
     train_end, val_end = split_bounds(n)
-    clean = compute_features(bars, benchmark)
-    sigma = float(clean["return_1"].iloc[:train_end].std())
+    clean = compute_features(bars, benchmark, profile)
+    sigma = float(clean["change_bp" if profile.get("value_kind") == "yield" else "return_1"].iloc[:train_end].std())
     val_pos = choose_positions(rng, train_end, val_end, N_PER_SEGMENT)
     test_pos = choose_positions(rng, val_end, n, N_PER_SEGMENT)
-    kinds = [TYPES[i % len(TYPES)] for i in range(len(val_pos) + len(test_pos))]
-    injected = inject(bars, val_pos + test_pos, kinds, sigma)
-    feats = compute_features(injected, benchmark)
+    kinds = [types[i % len(types)] for i in range(len(val_pos) + len(test_pos))]
+    injected = inject(bars, val_pos + test_pos, kinds, sigma, bool(profile.get("has_ohlc")))
+    feats = compute_features(injected, benchmark, profile)
 
     labels = np.zeros(n, dtype=bool); labels[val_pos + test_pos] = True
     idx = np.arange(n)
     val_mask, test_mask = (idx >= train_end) & (idx < val_end), idx >= val_end
     train = feats.iloc[:train_end]
 
-    fp, _ = compute_fingerprint(feats)
-    stat = statistical_scores(feats)["statistical_score"].to_numpy()
-    iso = UnsupervisedDetector("isolation_forest").fit(train).score(feats)
-    lof = UnsupervisedDetector("lof").fit(train).score(feats)
+    fp, _ = compute_fingerprint(feats, feature_set["fingerprint"])
+    stat = statistical_scores(feats, feature_set["statistical"])["statistical_score"].to_numpy()
+    iso = UnsupervisedDetector("isolation_forest").fit(train, feature_set["detector"]).score(feats)
+    lof = UnsupervisedDetector("lof").fit(train, feature_set["detector"]).score(feats)
     fingerprint = fp["fingerprint_score"].to_numpy()
 
     def ensemble(weights: dict) -> np.ndarray:
@@ -146,10 +167,10 @@ def run_symbol(bars: pd.DataFrame, benchmark: pd.DataFrame | None, seed: int, in
         "ablation_without_statistical": ensemble({**w, "statistical": 0.0}),
     }
     if include_lstm:
-        detectors["experimental_lstm_autoencoder"] = LstmAutoencoderDetector(seed=seed).fit(train).score(feats)
+        detectors["experimental_lstm_autoencoder"] = LstmAutoencoderDetector(seed=seed).fit(train, feature_set["detector"]).score(feats)
 
     by_type = {}
-    for kind in TYPES:
+    for kind in types:
         kind_labels = np.zeros(n, dtype=bool)
         kind_labels[[p for p, k in zip(val_pos + test_pos, kinds) if k == kind]] = True
         other = labels & ~kind_labels

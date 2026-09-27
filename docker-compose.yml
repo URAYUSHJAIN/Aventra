@@ -1,6 +1,27 @@
-# Local Aventra stack:  docker compose up --build   →  http://localhost:${FRONTEND_PORT:-8080}
-# Storage is SQLite on the aventra-state volume (Final Plan §4: SQLite first; no separate DB container yet).
+# Local Aventra stack:  cp .env.example .env  (set POSTGRES_PASSWORD)  →  docker compose up --build  →  http://localhost:${FRONTEND_PORT:-8080}
+# Services: postgres (database + job queue), backend (Flask API, runs migrations on start), worker (background jobs + scheduler),
+# frontend (nginx serving the Vite build and proxying /api). No Redis: the job queue is a PostgreSQL table (FOR UPDATE SKIP LOCKED).
+x-aventra-env: &aventra-env
+  AVENTRA_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-aventra}:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@postgres:5432/${POSTGRES_DB:-aventra}
+  AVENTRA_JOB_MODE: external            # the API enqueues; only the worker container runs jobs
+  AVENTRA_DEFAULT_WATCHLIST: ${AVENTRA_DEFAULT_WATCHLIST:-}   # canonical IDs, e.g. CRYPTO:BTC-USDT,FX:USDINR (from .env or the shell)
+
 services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-aventra}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-aventra}
+    volumes:
+      - aventra-pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped            # not published to the host; reachable only on the compose network
+
   backend:
     build:
       context: .
@@ -9,13 +30,36 @@ services:
       - path: .env
         required: false
     environment:
-      AVENTRA_DATA_MODE: ${AVENTRA_DATA_MODE:-live}
+      <<: *aventra-env
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8080}
+    depends_on:
+      postgres:
+        condition: service_healthy
     volumes:
       - ${FINBERT_HOST_PATH:-./backend/models/finbert}:/models/finbert:ro
       - aventra-state:/app/state
     ports:
       - "${BACKEND_PORT:-5050}:5000"   # optional direct API access; the frontend uses the internal network
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    command: ["python", "-m", "ml.jobs.worker"]
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      <<: *aventra-env
+    depends_on:
+      backend:
+        condition: service_healthy     # the backend applies migrations first
+    volumes:
+      - ${FINBERT_HOST_PATH:-./backend/models/finbert}:/models/finbert:ro
+      - aventra-state:/app/state
+    healthcheck:
+      disable: true                    # the image healthcheck probes the HTTP API, which the worker does not serve
     restart: unless-stopped
 
   frontend:
@@ -30,4 +74,5 @@ services:
     restart: unless-stopped
 
 volumes:
+  aventra-pg:
   aventra-state:

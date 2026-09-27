@@ -1,5 +1,5 @@
 import type { Assessment, Intelligence } from '../../types/api'
-import { fmtDate, fmtPrice, fmtScore } from '../../utils/format'
+import { fmtDate, fmtLevel, fmtScore } from '../../utils/format'
 import { LineChart } from './LineChart'
 
 const DETECTORS: Array<[keyof Assessment['anomaly']['scores'], string]> = [['statistical', 'Statistical z-score'], ['fingerprint', 'Behavioural fingerprint'], ['isolation_forest', 'Isolation Forest']]
@@ -7,9 +7,9 @@ const DETECTORS: Array<[keyof Assessment['anomaly']['scores'], string]> = [['sta
 export function AnomalyPanel({ data, focus, onFocus }: { data: Intelligence; focus: Assessment; onFocus?: (eventId: string) => void }) {
   const anomaly = focus.anomaly
   return <section className="intel-panel" aria-labelledby="anomaly-title">
-    <header className="intel-panel-head"><div><p className="eyebrow">ANOMALY DETECTION</p><h2 id="anomaly-title">Price with detected anomalies</h2></div>
+    <header className="intel-panel-head"><div><p className="eyebrow">ANOMALY DETECTION</p><h2 id="anomaly-title">{data.capabilities.value_kind === 'price' ? 'Price' : data.capabilities.value_kind === 'nav' ? 'NAV' : 'Series'} with detected anomalies</h2></div>
       <div className={`level-chip severity-${anomaly.severity.toLowerCase()}`}>{anomaly.severity}<small>{fmtDate(anomaly.trading_date)} · score {fmtScore(anomaly.anomaly_score)}</small></div></header>
-    <LineChart ariaLabel={`${data.symbol} closing price over the scoring window with flagged anomalies marked`} format={fmtPrice}
+    <LineChart ariaLabel={`${data.symbol} daily series over the scoring window with flagged anomalies marked`} format={(v) => fmtLevel(v, data.capabilities.value_kind, data.asset.currency)}
       points={data.market.series.map((p) => ({ label: p.date, value: p.close, highlight: p.is_anomaly }))} />
     <div className="detector-grid">{DETECTORS.map(([key, label]) => <div key={key} className="detector"><span>{label}</span><strong>{fmtScore(anomaly.scores[key])}</strong><i><b style={{ width: `${(anomaly.scores[key] ?? 0) * 100}%` }} /></i></div>)}
       <div className="detector"><span>Detector agreement</span><strong>{fmtScore(anomaly.model_agreement)}</strong><i><b style={{ width: `${anomaly.model_agreement * 100}%` }} /></i></div></div>

@@ -88,10 +88,10 @@ RISK_WEIGHTS = {
 RISK_LEVELS = ((75, "HIGH"), (50, "ELEVATED"), (25, "MODERATE"), (0, "LOW"))
 
 
-def data_mode() -> str:
-    """'live' uses external providers (with cached fallback); 'demo' uses only data/demo."""
-    mode = os.getenv("AVENTRA_DATA_MODE", "live").strip().lower()
-    return mode if mode in {"live", "demo"} else "live"
+def synthetic_test_data_enabled() -> bool:
+    """The synthetic TEST:DEMO instrument (data/demo) exists only for the automated test-suite.
+    It is enabled solely by AVENTRA_ENABLE_SYNTHETIC_TEST_DATA=1 and must never be set in user-facing deployments."""
+    return os.getenv("AVENTRA_ENABLE_SYNTHETIC_TEST_DATA", "").strip() == "1"
 
 
 def severity_for(score: float) -> str:

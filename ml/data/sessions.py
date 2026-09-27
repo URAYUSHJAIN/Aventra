@@ -1,17 +1,19 @@
-"""Timestamp normalisation and NSE session alignment.
+"""Timestamp normalisation and session alignment (calendar-aware; see ml/data/calendars.py).
 
-All timestamps are stored and compared in UTC. Local (Asia/Kolkata) time is used
-only to derive session boundaries and for display.
+All timestamps are stored and compared in UTC. The calendar argument defaults to XBOM (the documented NSE proxy)
+so v0.1 callers keep their behaviour; the pipeline passes each instrument's own calendar.
 """
 from __future__ import annotations
 
-from datetime import datetime, time, timedelta, timezone
+from datetime import datetime
 
 import pandas as pd
 
 from ml import config
+from ml.data import calendars
 
 LOCAL_TZ = config.MARKET_TIMEZONE
+DEFAULT_CALENDAR = "XBOM"
 
 
 def to_utc(value) -> pd.Timestamp:
@@ -26,33 +28,27 @@ def iso(ts) -> str | None:
     return to_utc(ts).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def session_bounds(trading_date) -> tuple[pd.Timestamp, pd.Timestamp]:
-    """UTC open/close of the NSE regular session on a local trading date."""
-    day = pd.Timestamp(trading_date).date()
-    open_local = pd.Timestamp(datetime.combine(day, time(*config.SESSION_OPEN))).tz_localize(LOCAL_TZ)
-    close_local = pd.Timestamp(datetime.combine(day, time(*config.SESSION_CLOSE))).tz_localize(LOCAL_TZ)
-    return open_local.tz_convert("UTC"), close_local.tz_convert("UTC")
+def session_bounds(trading_date, calendar_code: str | None = DEFAULT_CALENDAR) -> tuple[pd.Timestamp, pd.Timestamp]:
+    """UTC open/close of the session on a local trading date for the given calendar."""
+    return calendars.session_bounds(trading_date, calendar_code)
 
 
-def local_date(ts) -> pd.Timestamp:
-    return to_utc(ts).tz_convert(LOCAL_TZ).normalize().tz_localize(None)
+def local_date(ts, calendar_code: str | None = DEFAULT_CALENDAR, tz_name: str | None = LOCAL_TZ) -> pd.Timestamp:
+    return calendars.local_trading_date(ts, calendar_code, tz_name)
 
 
-def is_session_in_progress(trading_date, now: datetime | None = None) -> bool:
-    now_utc = to_utc(now or datetime.now(timezone.utc))
-    open_utc, close_utc = session_bounds(trading_date)
-    return open_utc <= now_utc < close_utc + timedelta(minutes=15)
+def is_session_in_progress(trading_date, now: datetime | None = None, calendar_code: str | None = DEFAULT_CALENDAR) -> bool:
+    return calendars.is_session_in_progress(trading_date, calendar_code, now)
 
 
-def align_to_session(published_utc, trading_dates: list[pd.Timestamp]) -> pd.Timestamp | None:
+def align_to_session(published_utc, trading_dates: list[pd.Timestamp], calendar_code: str | None = DEFAULT_CALENDAR) -> pd.Timestamp | None:
     """Map a publication time to the first observed trading session whose close is at/after it.
 
-    Uses the trading dates actually present in the price data, so exchange holidays
-    are respected without a hard-coded calendar. Returns None when the news is newer
-    than the last observed session.
+    Uses the trading dates actually present in the price data, so holidays are respected without relying on
+    the calendar's holiday list. Returns None when the news is newer than the last observed session.
     """
     published = to_utc(published_utc)
     for trading_date in trading_dates:
-        if session_bounds(trading_date)[1] >= published:
+        if session_bounds(trading_date, calendar_code)[1] >= published:
             return pd.Timestamp(trading_date)
     return None

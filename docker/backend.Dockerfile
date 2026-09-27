@@ -13,12 +13,12 @@ COPY ml ml
 COPY backend backend
 COPY scripts scripts
 COPY data/reference data/reference
-COPY data/demo data/demo
+# data/demo (synthetic TEST:DEMO fixtures) is deliberately not copied: synthetic data exists only for automated tests.
 
 RUN useradd --create-home aventra && mkdir -p /app/state && chown -R aventra /app
 USER aventra
 
-# Mutable state (SQLite, trained artefacts, Hugging Face cache) lives on the /app/state volume.
+# Mutable state (trained artefacts, Hugging Face cache; SQLite when AVENTRA_DATABASE_URL is unset) lives on the /app/state volume.
 # FinBERT weights are mounted read-only at /models/finbert (see docker-compose.yml); they are not baked into the image.
 ENV AVENTRA_DB_PATH=/app/state/aventra.sqlite3 \
     AVENTRA_ARTIFACT_DIR=/app/state/artifacts \

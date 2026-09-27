@@ -44,13 +44,13 @@ class LstmAutoencoderDetector:
         scaled[valid] = np.clip(self.scaler.transform(matrix[valid]), -10, 10)
         return scaled, valid
 
-    def fit(self, train: pd.DataFrame) -> "LstmAutoencoderDetector":
+    def fit(self, train: pd.DataFrame, candidate_columns=config.DETECTOR_FEATURES) -> "LstmAutoencoderDetector":
         import torch
         from torch import nn
 
         torch.manual_seed(self.seed)
         np.random.seed(self.seed)
-        self.feature_columns = [c for c in config.DETECTOR_FEATURES if c in train.columns and train[c].notna().mean() > 0.9]
+        self.feature_columns = [c for c in candidate_columns if c in train.columns and train[c].notna().mean() > 0.9]
         raw = train[self.feature_columns].to_numpy(dtype=float)
         self.scaler = RobustScaler().fit(raw[~np.isnan(raw).any(axis=1)])
         scaled, valid = self._prepare(train)
