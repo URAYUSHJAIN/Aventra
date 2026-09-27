@@ -122,6 +122,9 @@ class StoreAndSearchTests(TempDatabase):
         self.assertNotEqual(page1["items"][0]["instrument_id"], page2["items"][0]["instrument_id"])
         self.assertEqual(master.search("")["items"], [])
         self.assertEqual(master.search("%' OR 1=1 --")["items"], [])                         # no SQL injection effect
+        # LIKE wildcards in input are literal: "r_liance" may still match by tokens (rank 7), never as a name prefix (rank 3).
+        self.assertTrue(all(item["match_rank"] >= 7 for item in master.search("r_liance")["items"]))
+        self.assertEqual(master.search("%")["items"], [])
 
     def test_prices_store_provenance(self):
         frame = pd.DataFrame([{"instrument_id": "XNAS:AAPL", "interval": "1d", "timestamp": "2026-09-25T13:30:00Z", "open": 1, "high": 2, "low": 0.5,

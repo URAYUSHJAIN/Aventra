@@ -72,6 +72,11 @@ def _cursor_decode(cursor: str | None) -> int:
         return 0
 
 
+def _lit(value: str) -> str:
+    """Escape LIKE metacharacters so user input is matched literally (values are bound parameters; this is about % and _)."""
+    return value.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+
+
 def search(query: str, *, asset_class: str | None = None, exchange: str | None = None, country: str | None = None,
            limit: int = 20, cursor: str | None = None) -> dict:
     """Ranked, paginated search over the Instrument Master. Returns {items, next_cursor, total_estimate}."""
@@ -84,16 +89,16 @@ def search(query: str, *, asset_class: str | None = None, exchange: str | None =
     i, a = db.instruments, db.instrument_aliases
     tokens = [t for t in qn.split(" ") if t][:6]
     alias_exact = exists().where(and_(a.c.instrument_id == i.c.instrument_id, a.c.alias_norm == qn, a.c.kind != "exclude"))
-    alias_prefix = exists().where(and_(a.c.instrument_id == i.c.instrument_id, a.c.alias_norm.like(f"{qn}%"), a.c.kind != "exclude"))
+    alias_prefix = exists().where(and_(a.c.instrument_id == i.c.instrument_id, a.c.alias_norm.like(f"{_lit(qn)}%", escape="\\"), a.c.kind != "exclude"))
     name_l = func.lower(i.c.name)
     text = func.coalesce(i.c.search_text, func.lower(i.c.symbol) + literal(" ") + name_l)
-    token_match = and_(*[text.like(f"%{t}%") for t in tokens]) if tokens else literal(False)
+    token_match = and_(*[text.like(f"%{_lit(t)}%", escape="\\") for t in tokens]) if tokens else literal(False)
     # CoinGecko tickers are not unique (junk coins reuse "BITCOIN", "ETH", …), so an exact ticker match there ranks low.
     unique_symbols = i.c.exchange != "COINGECKO"
     rank = case(
         (func.upper(i.c.instrument_id) == qu, 0), (and_(unique_symbols, func.upper(i.c.symbol) == qu), 0),
-        (name_l == q.lower(), 1), (alias_exact, 1), (and_(unique_symbols, func.upper(i.c.symbol).like(f"{qu}%")), 2),
-        (name_l.like(f"{q.lower()}%"), 3), (alias_prefix, 4), (func.upper(i.c.symbol) == qu, 5), (name_l.like(f"%{q.lower()}%"), 6),
+        (name_l == q.lower(), 1), (alias_exact, 1), (and_(unique_symbols, func.upper(i.c.symbol).like(f"{_lit(qu)}%", escape="\\")), 2),
+        (name_l.like(f"{_lit(q.lower())}%", escape="\\"), 3), (alias_prefix, 4), (func.upper(i.c.symbol) == qu, 5), (name_l.like(f"%{_lit(q.lower())}%", escape="\\"), 6),
         (token_match, 7), else_=9)
     status_rank = case((i.c.status.in_(["listed", "resolved"]), 0), else_=1)
     popularity_missing = case((i.c.popularity.is_(None), 1), else_=0)
