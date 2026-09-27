@@ -524,4 +524,5 @@ Record new conflicts here. On 2026-09-27 the user authorised autonomous decision
 | C18 | ±15 min window vs available data | **Resolved:** daily bars for analytics (5 years available). The correlation window is session-based ([open − 24 h, close + 12 h], configurable). 5-minute bars are used only for the live quote chart. |
 | C19 | Vercel vs Docker | **Resolved:** both are supported (docs/21_DEPLOYMENT.md). |
 | C20 | Research/patent cards without documents | **Open:** not built; no placeholder patent/paper content. |
+| C22 | **Provider terms (Phase 0, 2026-09-27):** Yahoo's Terms of Service §2.4(i) prohibit automated data collection without permission, and the NSE Terms of Use prohibit automated collection from the NSE website. The shipped pipeline uses Yahoo for prices and search. | **Open — user decision:** see docs/06_DATA_SOURCES_AND_PROVIDERS.md §5. Do not add new Yahoo or NSE-website dependencies until decided. Never schedule NSE website downloads. |
 | C21 | ML Pipeline §77 lists 26 doc files | **Open:** 7 docs with real content exist. The others are added when their subject has content, with no placeholder documents (Final Plan §23). |

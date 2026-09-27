@@ -1,0 +1,1135 @@
+{
+  "verified_at": "2026-09-27T17:08:36Z",
+  "script": "scripts/verify_providers.py",
+  "results": [
+    {
+      "provider": "yahoo_chart",
+      "check": "daily history equity_in (TCS.NS)",
+      "ok": true,
+      "http": 200,
+      "bars": 2656,
+      "first": "2016-01-01",
+      "granularity": "1d",
+      "instrumentType": "EQUITY",
+      "exchange": "NSI",
+      "timezone": "Asia/Kolkata",
+      "currency": "INR",
+      "nonzero_volume": 2650,
+      "validRanges": [
+        "1d",
+        "5d",
+        "1mo",
+        "3mo",
+        "6mo",
+        "1y",
+        "2y",
+        "5y",
+        "10y",
+        "ytd",
+        "max"
+      ]
+    },
+    {
+      "provider": "yahoo_chart",
+      "check": "daily history equity_us (AAPL)",
+      "ok": true,
+      "http": 200,
+      "bars": 2698,
+      "first": "2016-01-04",
+      "granularity": "1d",
+      "instrumentType": "EQUITY",
+      "exchange": "NMS",
+      "timezone": "America/New_York",
+      "currency": "USD",
+      "nonzero_volume": 2698,
+      "validRanges": [
+        "1d",
+        "5d",
+        "1mo",
+        "3mo",
+        "6mo",
+        "1y",
+        "2y",
+        "5y",
+        "10y",
+        "ytd",
+        "max"
+      ]
+    },
+    {
+      "provider": "yahoo_chart",
+      "check": "daily history etf_in (NIFTYBEES.NS)",
+      "ok": true,
+      "http": 200,
+      "bars": 2656,
+      "first": "2016-01-01",
+      "granularity": "1d",
+      "instrumentType": "EQUITY",
+      "exchange": "NSI",
+      "timezone": "Asia/Kolkata",
+      "currency": "INR",
+      "nonzero_volume": 2647,
+      "validRanges": [
+        "1d",
+        "5d",
+        "1mo",
+        "3mo",
+        "6mo",
+        "1y",
+        "2y",
+        "5y",
+        "10y",
+        "ytd",
+        "max"
+      ]
+    },
+    {
+      "provider": "yahoo_chart",
+      "check": "daily history etf_us (SPY)",
+      "ok": true,
+      "http": 200,
+      "bars": 2698,
+      "first": "2016-01-04",
+      "granularity": "1d",
+      "instrumentType": "ETF",
+      "exchange": "PCX",
+      "timezone": "America/New_York",
+      "currency": "USD",
+      "nonzero_volume": 2698,
+      "validRanges": [
+        "1d",
+        "5d",
+        "1mo",
+        "3mo",
+        "6mo",
+        "1y",
+        "2y",
+        "5y",
+        "10y",
+        "ytd",
+        "max"
+      ]
+    },
+    {
+      "provider": "yahoo_chart",
+      "check": "daily history index_in (^NSEI)",
+      "ok": true,
+      "http": 200,
+      "bars": 2655,
+      "first": "2016-01-04",
+      "granularity": "1d",
+      "instrumentType": "INDEX",
+      "exchange": "NSI",
+      "timezone": "Asia/Kolkata",
+      "currency": "INR",
+      "nonzero_volume": 2617,
+      "validRanges": [
+        "1d",
+        "5d",
+        "1mo",
+        "3mo",
+        "6mo",
+        "1y",
+        "2y",
+        "5y",
+        "10y",
+        "ytd",
+        "max"
+      ]
+    },
+    {
+      "provider": "yahoo_chart",
+      "check": "daily history index_us (^GSPC)",
+      "ok": true,
+      "http": 200,
+      "bars": 2698,
+      "first": "2016-01-04",
+      "granularity": "1d",
+      "instrumentType": "INDEX",
+      "exchange": "SNP",
+      "timezone": "America/New_York",
+      "currency": "USD",
+      "nonzero_volume": 2697,
+      "validRanges": [
+        "1d",
+        "5d",
+        "1mo",
+        "3mo",
+        "6mo",
+        "1y",
+        "2y",
+        "5y",
+        "10y",
+        "ytd",
+        "max"
+      ]
+    },
+    {
+      "provider": "yahoo_chart",
+      "check": "daily history reit_in (EMBASSY.NS)",
+      "ok": true,
+      "http": 200,
+      "bars": 1856,
+      "first": "2019-04-01",
+      "granularity": "1d",
+      "instrumentType": "MUTUALFUND",
+      "exchange": "NSI",
+      "timezone": "Asia/Kolkata",
+      "currency": "INR",
+      "nonzero_volume": 1845,
+      "validRanges": [
+        "1mo",
+        "3mo",
+        "6mo",
+        "ytd",
+        "1y",
+        "2y",
+        "5y",
+        "10y",
+        "max"
+      ]
+    },
+    {
+      "provider": "yahoo_chart",
+      "check": "daily history forex (USDINR=X)",
+      "ok": true,
+      "http": 200,
+      "bars": 2802,
+      "first": "2016-01-01",
+      "granularity": "1d",
+      "instrumentType": "CURRENCY",
+      "exchange": "CCY",
+      "timezone": "Europe/London",
+      "currency": "INR",
+      "nonzero_volume": 0,
+      "validRanges": [
+        "1d",
+        "5d",
+        "1mo",
+        "3mo",
+        "6mo",
+        "1y",
+        "2y",
+        "5y",
+        "10y",
+        "ytd",
+        "max"
+      ]
+    },
+    {
+      "provider": "yahoo_chart",
+      "check": "daily history crypto (BTC-USD)",
+      "ok": true,
+      "http": 200,
+      "bars": 3923,
+      "first": "2016-01-01",
+      "granularity": "1d",
+      "instrumentType": "CRYPTOCURRENCY",
+      "exchange": "CCC",
+      "timezone": "UTC",
+      "currency": "USD",
+      "nonzero_volume": 3923,
+      "validRanges": [
+        "1d",
+        "5d",
+        "1mo",
+        "3mo",
+        "6mo",
+        "1y",
+        "2y",
+        "5y",
+        "10y",
+        "ytd",
+        "max"
+      ]
+    },
+    {
+      "provider": "yahoo_chart",
+      "check": "daily history commodity_future (GC=F)",
+      "ok": true,
+      "http": 200,
+      "bars": 2703,
+      "first": "2016-01-04",
+      "granularity": "1d",
+      "instrumentType": "FUTURE",
+      "exchange": "CMX",
+      "timezone": "America/New_York",
+      "currency": "USD",
+      "nonzero_volume": 2662,
+      "validRanges": [
+        "1d",
+        "5d",
+        "1mo",
+        "3mo",
+        "6mo",
+        "1y",
+        "2y",
+        "5y",
+        "10y",
+        "ytd",
+        "max"
+      ]
+    },
+    {
+      "provider": "yahoo_chart",
+      "check": "daily history bond_yield (^TNX)",
+      "ok": true,
+      "http": 200,
+      "bars": 2698,
+      "first": "2016-01-04",
+      "granularity": "1d",
+      "instrumentType": "INDEX",
+      "exchange": "CGI",
+      "timezone": "America/Chicago",
+      "currency": "USD",
+      "nonzero_volume": 0,
+      "validRanges": [
+        "1d",
+        "5d",
+        "1mo",
+        "3mo",
+        "6mo",
+        "1y",
+        "2y",
+        "5y",
+        "10y",
+        "ytd",
+        "max"
+      ]
+    },
+    {
+      "provider": "yahoo_chart",
+      "check": "daily history mutual_fund_us (VFIAX)",
+      "ok": true,
+      "http": 200,
+      "bars": 2698,
+      "first": "2016-01-04",
+      "granularity": "1d",
+      "instrumentType": "MUTUALFUND",
+      "exchange": "NAS",
+      "timezone": "America/New_York",
+      "currency": "USD",
+      "nonzero_volume": 0,
+      "validRanges": [
+        "1mo",
+        "3mo",
+        "6mo",
+        "ytd",
+        "1y",
+        "2y",
+        "5y",
+        "10y",
+        "max"
+      ]
+    },
+    {
+      "provider": "yahoo_chart",
+      "check": "daily history mutual_fund_in (0P0000XVKP.BO)",
+      "ok": true,
+      "http": 200,
+      "bars": 2162,
+      "first": "2018-01-01",
+      "granularity": "1d",
+      "instrumentType": "MUTUALFUND",
+      "exchange": "BSE",
+      "timezone": "Asia/Kolkata",
+      "currency": "INR",
+      "nonzero_volume": 0,
+      "validRanges": [
+        "1mo",
+        "3mo",
+        "6mo",
+        "ytd",
+        "1y",
+        "2y",
+        "5y",
+        "10y",
+        "max"
+      ]
+    },
+    {
+      "provider": "yahoo_chart",
+      "check": "daily history equity_bse_short_history (RELIANCE.BO)",
+      "ok": false,
+      "http": 200,
+      "bars": 1,
+      "first": "2026-09-25",
+      "granularity": "1d",
+      "instrumentType": "EQUITY",
+      "exchange": "BSE",
+      "timezone": "Asia/Kolkata",
+      "currency": "INR",
+      "nonzero_volume": 1,
+      "validRanges": [
+        "1d",
+        "5d",
+        "1mo",
+        "3mo",
+        "ytd",
+        "max"
+      ]
+    },
+    {
+      "provider": "yahoo_chart",
+      "check": "range=max keeps daily granularity",
+      "ok": false,
+      "granularity": "1mo"
+    },
+    {
+      "provider": "yahoo_chart",
+      "check": "intraday 5m over 60d",
+      "ok": true,
+      "http": 200,
+      "bars": 4500,
+      "error": null
+    },
+    {
+      "provider": "yahoo_chart",
+      "check": "intraday 1m over 7d",
+      "ok": true,
+      "http": 200,
+      "bars": 2625,
+      "error": null
+    },
+    {
+      "provider": "yahoo_chart",
+      "check": "intraday 1m over 30d",
+      "ok": false,
+      "http": 422,
+      "bars": 0,
+      "error": "1m data not available for startTime=1787936945 and endTime=1790528945. Only 8 days worth of 1m granularity data are allowed to be fetched per request."
+    },
+    {
+      "provider": "yahoo_search",
+      "check": "search 'reliance'",
+      "ok": true,
+      "http": 200,
+      "results": 7,
+      "sample": [
+        [
+          "RELIANCE.NS",
+          "EQUITY"
+        ],
+        [
+          "RS",
+          "EQUITY"
+        ],
+        [
+          "EZRA",
+          "EQUITY"
+        ],
+        [
+          "RCOM.NS",
+          "EQUITY"
+        ],
+        [
+          "RIGD.IL",
+          "EQUITY"
+        ]
+      ]
+    },
+    {
+      "provider": "yahoo_search",
+      "check": "search 'embassy office parks'",
+      "ok": true,
+      "http": 200,
+      "results": 2,
+      "sample": [
+        [
+          "EMBASSY.BO",
+          "EQUITY"
+        ],
+        [
+          "EMBASSY-RR.NS",
+          "EQUITY"
+        ]
+      ]
+    },
+    {
+      "provider": "yahoo_search",
+      "check": "search 'EMBASSY'",
+      "ok": true,
+      "http": 200,
+      "results": 5,
+      "sample": [
+        [
+          "EMBASSY.BO",
+          "EQUITY"
+        ],
+        [
+          "EMYB",
+          "EQUITY"
+        ],
+        [
+          "EMBDL.NS",
+          "EQUITY"
+        ],
+        [
+          "EMBDL.BO",
+          "EQUITY"
+        ],
+        [
+          "EMBASSY-RR.NS",
+          "EQUITY"
+        ]
+      ]
+    },
+    {
+      "provider": "yahoo_search",
+      "check": "search 'mindspace reit'",
+      "ok": false,
+      "http": 200,
+      "results": 0,
+      "sample": []
+    },
+    {
+      "provider": "yahoo_search",
+      "check": "search 'bitcoin'",
+      "ok": true,
+      "http": 200,
+      "results": 7,
+      "sample": [
+        [
+          "BTC-USD",
+          "CRYPTOCURRENCY"
+        ],
+        [
+          "BCH-USD",
+          "CRYPTOCURRENCY"
+        ],
+        [
+          "IBIT",
+          "ETF"
+        ],
+        [
+          "BTC=F",
+          "FUTURE"
+        ],
+        [
+          "MBT=F",
+          "FUTURE"
+        ]
+      ]
+    },
+    {
+      "provider": "yahoo_search",
+      "check": "search 'gold'",
+      "ok": true,
+      "http": 200,
+      "results": 7,
+      "sample": [
+        [
+          "GOLD",
+          "EQUITY"
+        ],
+        [
+          "GC=F",
+          "FUTURE"
+        ],
+        [
+          "MGC=F",
+          "FUTURE"
+        ],
+        [
+          "GLD",
+          "ETF"
+        ],
+        [
+          "GS",
+          "EQUITY"
+        ]
+      ]
+    },
+    {
+      "provider": "yahoo_search",
+      "check": "search 'usd inr'",
+      "ok": true,
+      "http": 200,
+      "results": 3,
+      "sample": [
+        [
+          "INR=X",
+          "CURRENCY"
+        ],
+        [
+          "USDT-INR",
+          "CRYPTOCURRENCY"
+        ],
+        [
+          "USDC-INR",
+          "CRYPTOCURRENCY"
+        ]
+      ]
+    },
+    {
+      "provider": "yahoo_search",
+      "check": "search 'hdfc mutual fund'",
+      "ok": true,
+      "http": 200,
+      "results": 7,
+      "sample": [
+        [
+          "HDFCPSUBK.BO",
+          "EQUITY"
+        ],
+        [
+          "HDFCGOLD.BO",
+          "EQUITY"
+        ],
+        [
+          "HDFCNIFTY.BO",
+          "EQUITY"
+        ],
+        [
+          "HDFCSENSEX.NS",
+          "EQUITY"
+        ],
+        [
+          "HDFCNIF100.BO",
+          "EQUITY"
+        ]
+      ]
+    },
+    {
+      "provider": "yahoo_search",
+      "check": "search 'treasury yield'",
+      "ok": true,
+      "http": 200,
+      "results": 7,
+      "sample": [
+        [
+          "^TYX",
+          "INDEX"
+        ],
+        [
+          "^FVX",
+          "INDEX"
+        ],
+        [
+          "CHSX.DU",
+          "ETF"
+        ],
+        [
+          "LU3079567130.SG",
+          "MUTUALFUND"
+        ],
+        [
+          "CHSW.MU",
+          "ETF"
+        ]
+      ]
+    },
+    {
+      "provider": "yahoo_search",
+      "check": "search 'nifty bank'",
+      "ok": true,
+      "http": 200,
+      "results": 7,
+      "sample": [
+        [
+          "^NSEBANK",
+          "INDEX"
+        ],
+        [
+          "BANKBEES.NS",
+          "EQUITY"
+        ],
+        [
+          "BANKBETF.NS",
+          "EQUITY"
+        ],
+        [
+          "BNKETFAXIS.NS",
+          "EQUITY"
+        ],
+        [
+          "BANKIETF.NS",
+          "EQUITY"
+        ]
+      ]
+    },
+    {
+      "provider": "nse_archives",
+      "check": "equities EQUITY_L.csv",
+      "ok": true,
+      "http": 200,
+      "rows": 2585,
+      "columns": [
+        "SYMBOL",
+        "NAME OF COMPANY",
+        " SERIES",
+        " DATE OF LISTING",
+        " PAID UP VALUE",
+        " MARKET LOT",
+        " ISIN NUMBER",
+        " FACE VALUE"
+      ]
+    },
+    {
+      "provider": "nse_archives",
+      "check": "ETFs eq_etfseclist.csv",
+      "ok": true,
+      "http": 200,
+      "rows": 351,
+      "columns": [
+        "Symbol",
+        "Underlying Asset",
+        "SecurityName",
+        "DateofListing",
+        "MarketLot",
+        "ISINNumber",
+        "FaceValue",
+        "ETF Underlying"
+      ]
+    },
+    {
+      "provider": "nse_archives",
+      "check": "ETF list contains bond / gold ETFs",
+      "ok": true,
+      "bond_etfs": 4,
+      "gold_etfs": 26,
+      "bond_sample": [
+        "EBBETF0430",
+        "EBBETF0431",
+        "BBETF0432"
+      ]
+    },
+    {
+      "provider": "nse_archives",
+      "check": "REIT/InvIT listing file",
+      "ok": false,
+      "http": 404
+    },
+    {
+      "provider": "bse_api",
+      "check": "scrip master",
+      "ok": false,
+      "http": 403
+    },
+    {
+      "provider": "sec",
+      "check": "company_tickers_exchange.json",
+      "ok": true,
+      "http": 200,
+      "rows": 10428,
+      "fields": [
+        "cik",
+        "name",
+        "ticker",
+        "exchange"
+      ],
+      "by_exchange": {
+        "Nasdaq": 4374,
+        "NYSE": 3302,
+        "OTC": 2542,
+        "CBOE": 44,
+        "null": 166
+      }
+    },
+    {
+      "provider": "nasdaq_trader",
+      "check": "nasdaqlisted.txt",
+      "ok": true,
+      "http": 200,
+      "rows": 5636,
+      "header": [
+        "Symbol",
+        "Security Name",
+        "Market Category",
+        "Test Issue",
+        "Financial Status",
+        "Round Lot Size",
+        "ETF",
+        "NextShares"
+      ],
+      "etf_rows": 1289
+    },
+    {
+      "provider": "nasdaq_trader",
+      "check": "otherlisted.txt",
+      "ok": true,
+      "http": 200,
+      "rows": 7652,
+      "header": [
+        "ACT Symbol",
+        "Security Name",
+        "Exchange",
+        "CQS Symbol",
+        "ETF",
+        "Round Lot Size",
+        "Test Issue",
+        "NASDAQ Symbol"
+      ],
+      "etf_rows": 4449
+    },
+    {
+      "provider": "nasdaq_trader",
+      "check": "mfundslist.txt",
+      "ok": false,
+      "http": 200,
+      "rows": 0,
+      "header": "not a pipe-delimited symbol file (HTML returned)",
+      "etf_rows": 0
+    },
+    {
+      "provider": "amfi",
+      "check": "NAVAll.txt (all schemes, latest NAV)",
+      "ok": true,
+      "http": 200,
+      "schemes": 14396,
+      "header": "Scheme Code;ISIN Div Payout/ ISIN Growth;ISIN Div Reinvestment;Scheme Name;Plan;Option;Net Asset Value;Date",
+      "field_counts": [
+        8
+      ],
+      "schemes_with_2026_nav": 8970,
+      "stale_or_inactive": 5426
+    },
+    {
+      "provider": "amfi",
+      "check": "official NAV history report (date range)",
+      "ok": true,
+      "http": 200,
+      "bytes": 4707150,
+      "head": "Scheme Code;NAV Name;Plan;Option;ISIN Div Payout/ISIN Growth"
+    },
+    {
+      "provider": "mfapi_in",
+      "check": "scheme list",
+      "ok": true,
+      "http": 200,
+      "schemes": 37917
+    },
+    {
+      "provider": "mfapi_in",
+      "check": "history for AMFI code 135762",
+      "ok": true,
+      "navs": 2666,
+      "oldest": "14-12-2015",
+      "latest": {
+        "date": "25-09-2026",
+        "nav": "29.69050"
+      },
+      "amfi_latest": [
+        "29.6905",
+        "25-Sep-2026"
+      ],
+      "latest_matches_amfi": true
+    },
+    {
+      "provider": "mfapi_in",
+      "check": "history for AMFI code 111989",
+      "ok": true,
+      "navs": 2879,
+      "oldest": "02-03-2010",
+      "latest": {
+        "date": "16-09-2022",
+        "nav": "10.30400"
+      },
+      "amfi_latest": [
+        "10.3040",
+        "16-Sep-2022"
+      ],
+      "latest_matches_amfi": true
+    },
+    {
+      "provider": "mfapi_in",
+      "check": "history for AMFI code 148075",
+      "ok": true,
+      "navs": 471,
+      "oldest": "17-02-2020",
+      "latest": {
+        "date": "27-01-2022",
+        "nav": "1.44160"
+      },
+      "amfi_latest": [
+        "1.4416",
+        "27-Jan-2022"
+      ],
+      "latest_matches_amfi": true
+    },
+    {
+      "provider": "mfapi_in",
+      "check": "history for AMFI code 148100",
+      "ok": true,
+      "navs": 471,
+      "oldest": "17-02-2020",
+      "latest": {
+        "date": "27-01-2022",
+        "nav": "0.43330"
+      },
+      "amfi_latest": [
+        "0.4333",
+        "27-Jan-2022"
+      ],
+      "latest_matches_amfi": true
+    },
+    {
+      "provider": "mfapi_in",
+      "check": "history for AMFI code 101909",
+      "ok": true,
+      "navs": 3978,
+      "oldest": "03-04-2006",
+      "latest": {
+        "date": "23-09-2022",
+        "nav": "34.92170"
+      },
+      "amfi_latest": [
+        "34.9217",
+        "23-Sep-2022"
+      ],
+      "latest_matches_amfi": true
+    },
+    {
+      "provider": "mfapi_in",
+      "check": "scheme codes are AMFI codes (latest NAV cross-check)",
+      "ok": true,
+      "matched": 5,
+      "checked": 5
+    },
+    {
+      "provider": "binance",
+      "check": "exchangeInfo",
+      "ok": true,
+      "http": 200,
+      "symbols": 3713,
+      "trading": 1368,
+      "top_quote_assets": [
+        [
+          "USDT",
+          496
+        ],
+        [
+          "TRY",
+          310
+        ],
+        [
+          "USDC",
+          258
+        ],
+        [
+          "U",
+          48
+        ],
+        [
+          "BTC",
+          38
+        ],
+        [
+          "FDUSD",
+          32
+        ]
+      ],
+      "used_weight": "20"
+    },
+    {
+      "provider": "binance",
+      "check": "klines 1d from 2017 (1000/request)",
+      "ok": true,
+      "http": 200,
+      "bars": 1000,
+      "first": "2017-08-17",
+      "fields": "open,high,low,close,volume,quote_volume,trades",
+      "used_weight": "22"
+    },
+    {
+      "provider": "coinbase_exchange",
+      "check": "public products",
+      "ok": true,
+      "http": 200,
+      "products": 838
+    },
+    {
+      "provider": "coinbase_exchange",
+      "check": "daily candles (max 300/request)",
+      "ok": true,
+      "http": 200,
+      "bars": 350
+    },
+    {
+      "provider": "coingecko_keyless",
+      "check": "coins/list",
+      "ok": true,
+      "http": 200,
+      "coins": 21641
+    },
+    {
+      "provider": "coingecko_keyless",
+      "check": "market_chart days=365",
+      "ok": true,
+      "http": 200,
+      "points": 366,
+      "error": null
+    },
+    {
+      "provider": "coingecko_keyless",
+      "check": "market_chart days=max",
+      "ok": false,
+      "http": 401,
+      "points": 0,
+      "error": {
+        "status": {
+          "timestamp": "2026-09-27T17:09:54.780+00:00",
+          "error_code": 10012,
+          "error_message": "Your request exceeds the allowed time range. Public API users are limited to querying historical data within the past 365 days. Upgrade to a paid plan to enjoy full historical data access: https://www.coingecko.com/en/api/pricing. "
+        }
+      }
+    },
+    {
+      "provider": "frankfurter",
+      "check": "v1 currencies (ECB reference)",
+      "ok": true,
+      "http": 200,
+      "currencies": 30
+    },
+    {
+      "provider": "frankfurter",
+      "check": "USD/INR daily history since 2016",
+      "ok": true,
+      "http": 200,
+      "observations": 2749
+    },
+    {
+      "provider": "ecb_data_portal",
+      "check": "EXR daily INR/EUR (official, no key)",
+      "ok": true,
+      "http": 200,
+      "rows": 2748
+    },
+    {
+      "provider": "fred_csv_download",
+      "check": "series DGS10",
+      "ok": true,
+      "http": 200,
+      "observations": 16888,
+      "last": "2026-09-24,5.18"
+    },
+    {
+      "provider": "fred_csv_download",
+      "check": "series DGS2",
+      "ok": true,
+      "http": 200,
+      "observations": 13128,
+      "last": "2026-09-24,4.87"
+    },
+    {
+      "provider": "fred_csv_download",
+      "check": "series DCOILWTICO",
+      "ok": true,
+      "http": 200,
+      "observations": 10624,
+      "last": "2026-09-22,96.41"
+    },
+    {
+      "provider": "fred_csv_download",
+      "check": "series DCOILBRENTEU",
+      "ok": true,
+      "http": 200,
+      "observations": 10265,
+      "last": "2026-09-22,114.89"
+    },
+    {
+      "provider": "fred_csv_download",
+      "check": "series DEXINUS",
+      "ok": true,
+      "http": 200,
+      "observations": 14014,
+      "last": "2026-09-18,95.8700"
+    },
+    {
+      "provider": "fred_api",
+      "check": "API without key",
+      "ok": false,
+      "http": 400,
+      "message": "{\"error_code\":400,\"error_message\":\"Bad Request.  Variable api_key is not set.  Read https:"
+    },
+    {
+      "provider": "openfigi",
+      "check": "ISIN mapping without key",
+      "ok": true,
+      "http": 200,
+      "sample": [
+        [
+          "RELIANCE",
+          "IN",
+          "Common Stock"
+        ],
+        [
+          "RELIANCE",
+          "IB",
+          "Common Stock"
+        ],
+        [
+          "RELIANCE",
+          "IS",
+          "Common Stock"
+        ],
+        [
+          "RELIANCE",
+          "IG",
+          "Common Stock"
+        ]
+      ],
+      "ratelimit": "25"
+    },
+    {
+      "provider": "openfigi",
+      "check": "filter: enumerate NSE (exchCode IN) listings",
+      "ok": true,
+      "http": 200,
+      "total": 6478,
+      "page_size": 100,
+      "has_next": true,
+      "sample": [
+        [
+          "GAIL",
+          "GAIL INDIA LTD"
+        ],
+        [
+          "JOHNPHAR",
+          "JOHNSON PHARMACARE LTD"
+        ],
+        [
+          "7HVN",
+          "HATHWAY BHAWANI CABLETEL & D"
+        ]
+      ],
+      "ratelimit": "5",
+      "error": null
+    },
+    {
+      "provider": "upstox",
+      "check": "public instrument master (complete.json.gz)",
+      "ok": true,
+      "http": 200,
+      "instruments": 119883,
+      "segments": {
+        "BSE_FO": 4560,
+        "NSE_EQ": 9764,
+        "BSE_EQ": 12971,
+        "NSE_FO": 37224,
+        "BCD_FO": 9700,
+        "NCD_FO": 9176,
+        "MCX_FO": 14893,
+        "NSE_COM": 21365,
+        "NSE_INDEX": 139,
+        "BSE_INDEX": 78,
+        "GLOBAL_INDEX": 10,
+        "GLOBAL_INDICATOR": 3
+      },
+      "nse_reits_found": [
+        "BIRET",
+        "EMBASSY",
+        "MINDSPACE",
+        "NXST"
+      ]
+    },
+    {
+      "provider": "upstox",
+      "check": "v2 daily candles WITHOUT token (undocumented)",
+      "ok": true,
+      "http": 200,
+      "candles": 247,
+      "note": "documentation requires 'Authorization: Bearer <token>'; do not rely on keyless access"
+    }
+  ]
+}
