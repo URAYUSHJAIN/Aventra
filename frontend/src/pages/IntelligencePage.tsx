@@ -15,7 +15,7 @@ export function IntelligencePage() {
       <div className="span-2"><AnomalyPanel data={data} focus={focus} onFocus={setFocus} /></div>
       <RiskPanel risk={focus.risk} title={`Risk signal · ${fmtDate(focus.trading_date)}`} />
       <FingerprintPanel fingerprint={data.fingerprint} />
-      <NewsPanel news={data.news} />
+      <NewsPanel news={data.news} timeZone={data.asset.timezone} />
       <CorrelationPanel assessment={focus} />
       <div className="span-2"><EvidencePanel assessment={focus} /></div>
     </div>}</IntelligenceWorkspace>

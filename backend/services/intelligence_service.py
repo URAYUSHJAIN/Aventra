@@ -34,9 +34,9 @@ class AnalysisPending(Exception):
 
 
 class AnalysisFailed(Exception):
-    def __init__(self, code: str, message: str):
+    def __init__(self, code: str, message: str, attempts: list[dict] | None = None):
         super().__init__(message)
-        self.code = code
+        self.code, self.attempts = code, attempts or []
 
 
 def _lock_for(key: str) -> Lock:
@@ -73,7 +73,7 @@ def get_intelligence(instrument_id: str, refresh: bool = False) -> dict:
         failed_at = store.utc(last_job["updated_at"])
         if failed_at and datetime.now(timezone.utc) - failed_at < FAILURE_MEMORY:
             code, _, message = (last_job.get("error") or "ANALYSIS_FAILED: analysis failed").partition(": ")
-            raise AnalysisFailed(code, message)
+            raise AnalysisFailed(code, message, (last_job.get("result") or {}).get("attempts"))
     job = queue.enqueue("analyze", instrument_id, {"refresh": refresh}, dedupe_key=f"analyze:{instrument_id}", priority=10)
     dispatch()
     raise AnalysisPending(job, stored)

@@ -20,11 +20,11 @@ export function CapabilityPage({ capability }: { capability: Capability }) {
   const config = configurations[capability]; const Icon = config.icon
   return <main className="intel-page"><div className="container">
     <header className="intel-hero"><p className="eyebrow"><Icon size={14} /> {config.eyebrow}</p><h1 className="section-title">{config.title}</h1><p className="section-intro">{config.intro}</p>
-      <p className="intel-links"><a className="back-link" href="/#services">← Back to services</a> <a className="back-link" href="/intelligence">Open the full intelligence dashboard →</a></p></header>
+      <p className="intel-links"><a className="back-link" href="/#services">← Back to services</a> <a className="back-link" href={`/intelligence${window.location.search}`}>Open the full intelligence dashboard →</a></p></header>
     <IntelligenceWorkspace>{({ data, focus, setFocus }) => <div className="intel-grid">
       {capability === 'fingerprint' && <div className="span-2"><FingerprintPanel fingerprint={data.fingerprint} /></div>}
       {capability === 'anomaly' && <div className="span-2"><AnomalyPanel data={data} focus={focus} onFocus={setFocus} /></div>}
-      {capability === 'correlation' && <><CorrelationPanel assessment={focus} /><NewsPanel news={data.news} /></>}
+      {capability === 'correlation' && <><CorrelationPanel assessment={focus} /><NewsPanel news={data.news} timeZone={data.asset.timezone} /></>}
       {capability === 'risk' && <><RiskPanel risk={focus.risk} /><EvidencePanel assessment={focus} /></>}
     </div>}</IntelligenceWorkspace>
   </div></main>

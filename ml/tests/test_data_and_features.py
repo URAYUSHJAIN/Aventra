@@ -89,5 +89,18 @@ class FeatureTests(unittest.TestCase):
         self.assertTrue(np.allclose(rel.dropna(), 0.0))
 
 
+class FeatureSetSelectionTests(unittest.TestCase):
+    def test_set_follows_capabilities_and_calendar(self):
+        from ml.features.sets import FEATURE_SETS, select_set
+        self.assertEqual(select_set({"has_ohlc": True, "has_volume": True, "calendar": "XNYS"}), "ohlcv")
+        self.assertEqual(select_set({"has_ohlc": True, "has_volume": True, "calendar": "24/7"}), "ohlcv_continuous")
+        self.assertEqual(select_set({"has_ohlc": False, "has_volume": True}), "close_volume")
+        self.assertEqual(select_set({"has_ohlc": False, "has_volume": False}), "close")
+        self.assertEqual(select_set({"value_kind": "yield"}), "yield")
+        continuous = FEATURE_SETS["ohlcv_continuous"]
+        self.assertNotIn("gap_pct", continuous["fingerprint"])   # a 24/7 daily open is the previous close: no gap
+        self.assertNotIn("gap_pct", continuous["detector"])
+
+
 if __name__ == "__main__":
     unittest.main()

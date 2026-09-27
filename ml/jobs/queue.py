@@ -75,8 +75,10 @@ def complete(job_id: int, result: dict | None = None) -> None:
         conn.execute(update(db.jobs).where(db.jobs.c.id == job_id).values(status="done", result=result or {}, error=None, updated_at=_now()))
 
 
-def fail(job_id: int, error: str, retryable: bool = True) -> str:
-    """Record a failure; re-queue with exponential backoff while attempts remain. Returns the new status."""
+def fail(job_id: int, error: str, retryable: bool = True, detail: dict | None = None) -> str:
+    """Record a failure; re-queue with exponential backoff while attempts remain. Returns the new status.
+
+    detail: typed failure state ({"code", "attempts"}) kept in `result` so the API can show which providers were tried."""
     with store.begin() as conn:
         job = conn.execute(select(db.jobs).where(db.jobs.c.id == job_id)).mappings().first()
         if job is None:
@@ -84,7 +86,7 @@ def fail(job_id: int, error: str, retryable: bool = True) -> str:
         again = retryable and job["attempts"] < job["max_attempts"]
         status = "queued" if again else "failed"
         delay = timedelta(seconds=BACKOFF_BASE_SECONDS * 2 ** max(job["attempts"] - 1, 0))
-        conn.execute(update(db.jobs).where(db.jobs.c.id == job_id).values(status=status, error=error[:1000], locked_by=None, locked_at=None,
+        conn.execute(update(db.jobs).where(db.jobs.c.id == job_id).values(status=status, error=error[:1000], result=detail, locked_by=None, locked_at=None,
                                                                            run_after=_now() + delay if again else job["run_after"], updated_at=_now()))
         return status
 

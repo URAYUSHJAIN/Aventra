@@ -48,7 +48,7 @@ def ingest_news(instrument_id: str, instrument: dict) -> dict:
     except (NewsProviderError, ProviderError) as error:
         logger.warning("News provider failed for %s: %s", instrument_id, error)
         items = _from_store(instrument_id)
-        report.update(status="stale_cache" if items else "unavailable", message="Live news provider unavailable; showing previously stored news." if items else "News context unavailable.")
+        report.update(status="stale_cache" if items else "unavailable", message="Live news provider unavailable; showing previously stored news." if items else f"News context unavailable: {error}")
         report["items"], report["duplicates_removed"] = items, 0
         report["sentiment_status"] = "stored" if items else "unavailable"
         return report

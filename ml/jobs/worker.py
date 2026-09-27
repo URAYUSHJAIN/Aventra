@@ -89,7 +89,9 @@ def run_job(job: dict) -> str:
         attempts = getattr(error, "attempts", None) or []
         # Retrying cannot help when every provider lacks credentials (configuration, not a transient failure).
         missing_credentials = bool(attempts) and all(a.get("reason") == "missing_credentials" for a in attempts)
-        status = queue.fail(job["id"], f"{code}: {error}", retryable=code not in NON_RETRYABLE and not missing_credentials)
+        safe_attempts = [{k: a.get(k) for k in ("provider", "status", "reason", "detail")} for a in attempts]
+        status = queue.fail(job["id"], f"{code}: {error}", retryable=code not in NON_RETRYABLE and not missing_credentials,
+                            detail={"code": code, "attempts": safe_attempts})
         logger.info("job=%s type=%s instrument=%s status=%s code=%s", job["id"], job["type"], job.get("instrument_id"), status, code)
         return status
     queue.complete(job["id"], result)

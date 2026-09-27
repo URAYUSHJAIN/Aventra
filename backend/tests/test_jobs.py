@@ -97,7 +97,11 @@ class AsyncApiTests(JobTestCase):
         Worker("test").process_ready()
         response = self.client.get("/api/intelligence/XNAS:AAPL")
         self.assertEqual(response.status_code, 503)
-        self.assertEqual(response.get_json()["code"], "PROVIDER_UNAVAILABLE")
+        body = response.get_json()
+        self.assertEqual(body["code"], "PROVIDER_UNAVAILABLE")
+        self.assertEqual(body["error"].count("Data unavailable / insufficient source data"), 1)
+        self.assertTrue(body["attempts"])                                             # which providers were tried, and why they failed
+        self.assertTrue(all(a["reason"] == "missing_credentials" for a in body["attempts"]))
         self.assertEqual(self.client.get("/api/jobs/999999").status_code, 404)
         self.assertEqual(self.client.get("/api/intelligence/XNSE:NOPE").status_code, 404)   # unknown instruments are never queued
 

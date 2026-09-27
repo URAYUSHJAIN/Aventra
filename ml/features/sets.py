@@ -11,11 +11,18 @@ import json
 
 from ml import config
 
+ROUND_THE_CLOCK = {"24/7", "24/5"}   # mirrors ml.data.calendars (no import: keeps features free of data-layer deps)
+
 FEATURE_SETS: dict[str, dict] = {
     "ohlcv": {
         "fingerprint": dict(config.FINGERPRINT_WEIGHTS),
         "statistical": tuple(config.STATISTICAL_FEATURES),
         "detector": tuple(config.DETECTOR_FEATURES),
+    },
+    "ohlcv_continuous": {   # OHLCV on round-the-clock markets (e.g. Binance): a daily open equals the previous close, so no opening gap
+        "fingerprint": {k: v for k, v in config.FINGERPRINT_WEIGHTS.items() if k != "gap_pct"},
+        "statistical": tuple(config.STATISTICAL_FEATURES),
+        "detector": tuple(f for f in config.DETECTOR_FEATURES if f != "gap_pct"),
     },
     "close_volume": {   # e.g. CoinGecko daily close + volume, no OHLC
         "fingerprint": {"return_1": 1.0, "log_volume": 1.0, "volatility_20": 1.0, "drawdown": 1.0, "relative_return": 1.0},
@@ -39,7 +46,7 @@ def select_set(profile: dict) -> str:
     if profile.get("value_kind") == "yield":
         return "yield"
     if profile.get("has_ohlc") and profile.get("has_volume"):
-        return "ohlcv"
+        return "ohlcv_continuous" if profile.get("calendar") in ROUND_THE_CLOCK else "ohlcv"
     if profile.get("has_volume"):
         return "close_volume"
     return "close"

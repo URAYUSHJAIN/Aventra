@@ -21,7 +21,13 @@ from ml.providers.registry import DataUnavailable
 
 logger = logging.getLogger(__name__)
 # Data-availability states → HTTP status. Every one is shown to the user as "Data unavailable / insufficient source data".
+UNAVAILABLE = "Data unavailable / insufficient source data"
 DATA_STATUS = {"INSTRUMENT_NOT_FOUND": 404, "NO_PROVIDER_FOR_ASSET": 422, "PROVIDER_UNAVAILABLE": 503, "RATE_LIMITED": 503}
+
+
+def _unavailable_text(error: Exception) -> str:
+    text = str(error)
+    return text if text.startswith(UNAVAILABLE) else f"{UNAVAILABLE}. {text}"
 
 
 def create_app(test_config=None):
@@ -77,7 +83,7 @@ def _register_error_handlers(app: Flask) -> None:
     @app.errorhandler(AnalysisFailed)
     def analysis_failed(error: AnalysisFailed):
         status = DATA_STATUS.get(error.code, 422 if error.code.startswith("INSUFFICIENT") else 503)
-        return jsonify(success=False, error=f"Data unavailable / insufficient source data. {error}", code=error.code), status
+        return jsonify(success=False, error=_unavailable_text(error), code=error.code, attempts=error.attempts), status
 
     @app.errorhandler(ids.InvalidInstrumentId)
     def invalid_id(error):
@@ -94,7 +100,7 @@ def _register_error_handlers(app: Flask) -> None:
     @app.errorhandler(DataUnavailable)
     def data_unavailable(error: DataUnavailable):
         attempts = [{k: a.get(k) for k in ("provider", "status", "reason", "detail")} for a in error.attempts]
-        return jsonify(success=False, error=f"Data unavailable / insufficient source data. {error}", code=error.code, attempts=attempts), DATA_STATUS.get(error.code, 503)
+        return jsonify(success=False, error=_unavailable_text(error), code=error.code, attempts=attempts), DATA_STATUS.get(error.code, 503)
 
     @app.errorhandler(ProviderError)
     def provider_error(error: ProviderError):

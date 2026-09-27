@@ -1,17 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ApiError, apiGet } from './apiClient'
-import { fallback, getWatchlist, toMarketData } from './marketApi'
+import { getIntelligence, getSnapshots, searchInstruments } from './intelligenceApi'
 import { analyzeNews } from './newsApi'
 import { fail, mockFetch, ok } from '../test/fetchMock'
-import type { Quote } from '../types/api'
+import { fmtBp, fmtLevel, fmtMoney } from '../utils/format'
+import fixture from '../test/fixtures/intelligence-demo.json'
 
-const quote: Quote = {
-  symbol: 'RELIANCE', name: 'Reliance Industries', currency: 'INR', price: 1200, previous_close: 1190, change_pct: 0.84, volume: 1500000, day_high: 1210, day_low: 1180,
-  market_time: '2026-09-25T10:00:00Z', intraday: [{ timestamp: 't1', close: 1190 }, { timestamp: 't2', close: 1200 }], interval: '5m', market_state: 'CLOSED',
-  data_source: { provider: 'yahoo_finance_chart', is_demo: false, fetched_at: '2026-09-27T10:00:00Z' },
-}
-
-afterEach(() => vi.unstubAllGlobals())
+afterEach(() => { vi.unstubAllGlobals(); vi.useRealTimers() })
 
 describe('apiClient', () => {
   it('unwraps the success envelope', async () => {
@@ -19,9 +14,18 @@ describe('apiClient', () => {
     await expect(apiGet<{ value: number }>('/api/x')).resolves.toEqual({ value: 1 })
   })
 
-  it('surfaces the server error message for client errors without retrying', async () => {
-    const fetchMock = mockFetch(() => fail(404, 'NOTREAL is not in Aventra\'s analysed asset universe.'))
-    await expect(apiGet('/api/intelligence/NOTREAL')).rejects.toMatchObject({ kind: 'client', status: 404, message: expect.stringContaining('NOTREAL') })
+  it('surfaces the server error message and code for client errors without retrying', async () => {
+    const fetchMock = mockFetch(() => fail(404, 'XNAS:NOTREAL is not in the instrument master.', 'INSTRUMENT_NOT_FOUND'))
+    await expect(apiGet('/api/intelligence/XNAS:NOTREAL')).rejects.toMatchObject({ kind: 'client', status: 404, code: 'INSTRUMENT_NOT_FOUND', message: expect.stringContaining('NOTREAL') })
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not retry typed data-availability states and keeps provider attempts', async () => {
+    const attempts = [{ provider: 'alpha_vantage', status: 'unavailable', reason: 'ALPHAVANTAGE_API_KEY not set' }]
+    const fetchMock = mockFetch(() => fail(503, 'No configured provider could supply data.', 'PROVIDER_UNAVAILABLE', attempts))
+    const error = await apiGet('/api/intelligence/XNAS:AAPL').catch((reason: unknown) => reason) as ApiError
+    expect(error.code).toBe('PROVIDER_UNAVAILABLE')
+    expect(error.attempts).toEqual(attempts)
     expect(fetchMock).toHaveBeenCalledTimes(1)
   })
 
@@ -35,35 +39,59 @@ describe('apiClient', () => {
 
   it('recovers when a retried request succeeds', async () => {
     let calls = 0
-    mockFetch(() => (++calls === 1 ? fail(502, 'provider down') : ok('fine')))
-    await expect(apiGet('/api/market/TCS')).resolves.toBe('fine')
+    mockFetch(() => (++calls === 1 ? fail(502, 'gateway') : ok('fine')))
+    await expect(apiGet('/api/market/CRYPTO:BTC-USDT')).resolves.toBe('fine')
   })
 })
 
-describe('marketApi', () => {
-  it('maps a live quote without inventing values', () => {
-    const data = toMarketData(quote)
-    expect(data.status).toBe('LIVE QUOTE · NSE · CLOSED')
-    expect(data.metrics[1]).toMatchObject({ value: '+0.84%', tone: 'positive' })
-    expect(data.points).toEqual([1190, 1200])
-    expect(data.isDemo).toBe(false)
+describe('intelligenceApi', () => {
+  it('searches with encoded query, filters and cursor', async () => {
+    const fetchMock = mockFetch(() => ok({ items: [], next_cursor: null, query: 'S&P', master_size: 10, master_status: 'ok' }))
+    await searchInstruments('S&P', { asset_class: 'etf' }, 'abc')
+    const url = fetchMock.mock.calls[0][0] as string
+    expect(url).toContain('/api/instruments/search?')
+    expect(url).toContain('q=S%26P')
+    expect(url).toContain('asset_class=etf')
+    expect(url).toContain('cursor=abc')
   })
 
-  it('labels demo data as synthetic', () => {
-    expect(toMarketData({ ...quote, market_state: 'DEMO', data_source: { ...quote.data_source, is_demo: true } }).status).toBe('DEMO DATA · SYNTHETIC')
+  it('requests snapshots by canonical IDs and keeps per-item states', async () => {
+    const fetchMock = mockFetch(() => ok({ items: [{ instrument_id: 'XNAS:AAPL', status: 'PROVIDER_UNAVAILABLE', snapshot: null, error: 'key missing' }] }))
+    const items = await getSnapshots(['XNAS:AAPL'])
+    expect(fetchMock.mock.calls[0][0]).toContain('ids=XNAS%3AAAPL')
+    expect(items[0].status).toBe('PROVIDER_UNAVAILABLE')
+    expect(items[0].snapshot).toBeNull()
   })
 
-  it('fallback has no chart points or numbers', () => {
-    const data = fallback('TCS')
-    expect(data.points).toEqual([])
-    expect(data.metrics.every((metric) => metric.value === '—' || metric.value === 'Check source')).toBe(true)
+  it('polls a queued analysis job until the result is ready', async () => {
+    let intelligenceCalls = 0
+    const pending = { status: 'queued', job: { id: 7, type: 'analyze', instrument_id: 'TEST:DEMO', status: 'queued', attempts: 0, error: null, updated_at: null }, previous_result: null, message: 'queued' }
+    mockFetch((url) => {
+      if (url.includes('/api/jobs/7')) return ok({ ...pending.job, status: 'done' })
+      return ++intelligenceCalls === 1 ? { status: 202, body: { success: true, data: pending } } : ok(fixture)
+    })
+    const onPending = vi.fn()
+    vi.useFakeTimers()
+    const promise = getIntelligence('TEST:DEMO', { onPending })
+    await vi.advanceTimersByTimeAsync(2_500)
+    const result = await promise
+    expect(result.instrument_id).toBe('TEST:DEMO')
+    expect(onPending).toHaveBeenCalled()
+    expect(intelligenceCalls).toBe(2)
+  })
+})
+
+describe('format', () => {
+  it('uses the instrument currency, never a hard-coded one', () => {
+    expect(fmtMoney(1200, 'USD')).toContain('$')
+    expect(fmtMoney(1200, 'INR')).toContain('₹')
+    expect(fmtMoney(0.5, 'USDT')).toBe('0.5 USDT')
+    expect(fmtMoney(null, 'USD')).toBe('—')
   })
 
-  it('watchlist marks unavailable symbols explicitly', async () => {
-    mockFetch(() => ok({ quotes: [{ symbol: 'RELIANCE', status: 'ok', quote }, { symbol: 'TCS', status: 'unavailable', quote: null, error: 'down' }] }))
-    const [first, second] = await getWatchlist(['RELIANCE', 'TCS'])
-    expect(first.metrics[0].value).toContain('1,200')
-    expect(second.status).toBe('MARKET DATA UNAVAILABLE')
+  it('formats yields and basis points', () => {
+    expect(fmtLevel(4.25, 'yield', 'USD')).toBe('4.250%')
+    expect(fmtBp(-3.2)).toBe('-3.2 bp')
   })
 })
 

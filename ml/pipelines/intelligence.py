@@ -37,7 +37,7 @@ from ml.temporal.analysis import lead_lag
 
 logger = logging.getLogger(__name__)
 DISCLAIMER = "Aventra provides analytical signals and evidence, not financial advice or guaranteed predictions."
-CHANGE_POINT_COLUMNS = {"yield": ("change_bp",), "close": ("log_return",), "close_volume": ("log_return", "log_volume"), "ohlcv": ("log_return", "log_volume")}
+CHANGE_POINT_COLUMNS = {"yield": ("change_bp",), "close": ("log_return",), "close_volume": ("log_return", "log_volume"), "ohlcv": ("log_return", "log_volume"), "ohlcv_continuous": ("log_return", "log_volume")}
 
 
 class UnknownAsset(LookupError):
