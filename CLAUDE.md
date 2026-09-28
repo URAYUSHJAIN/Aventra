@@ -16,7 +16,7 @@ This file adds **how Claude Code must execute work**. If this file and AGENTS.md
 2. **The repository is the source of truth for what exists.** The `context/` master docs describe what *should* exist. Never report a PLANNED component as implemented (AGENTS.md §7).
 3. **Preserve working code.** Don't rewrite, restructure or restyle anything the task didn't ask for.
 4. **Never fabricate** data, news, sentiment, scores, metrics, dataset sizes, citations or results. If something is unavailable, return and display an explicit "unavailable" state.
-5. **Don't touch the user's uncommitted work** (currently `three`/`@types/three` in `frontend/package.json` + lock and the `.neural-*` CSS in `index.css`), and don't touch `context/`, unless the task is about them. Run `git status` to see the current list.
+5. **Don't touch the user's uncommitted work**, and don't touch `context/`, unless the task is about them. Run `git status` to see the current list.
 6. **Don't install packages, start long-running servers, commit, push or delete files unless the task requires it.** If you need any of these and the user hasn't clearly authorised it, ask first.
 7. When a document conflict affects the task, check AGENTS.md §32. If it isn't resolved, **ask**. Never invent a resolution.
 
@@ -72,7 +72,7 @@ Before planning, answer these to yourself:
 - For new packages, check `package.json` / `requirements.txt` for something that already covers the need. Check version constraints too: `torch<2.5`, `transformers<4.41` and `numpy<2` are pinned.
 
 ### IMPLEMENT
-- Follow the existing conventions (AGENTS.md §9–10): app factory and blueprints, lazy-loaded model singletons, typed domain exceptions, `{success, data|error}` envelope, `services/*.ts` for all network calls, named function components, and styles in `index.css`.
+- Follow the existing conventions (AGENTS.md §9–10): app factory and blueprints, lazy-loaded model singletons, typed domain exceptions, `{success, data|error}` envelope, `services/*.ts` for all network calls, named function components, and token-based styles in `styles/` (tokens → base → site / intelligence).
 - Match the density and style of the file you are editing.
 - Put constants in config and add new env vars to `.env.example`.
 - Implement every state: loading, empty, error and success.
@@ -132,11 +132,12 @@ Tests passing isn't the whole job. Verify the real integration path for whatever
 | Experiments / metrics | `ml/evaluation/*`, `experiments/results/`, `docs/17_MODEL_EVALUATION.md` |
 | Frontend API calls, loading/error/unavailable states | `services/apiClient.ts`, `hooks/useApiResource.ts`, `components/intelligence/StateViews.tsx` (`DataUnavailableState`) |
 | Health check | `GET /api/health` in `backend/app.py` |
-| Service list and links | `frontend/src/data/services.ts` (used by `Navbar`, `Services`, `ServiceCard`) |
+| Service list and links | `frontend/src/data/services.ts` (used by `Navbar`, `Footer`, `Services`, `CapabilityPage`) |
+| UI primitives, tones, 3D | `components/common/` (Button, Badge, Metric, Panel, SectionHeading, Logo), `components/visual/Scene3D` (lazy three.js), `styles/tokens.css` |
 | Fingerprint, anomaly, correlation and risk pages | `frontend/src/pages/CapabilityPage.tsx` (API-backed panels) and the route map in `App.tsx` |
 | Page titles and SEO | the `metadata` map in `App.tsx` |
 | Buttons and headings | `components/common/Button.tsx`, `SectionHeading.tsx` |
-| Pipeline diagram (How It Works) | `components/home/HowItWorks.tsx` (the `steps` array); see AGENTS.md C14 about the removed 3D version |
+| Pipeline diagram (How It Works) | `components/home/HowItWorks.tsx` (the `steps` array) |
 | CORS and env config | `backend/app.py`, root `.env.example` (all backend variables), `frontend/.env.example` |
 
 Also search before creating anything new:
@@ -151,7 +152,7 @@ If similar code exists, extend it. Create a new module only if the existing one 
 ## 4. Safely modifying legacy code
 
 - Most frontend components are written as **dense single-line JSX**. When you edit one, change only the part you need and keep that style. Don't reformat the whole file; that makes the diff unreadable to the user.
-- `index.css` is one large file with long single-line rule groups. Add new rules in a new block near related rules, or at the end under a comment header. Don't reflow existing lines.
+- Styles are split by layer (`tokens.css`, `base.css`, `site.css`, `intelligence.css`). Add rules next to the related block, use tokens only, and don't reflow existing lines.
 - Keep exported names, props, CSS class names, URLs and JSON field names stable. If one must change, update every consumer in the same change and say so in the report.
 - Currency, timezone and value kind always come from the API (`asset`, `capabilities`); never hard-code ₹, IST or an instrument list in the UI.
 - Replacing a PLACEHOLDER with real data is encouraged. Keep the layout and styling, change the data source, and add the unavailable/empty states.
@@ -176,7 +177,7 @@ The core pipeline (increments a–e of the original plan) was implemented on 202
 - b. A sourced known-event benchmark (never invent events), then detection-lead-time evaluation.
 - c. Scheduled news ingestion, so historical anomalies get news context.
 - d. A labelled news sample for entity-linking and relevant-news precision.
-- e. Design-spec items (C9–C11, C20), only when requested.
+- e. Replace the `/doc` Coming Soon cards with real publications once they exist (C20).
 
 ---
 

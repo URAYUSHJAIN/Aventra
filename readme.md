@@ -20,7 +20,7 @@ B.Tech final-year project — ABES Engineering College, Ghaziabad, India.
 | News + FinBERT sentiment (Alpha Vantage NEWS_SENTIMENT) | 🔑 Implemented, needs key; no Indian news source |
 | Behavioural fingerprint, anomaly ensemble, correlation, risk, evidence chain | ✅ Implemented (weights uncalibrated) |
 | PostgreSQL/SQLite + Alembic, background job queue + worker | ✅ Implemented |
-| React dashboard (search, dynamic currency/timezone, unavailable states) | ✅ Implemented |
+| React frontend (design-spec redesign: search, intelligence workspace, About/Research/Docs/Contact, lazy 3D) | ✅ Implemented |
 | Docker Compose (postgres, backend, worker, frontend) | ✅ Verified |
 | Evaluation | ⚠️ Partial — synthetic injection on real data (EXP-03) |
 | CI, real-event benchmark | ❌ Not implemented |
@@ -97,7 +97,7 @@ FinBERT weights go in `backend/models/finbert/`. More options: [docs/21_DEPLOYME
 ```bash
 py -3.12 -m unittest discover -s ml/tests -t .        # 73 passed (1 PostgreSQL-only skipped)
 py -3.12 -m unittest discover -s backend/tests -t .   # 25 passed
-cd frontend && npm test                                # 23 passed
+cd frontend && npm test                                # 39 passed
 ```
 
 ## Limitations

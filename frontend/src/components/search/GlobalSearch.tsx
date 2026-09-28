@@ -9,11 +9,11 @@ const DEBOUNCE_MS = 250
 type State = { status: 'idle' } | { status: 'loading' } | { status: 'ok'; items: InstrumentSummary[]; next: string | null; masterEmpty: boolean } | { status: 'error'; message: string }
 
 // Search is Aventra's primary discovery mechanism: any instrument in the Instrument Master (synced from real listings).
-export function GlobalSearch({ onSelect, placeholder = 'Search stocks, ETFs, funds, crypto, forex…', autoFocus = false, compact = false }:
-  { onSelect?: (item: InstrumentSummary) => void; placeholder?: string; autoFocus?: boolean; compact?: boolean }) {
-  const [query, setQuery] = useState('')
+export function GlobalSearch({ onSelect, placeholder = 'Search stocks, ETFs, funds, crypto, forex…', autoFocus = false, compact = false, size = 'default', initialQuery = '' }:
+  { onSelect?: (item: InstrumentSummary) => void; placeholder?: string; autoFocus?: boolean; compact?: boolean; size?: 'default' | 'large'; initialQuery?: string }) {
+  const [query, setQuery] = useState(initialQuery)
   const [state, setState] = useState<State>({ status: 'idle' })
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(initialQuery !== '')
   const [active, setActive] = useState(0)
   const [loadingMore, setLoadingMore] = useState(false)
   const listId = useId()
@@ -60,18 +60,18 @@ export function GlobalSearch({ onSelect, placeholder = 'Search stocks, ETFs, fun
     else if (event.key === 'Escape') setOpen(false)
   }
 
-  return <div className={`global-search ${compact ? 'compact' : ''}`} ref={box}>
+  return <div className={`global-search ${compact ? 'compact' : ''} ${size === 'large' ? 'is-large' : ''}`} ref={box}>
     <label className="sr-only" htmlFor={`${listId}-input`}>Search instruments</label>
     <div className="search-field"><Search size={15} aria-hidden="true" />
       <input id={`${listId}-input`} type="search" role="combobox" aria-expanded={open && query.trim() !== ''} aria-controls={listId} aria-autocomplete="list"
         aria-activedescendant={items[active] ? `${listId}-${active}` : undefined} value={query} placeholder={placeholder} autoFocus={autoFocus} autoComplete="off" maxLength={64}
         onChange={(event) => { setQuery(event.target.value); setOpen(true) }} onFocus={() => setOpen(true)} onKeyDown={onKeyDown} />
-      {state.status === 'loading' && <Loader2 size={14} className="spinning" aria-label="Searching" />}
+      {state.status === 'loading' ? <Loader2 size={14} className="spinning" aria-label="Searching" /> : size === 'large' && <kbd className="search-hint" aria-hidden="true">↵</kbd>}
     </div>
     {open && query.trim() !== '' && <div className="search-results" id={listId} role="listbox">
       {state.status === 'loading' && <p className="search-state" role="status">Searching the instrument master…</p>}
       {state.status === 'error' && <p className="search-state error" role="alert">{state.message}</p>}
-      {state.status === 'ok' && state.masterEmpty && <p className="search-state">The instrument master is empty — run the listing sync on the server.</p>}
+      {state.status === 'ok' && state.masterEmpty && <p className="search-state">The instrument master is empty. Run the listing sync on the server.</p>}
       {state.status === 'ok' && !state.masterEmpty && items.length === 0 && <p className="search-state">No instruments match “{query.trim()}”.</p>}
       {items.map((item, index) => <button type="button" role="option" id={`${listId}-${index}`} aria-selected={index === active} key={item.instrument_id}
         className={`search-option ${index === active ? 'active' : ''}`} onMouseEnter={() => setActive(index)} onClick={() => choose(item)}>

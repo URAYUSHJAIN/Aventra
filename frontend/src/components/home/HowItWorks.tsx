@@ -1,4 +1,30 @@
-import { Fragment } from 'react'
 import { SectionHeading } from '../common/SectionHeading'
-const steps=[['01','Collect','Market data · news · sentiment'],['02','Align','Timestamps · entities · tickers'],['03','Fingerprint','Learn normal asset behaviour'],['04','Detect','Identify behavioural deviations'],['05','Correlate','Connect related events and signals'],['06','Explain','Risk signal · evidence chain']]
-export function HowItWorks(){return <section className="section works" id="how-it-works"><div className="container"><SectionHeading eyebrow="CORE METHODOLOGY" title="How Aventra Works" intro="From raw financial signals to contextual anomaly evidence."/><div className="workflow"><div className="steps">{steps.map((s,i)=><Fragment key={s[0]}>{i===3&&<div className="workflow-arrow">→</div>}<article className={`step ${i===2?'fingerprint':''}`}><span>{s[0]}</span><h3>{s[1]}</h3><p>{s[2]}</p></article></Fragment>)}</div></div></div></section>}
+
+// The actual request path through the implemented system (docs/04, docs/05). Nothing here describes planned components.
+const steps: Array<{ key: string; label: string; text: string; detail?: string[] }> = [
+  { key: 'user', label: 'You', text: 'Ask about one instrument.' },
+  { key: 'search', label: 'Instrument search', text: 'Search the Instrument Master, synced from permitted listings (exchanges, SEC, Binance, AMFI and others).' },
+  { key: 'resolve', label: 'Instrument resolution', text: 'Resolve a canonical ID with asset class, exchange, currency, timezone, calendar and a capability profile.' },
+  { key: 'router', label: 'Provider router', text: 'Try only the permitted providers that cover this asset, with rate limits, retries and a circuit breaker. No hidden fallback.' },
+  { key: 'data', label: 'Real data', text: 'Daily observations with provenance: provider, retrieval time, currency and adjustment. Unavailable data is reported, never invented.' },
+  { key: 'validate', label: 'Validation', text: 'Remove duplicates and impossible values, keep extreme but valid moves, align to UTC and the instrument’s own sessions.' },
+  { key: 'features', label: 'Feature engineering', text: 'Past-only features chosen from what the data supports: returns, volume, volatility, range, gaps, drawdown.' },
+  { key: 'ml', label: 'ML intelligence', text: 'Four analyses run on the same features.', detail: ['Behavioural fingerprint: rolling median/MAD baseline', 'Anomaly ensemble: statistical, fingerprint, Isolation Forest', 'News: linked articles, FinBERT sentiment', 'Correlation: news aligned to the session window'] },
+  { key: 'risk', label: 'Risk + evidence', text: 'A transparent weighted risk score and a timestamped evidence chain with provenance.' },
+  { key: 'back', label: 'You', text: 'Read what happened, how unusual it was, what else happened at the same time, and why it was flagged.' },
+]
+
+export function HowItWorks() {
+  return <section className="section how" id="how-it-works" aria-labelledby="how-title">
+    <div className="wrap how-grid">
+      <div className="how-copy">
+        <SectionHeading id="how-title" eyebrow="HOW IT WORKS" title={<>From a search <em>to evidence.</em></>} intro="The path a request actually takes through Aventra. Every stage is implemented; each hands a typed result (or an explicit “unavailable”) to the next." />
+        <p className="how-principle"><span>Signal</span><span>Context</span><span>Explanation</span><span>Evidence</span></p>
+      </div>
+      <ol className="pipeline">{steps.map((step, index) => <li key={step.key} className={`pipeline-step step-${step.key} reveal`}>
+        <span className="pipeline-index">{String(index + 1).padStart(2, '0')}</span>
+        <div><strong>{step.label}</strong><p>{step.text}</p>{step.detail && <ul>{step.detail.map((d) => <li key={d}>{d}</li>)}</ul>}</div>
+      </li>)}</ol>
+    </div>
+  </section>
+}
