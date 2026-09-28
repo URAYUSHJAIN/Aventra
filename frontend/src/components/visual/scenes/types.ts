@@ -1,4 +1,5 @@
-export interface Pointer { x: number; y: number }
+/** Cursor relative to the scene box (−1…1 inside it, up to ±1.6 around it) and how present it is (0…1, eased). */
+export interface Pointer { x: number; y: number; active: number }
 export interface SceneOptions { lite: boolean; variant?: string }
 export interface SceneHandle {
   resize(width: number, height: number, dpr: number): void

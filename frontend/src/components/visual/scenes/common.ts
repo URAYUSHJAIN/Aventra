@@ -1,7 +1,7 @@
 import { AdditiveBlending, NormalBlending, ShaderMaterial, Vector3, WebGLRenderer } from 'three'
 
 // Scene colours are written straight to the sRGB canvas by the shaders (no colour-management conversion), so they match the CSS tokens.
-export const COLORS = { green: '#4dff9a', amber: '#f2b64c', line: '#7f958c', grid: '#56645f', core: '#0a0d10', rim: '#1d3a2b' }
+export const COLORS = { green: '#4dff9a', amber: '#f2b64c', red: '#ff6b6b', cyan: '#5cc8f0', line: '#7f958c', grid: '#56645f', core: '#0a0d10', rim: '#1d3a2b' }
 
 export function rgb(hex: string) { return new Vector3(parseInt(hex.slice(1, 3), 16) / 255, parseInt(hex.slice(3, 5), 16) / 255, parseInt(hex.slice(5, 7), 16) / 255) }
 

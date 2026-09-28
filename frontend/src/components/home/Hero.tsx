@@ -31,7 +31,7 @@ export function Hero() {
           : <p className="hero-fact">Analysed only where a permitted provider supplies real data</p>}
       </div>
       <div className="hero-visual">
-        <Scene3D scene="field" />
+        <Scene3D scene="field" tracking="section" />
         <ul className="hero-layers" aria-label="Signals Aventra connects">{LAYERS.map(([label, position]) => <li key={label} className={position}><i aria-hidden="true" />{label}</li>)}</ul>
         <p className="visual-caption">Illustrative: a behavioural baseline, a local deviation and a return to equilibrium. Not market data.</p>
       </div>
