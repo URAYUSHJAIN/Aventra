@@ -99,3 +99,9 @@ export interface Intelligence {
 
 // 202 body of GET /api/intelligence/<id> while an analysis job is queued/running.
 export interface AnalysisPending { status: 'queued' | 'running'; job: Job; previous_result: Intelligence | null; message: string }
+
+// GET /api/health (backend/app.py).
+export interface Health {
+  status: 'ok' | 'degraded'; database: 'ok' | 'unavailable'; database_backend: string; instrument_master_size: number | null
+  finbert_model_files: 'present' | 'missing'; synthetic_test_data: boolean; pipeline_version: string; job_mode: string
+}

@@ -1,0 +1,90 @@
+/* Aventra design tokens (context/Aventra_Design_Specification.md §3–4). Every colour, type, space, radius, shadow, motion and
+   layer value used by the stylesheets comes from here. Breakpoints (media queries cannot read custom properties):
+   1180 wide-laptop · 980 tablet-landscape · 760 tablet · 560 phone · 400 small phone. */
+:root {
+  color-scheme: dark;
+
+  /* Surfaces: tonal steps rather than heavy borders. */
+  --bg: #08090b;
+  --bg-1: #0d1013;
+  --bg-2: #11151a;
+  --bg-3: #151a1f;
+  --bg-4: #1b2127;
+  --line: rgba(222, 235, 242, .075);
+  --line-2: rgba(222, 235, 242, .13);
+  --line-3: rgba(222, 235, 242, .22);
+
+  /* Text (all ≥ 4.5:1 on --bg). */
+  --text: #eef1f3;
+  --text-2: #a8b0b7;
+  --text-3: #818a93;
+
+  /* Intelligence accent + semantic roles. Green = intelligence / positive / action; never decoration. */
+  --green: #4dff9a;
+  --green-2: #65f6a5;
+  --green-ink: #04150b;
+  --green-soft: rgba(77, 255, 154, .1);
+  --green-line: rgba(77, 255, 154, .32);
+  --amber: #f2b64c;
+  --orange: #ff9446;
+  --red: #ff6b6b;
+  --cyan: #5cc8f0;
+  --grey: #8e979f;
+
+  /* Risk-contribution segments (component order from the API). */
+  --seg-0: #4dff9a; --seg-1: #5cc8f0; --seg-2: #f2b64c; --seg-3: #b49cff; --seg-4: #ff8f7a; --seg-5: #8e979f;
+
+  /* Scene tints (SVG fallbacks). */
+  --scene-line: rgba(143, 163, 156, .35);
+  --scene-signal: var(--green);
+  --scene-core: #0a0d10;
+
+  /* Type. */
+  --font-display: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+  --font-ui: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'DM Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --fs-hero: clamp(2.9rem, 6.2vw, 5.6rem);
+  --fs-display: clamp(2.25rem, 4.4vw, 3.9rem);
+  --fs-display-sm: clamp(1.7rem, 3vw, 2.4rem);
+  --fs-lead: clamp(1.02rem, 1.3vw, 1.16rem);
+  --fs-body: .95rem;
+  --fs-small: .84rem;
+  --fs-label: .7rem;
+  --tracking-label: .14em;
+
+  /* Space (4-based) and layout. */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px; --s-6: 32px; --s-7: 48px; --s-8: 64px; --s-9: 96px; --s-10: 128px;
+  --section-y: clamp(72px, 8vw, 116px);
+  --wrap: 1240px;
+  --gutter: clamp(16px, 4vw, 40px);
+  --nav-h: 64px;
+
+  /* Shape and depth. */
+  --r-sm: 6px; --r-md: 10px; --r-lg: 16px; --r-xl: 22px; --r-pill: 999px;
+  --shadow-1: 0 1px 0 rgba(255, 255, 255, .03) inset, 0 12px 32px rgba(0, 0, 0, .35);
+  --shadow-2: 0 1px 0 rgba(255, 255, 255, .04) inset, 0 28px 70px rgba(0, 0, 0, .55);
+  --focus: 0 0 0 2px var(--bg), 0 0 0 4px var(--green);
+
+  /* Motion. */
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  --t-fast: .15s;
+  --t-base: .3s;
+  --t-slow: .7s;
+
+  /* Layers. */
+  --z-scene: 0;
+  --z-content: 1;
+  --z-sticky: 30;
+  --z-nav: 50;
+  --z-dropdown: 60;
+  --z-sheet: 70;
+  --z-skip: 90;
+}
+
+/* Semantic tones: components read --tone. */
+.tone-positive { --tone: var(--green); }
+.tone-warning { --tone: var(--amber); }
+.tone-elevated { --tone: var(--orange); }
+.tone-negative { --tone: var(--red); }
+.tone-info { --tone: var(--cyan); }
+.tone-neutral { --tone: var(--grey); }

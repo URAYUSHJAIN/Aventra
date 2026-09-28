@@ -17,7 +17,7 @@ function moneyFormatter(currency: string, value: number) {
 
 /** Money in the instrument's own currency (ISO codes via Intl; crypto quote assets as a suffix). */
 export function fmtMoney(value: number | null | undefined, currency: string | null | undefined) {
-  if (value === null || value === undefined) return '—'
+  if (value === null || value === undefined) return 'n/a'
   if (!currency) return plain.format(value)
   const formatter = moneyFormatter(currency, value)
   return formatter ? formatter.format(value) : `${plain.format(value)} ${currency}`
@@ -25,21 +25,28 @@ export function fmtMoney(value: number | null | undefined, currency: string | nu
 
 /** A level in the instrument's value kind: price/NAV/rate as money, yields as %, index levels as plain numbers. */
 export function fmtLevel(value: number | null | undefined, valueKind: ValueKind | undefined, currency: string | null | undefined) {
-  if (value === null || value === undefined) return '—'
+  if (value === null || value === undefined) return 'n/a'
   if (valueKind === 'yield') return `${value.toFixed(3)}%`
   if (valueKind === 'index_level' || valueKind === 'reference_rate') return plain.format(Number(value.toFixed(6)))
   return fmtMoney(value, currency)
 }
 
-export const fmtCompact = (value: number | null | undefined) => (value === null || value === undefined ? '—' : compact.format(value))
-export const fmtPct = (fraction: number | null | undefined, digits = 2) => (fraction === null || fraction === undefined ? '—' : `${fraction >= 0 ? '+' : ''}${(fraction * 100).toFixed(digits)}%`)
-export const fmtBp = (bp: number | null | undefined) => (bp === null || bp === undefined ? '—' : `${bp >= 0 ? '+' : ''}${bp.toFixed(1)} bp`)
-export const fmtScore = (value: number | null | undefined, digits = 2) => (value === null || value === undefined ? '—' : value.toFixed(digits))
-export const fmtSigned = (value: number | null | undefined, digits = 2) => (value === null || value === undefined ? '—' : `${value >= 0 ? '+' : ''}${value.toFixed(digits)}`)
+export const fmtCompact = (value: number | null | undefined) => (value === null || value === undefined ? 'n/a' : compact.format(value))
+export const fmtPct = (fraction: number | null | undefined, digits = 2) => (fraction === null || fraction === undefined ? 'n/a' : `${fraction >= 0 ? '+' : ''}${(fraction * 100).toFixed(digits)}%`)
+export const fmtBp = (bp: number | null | undefined) => (bp === null || bp === undefined ? 'n/a' : `${bp >= 0 ? '+' : ''}${bp.toFixed(1)} bp`)
+export const fmtScore = (value: number | null | undefined, digits = 2) => (value === null || value === undefined ? 'n/a' : value.toFixed(digits))
+/** Risk score as an integer, rounded half-to-even like the backend's explanation text (Python `:.0f`), so both always agree. */
+export function fmtRiskScore(score: number) {
+  const floor = Math.floor(score), diff = score - floor
+  return String(Math.abs(diff - 0.5) < 1e-9 ? (floor % 2 === 0 ? floor : floor + 1) : Math.round(score))
+}
+/** Unsigned percentage for magnitudes such as volatility. */
+export const fmtPctAbs = (fraction: number | null | undefined, digits = 2) => (fraction === null || fraction === undefined ? 'n/a' : `${(fraction * 100).toFixed(digits)}%`)
+export const fmtSigned = (value: number | null | undefined, digits = 2) => (value === null || value === undefined ? 'n/a' : `${value >= 0 ? '+' : ''}${value.toFixed(digits)}`)
 
 /** API timestamps are UTC; shown in the instrument's exchange timezone (or UTC for 24/7 markets). */
 export function fmtDateTime(iso: string | null | undefined, timeZone: string | null | undefined = 'UTC') {
-  if (!iso) return '—'
+  if (!iso) return 'n/a'
   try {
     return new Intl.DateTimeFormat(undefined, { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: timeZone || 'UTC', timeZoneName: 'short' }).format(new Date(iso))
   } catch { return new Date(iso).toISOString() }
@@ -47,13 +54,13 @@ export function fmtDateTime(iso: string | null | undefined, timeZone: string | n
 
 /** Trading dates (YYYY-MM-DD) are already local exchange dates: format them without a timezone shift. */
 export function fmtDate(isoDate: string | null | undefined) {
-  if (!isoDate) return '—'
+  if (!isoDate) return 'n/a'
   return new Intl.DateTimeFormat(undefined, { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${isoDate}T00:00:00Z`))
 }
 
 export function fmtDimension(value: number | null | undefined, unit: DimensionUnit) {
   if (unit === 'shares') return fmtCompact(value)
-  if (unit === 'bp') return value === null || value === undefined ? '—' : `${value.toFixed(1)} bp`
+  if (unit === 'bp') return value === null || value === undefined ? 'n/a' : `${value.toFixed(1)} bp`
   return fmtPct(value)
 }
 

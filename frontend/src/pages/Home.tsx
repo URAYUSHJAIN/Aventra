@@ -1,9 +1,9 @@
+import { ClosingCta } from '../components/home/ClosingCta'
 import { Hero } from '../components/home/Hero'
-import { AboutAventra } from '../components/home/AboutAventra'
-import { LiveMarketData } from '../components/home/LiveMarketData'
-import { IntelligencePreview } from '../components/home/IntelligencePreview'
-import { Services } from '../components/home/Services'
 import { HowItWorks } from '../components/home/HowItWorks'
+import { IntelligencePreview } from '../components/home/IntelligencePreview'
+import { LiveMarketData } from '../components/home/LiveMarketData'
+import { Services } from '../components/home/Services'
 import { WhyAventra } from '../components/home/WhyAventra'
-import { Contact } from '../components/home/Contact'
-export function Home(){return <main className="site-shell"><Hero/><AboutAventra/><LiveMarketData/><IntelligencePreview/><Services/><HowItWorks/><WhyAventra/><Contact/></main>}
+
+export function Home() { return <main id="main" className="page-home"><Hero /><IntelligencePreview /><LiveMarketData /><Services /><WhyAventra /><HowItWorks /><ClosingCta /></main> }

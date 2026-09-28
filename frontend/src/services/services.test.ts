@@ -86,7 +86,7 @@ describe('format', () => {
     expect(fmtMoney(1200, 'USD')).toContain('$')
     expect(fmtMoney(1200, 'INR')).toContain('₹')
     expect(fmtMoney(0.5, 'USDT')).toBe('0.5 USDT')
-    expect(fmtMoney(null, 'USD')).toBe('—')
+    expect(fmtMoney(null, 'USD')).toBe('n/a')
   })
 
   it('formats yields and basis points', () => {
@@ -104,5 +104,16 @@ describe('newsApi', () => {
   it('passes validation messages through', async () => {
     mockFetch(() => fail(400, 'News text is required.'))
     await expect(analyzeNews({ text: ' ' })).rejects.toThrow('News text is required.')
+  })
+})
+
+describe('risk score formatting', () => {
+  it('rounds half to even like the backend explanation text, so the panel and the text agree', async () => {
+    const { fmtRiskScore, fmtPctAbs } = await import('../utils/format')
+    expect(fmtRiskScore(28.5)).toBe('28')
+    expect(fmtRiskScore(29.5)).toBe('30')
+    expect(fmtRiskScore(89.3)).toBe('89')
+    expect(fmtRiskScore(6.7)).toBe('7')
+    expect(fmtPctAbs(0.0228)).toBe('2.28%')
   })
 })

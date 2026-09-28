@@ -1,5 +1,5 @@
 import { NewsAnalysis } from '../components/news/NewsAnalysis'
 
 export function NewsAnalysisPage() {
-  return <main className="site-shell"><NewsAnalysis /></main>
+  return <main id="main" className="page page-news"><NewsAnalysis /></main>
 }

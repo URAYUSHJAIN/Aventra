@@ -36,7 +36,7 @@ export async function getIntelligence(id: string, { refresh = false, signal, onP
     onPending?.(pending)
     let job = pending.job
     while (job.status === 'queued' || job.status === 'running') {
-      if (Date.now() - started > MAX_WAIT_MS) throw new Error('The analysis is taking longer than expected. It continues in the background — try again shortly.')
+      if (Date.now() - started > MAX_WAIT_MS) throw new Error('The analysis is taking longer than expected. It continues in the background; try again shortly.')
       await sleep(POLL_MS, signal)
       job = await getJob(job.id, signal)
       onPending?.({ ...pending, status: job.status === 'queued' ? 'queued' : 'running', job })
