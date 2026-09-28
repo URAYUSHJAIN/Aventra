@@ -3,7 +3,7 @@
 Repository-wide rules for any coding agent (Claude Code, Codex, Cursor, Copilot, etc.) working on Aventra.
 Claude Code additionally follows [CLAUDE.md](CLAUDE.md), which adds a mandatory workflow on top of these rules.
 
-Last verified against the repository: **2026-09-27**, after the full-system implementation pass (commit `3705a83` + uncommitted implementation; see §7).
+Last verified against the repository: **2026-09-28**, after the frontend redesign to the design specification (see §7, §32 C9–C26).
 If you find this file out of date with the repository, the repository wins — then fix this file (see §28).
 
 ---
@@ -27,8 +27,8 @@ Aventra is **not**: a price predictor, trading bot, buy/sell recommender, portfo
 
 | Layer | Actually in the repo | Planned / not present |
 |---|---|---|
-| Frontend | React 19, TypeScript (strict), Vite 8, Tailwind CSS v4 via `@tailwindcss/vite`, `lucide-react`; dev: vitest 5, @testing-library/react, jsdom. `three` + `@types/three` are in `package.json` but **unused** (C14) | React Router, chart library (both deliberately not added — C9, C15) |
-| Styling | `styles/index.css` (original) + `styles/intelligence.css` (dashboard, search, badges, states; same palette) | — |
+| Frontend | React 19, TypeScript (strict), Vite 8, Tailwind CSS v4 via `@tailwindcss/vite`, `lucide-react`, `three` (lazy-loaded decorative scenes only); dev: vitest 5, @testing-library/react, jsdom | React Router, chart library (both deliberately not added — C9, C15) |
+| Styling | `styles/index.css` (entry) → `tokens.css` (design tokens) → `base.css` (primitives) → `site.css` (nav, footer, home, pages) → `intelligence.css` (workspace). Fonts: Instrument Serif, Inter, DM Mono (index.html) | — |
 | Backend | Python 3.12, Flask 3, Flask-Cors, requests, SQLAlchemy 2 (Core), Alembic, psycopg 3; gunicorn in Docker | Pydantic/Marshmallow (C16) |
 | ML | pandas, NumPy (<2), scikit-learn (Isolation Forest, LOF), PyTorch (<2.5; FinBERT + experimental LSTM-AE), Transformers (<4.41), sentence-transformers (MiniLM), ruptures (PELT), exchange_calendars, NLTK | SHAP, LightGBM/XGBoost (no labelled risk data yet) |
 | Data | Instrument Master (~68,600 instruments from permitted listings); providers in `ml/providers/` (Upstox, Alpha Vantage, Binance, CoinGecko, Frankfurter, ECB, FRED, AMFI, mfapi, OpenFIGI, SEC); PostgreSQL (Docker) or SQLite (local/tests); `data/reference/` seeds; synthetic `data/demo/` for tests only | Parquet feature store |
@@ -77,18 +77,22 @@ Aventra/
     ├── vite.config.ts            dev proxy /api → AVENTRA_API_PROXY or 127.0.0.1:5000
     ├── vitest.config.ts, eslint.config.js
     └── src/
-        ├── App.tsx               manual routing + per-route metadata
-        ├── services/             apiClient (envelope, typed ApiError code/attempts), intelligenceApi (search, snapshots, watchlist, job polling), newsApi
+        ├── App.tsx               manual routing + per-route metadata + legacy /#about, /#contact redirects (+ App.test.tsx)
+        ├── services/             apiClient (envelope, typed ApiError code/attempts), intelligenceApi (search, snapshots, watchlist, job polling), newsApi, systemApi (/api/health)
         ├── types/api.ts          response types mirroring the backend
-        ├── hooks/useApiResource.ts, utils/format.ts (currency/timezone/value-kind aware)
-        ├── pages/                Home, IntelligencePage, CapabilityPage, NewsAnalysisPage, NotFoundPage (+ pages.test.tsx)
+        ├── hooks/                useApiResource, useHealth, useScrollSpy, useReveal; utils/format.ts (currency/timezone/value-kind aware)
+        ├── data/                 services.ts (the five modules), project.ts (public repository/doc links)
+        ├── styles/               index.css entry → tokens, base, site, intelligence
+        ├── pages/                Home, IntelligencePage, CapabilityPage, NewsAnalysisPage, AboutPage, ResearchPage, DocPage, ContactPage, NotFoundPage (+ pages.test.tsx)
+        ├── components/common/    Navbar, Footer (API status), Logo, Button, Badge (tones), Metric, Panel, SectionHeading
+        ├── components/visual/    Scene3D (lazy three.js container) + scenes/ (field, globe, terrain) + SVG fallbacks
         ├── components/search/    GlobalSearch (+ test)
-        ├── components/intelligence/  IntelligenceWorkspace, panels, LineChart, StateViews (DataUnavailableState)
-        ├── components/home/      …, LiveMarketData (watchlist + snapshots), IntelligencePreview
+        ├── components/intelligence/  IntelligenceWorkspace, panels, FingerprintGlyph, EvidenceChain, LineChart, StateViews (DataUnavailableState)
+        ├── components/home/      Hero, IntelligencePreview, LiveMarketData, Services (+ CapabilityVisual), WhyAventra, HowItWorks, ClosingCta
         └── test/                 fetchMock, fixtures/intelligence-demo.json (TEST:DEMO pipeline output)
 ```
 
-Still absent: CI, LICENSE. `App.css`, `react.svg`, `vite.svg`, and the `.demo-visual`/`.neural-*` CSS rules are unused.
+Still absent: CI, LICENSE. Unused files: `App.css`, `react.svg`, `vite.svg`, and (since the 2026-09-28 redesign) `assets/about.png`, `assets/hero page.png`, `assets/hero-shadow.png`.
 
 ## 5. Source-of-truth documents and hierarchy
 
@@ -150,7 +154,9 @@ Legend: **REAL** = working code exists · **PARTIAL** = works only in some condi
 
 | Component | Status | Evidence in repo |
 |---|---|---|
-| Landing page, Navbar (with global search), Footer | REAL | `frontend/src/components/**` |
+| Landing page, Navbar (with global search), Footer (live API status) | REAL | Redesigned 2026-09-28 to the design spec: `components/home/**`, `components/common/**` |
+| About, Research, Documentation (`/doc`), Contact pages | REAL | `AboutPage`, `ResearchPage` (content from docs/05, 17, 25), `DocPage` (publications marked Coming Soon; engineering docs link to the public repo), `ContactPage` |
+| Decorative 3D (hero behaviour field, contact globe, data terrain) | REAL | `components/visual/` — lazy chunk, off-screen pause, reduced-motion still frame, SVG fallback without WebGL |
 | Instrument Master + search (`/api/instruments/search`) | REAL | ~68,600 instruments synced from permitted listings; ranking, filters, cursor pagination |
 | Canonical IDs + capability profiles | REAL | `ml/instruments/ids.py`, `profiles.py` (11 classes) |
 | Provider registry / router / rate limits / circuit breaker / budget | REAL | `ml/providers/`; `GET /api/providers` |
@@ -165,11 +171,11 @@ Legend: **REAL** = working code exists · **PARTIAL** = works only in some condi
 | Correlation, temporal analysis, risk, evidence (with provenance) | REAL (uncalibrated weights) | `ml/correlation/`, `ml/temporal/`, `ml/risk/`, `ml/evidence/` |
 | Database + migrations | REAL | PostgreSQL (Docker, verified) / SQLite; Alembic 0001–0004 (incl. v0.1 legacy import) |
 | Background jobs (queue, worker, scheduler, async API 202 + polling) | REAL | `ml/jobs/`, `intelligence_service.py`, verified in Docker |
-| Intelligence dashboard, capability pages, homepage monitor + preview | REAL | search-driven, `?id=`; typed unavailable states; dynamic currency/timezone |
+| Intelligence dashboard, capability pages, homepage monitor + preview | REAL | search-driven, `?id=`; section tabs; fingerprint glyph and evidence chain drawn from API data; typed unavailable states; dynamic currency/timezone |
 | FinBERT text analysis `POST /api/news/analyze` + `/news-analysis` | REAL | unchanged contract; EXP-02 |
 | Evaluation | PARTIAL | EXP-03 (13 real keyless instruments, per class), EXP-01 (v0.1 Yahoo-era record), EXP-02. Equities, known-event benchmark, correlation quality, risk calibration: PLANNED |
 | Docker / Compose | REAL | Verified 2026-09-27: postgres + backend + worker + frontend; migrations, listing sync, scheduled analyses, nginx |
-| Tests | REAL | ML 73 (1 PostgreSQL-only skipped by default), backend 25, frontend 23. CI: PLANNED |
+| Tests | REAL | ML 73 (1 PostgreSQL-only skipped by default), backend 25, frontend 39. CI: PLANNED |
 | Synthetic data | TEST-ONLY | `TEST:DEMO` only with `AVENTRA_ENABLE_SYNTHETIC_TEST_DATA=1`; never a production fallback |
 | Contact form | PARTIAL | `mailto:` only if `VITE_CONTACT_EMAIL` is set |
 
@@ -216,13 +222,13 @@ Existing conventions (keep them):
 - API base URL: `import.meta.env.VITE_API_BASE_URL ?? ''` (empty → Vite `/api` proxy in dev).
 - Section components live in `components/home/`; shared primitives in `components/common/`; static content in `data/`.
 - Page metadata (title/description/og tags) is set in `App.tsx` per path.
-- Global styles live in `styles/index.css`. Match the existing class-based styling. Use Tailwind utilities only where the surrounding code already does.
+- Styles are class-based and live in `styles/` (`tokens.css` → `base.css` → `site.css` / `intelligence.css`). Use tokens (`var(--…)`), never raw colours or one-off values. Avoid bare class names that collide with Tailwind utilities (`container`, `hidden`, `visible`, `grid` …); the layout wrapper is `.wrap`.
 
 When extending:
 - Add feature folders per the Final Plan §21 (`components/dashboard/`, `fingerprint/`, `anomaly/`, `correlation/`, `risk/`, `market/`) and `types/`, `hooks/`, `utils/` **only when you add real content to them**.
 - Put shared API response types in `frontend/src/types/` and mirror the backend JSON exactly. No `any`.
 - Every API-driven component needs **loading, success, empty and error** states (ML §38). No blank panels.
-- When real endpoints exist, replace placeholder visuals in `CapabilityDemoPage.tsx` with API-backed components. Keep the existing routes working (see C9).
+- Analytical panels use `components/common/Panel`; status uses `Badge` tones (text + colour, never colour alone). Decorative 3D goes through `components/visual/Scene3D` only.
 - Introducing React Router is planned (both docs). When you do, keep every existing URL (`/news-analysis`, `/behavioural-fingerprint`, `/anomaly-detection`, `/event-correlation`, `/risk-evidence`, `/#section` anchors) working or redirecting, and keep the per-route metadata behaviour.
 - Lazy-load heavy visual dependencies (`three`) with `React.lazy`/dynamic import so they don't block the first paint.
 
@@ -380,8 +386,8 @@ Rules:
 
 Authority: `context/Aventra_Design_Specification.md`.
 - Product feel: "a serious financial intelligence product that happens to use AI". Dark financial terminal, restrained 3D depth.
-- Colour roles: **orange** = primary actions and highlights, **cyan** = technical labels and active states, **white** = main content, **grey** = secondary content. Existing tokens in `index.css`: bg `#101B20`, surface `#1B2A30`, text `#F5F7F8`/`#AAB4B8`, cyan `#62D6D0`/`#72E6E0`, orange `#F5A623`/`#FFB52E`, border `#304148`. The spec proposes a slightly different palette (C10). Do not mass-recolour without approval.
-- Fonts: Manrope (UI) + DM Mono (technical labels), already loaded. Do not add fonts.
+- Colour roles (design spec §3, tokens in `styles/tokens.css`): near-black surfaces `#08090B` / `#0D1013` / `#11151A` / `#151A1F`; **green `#4DFF9A`** = intelligence, positive/stable, primary action (never decoration); amber = warning/elevated; red = anomaly/negative; cyan = informational; grey = neutral. Do not add colours outside the tokens.
+- Fonts: Instrument Serif (editorial display), Inter (UI), DM Mono (numbers, IDs, technical labels), loaded in `index.html`. Do not add fonts.
 - Avoid generic AI/robot imagery, excess neon/glow, particle backgrounds, heavy glassmorphism, random decorative animation, overcrowded cards and stock imagery.
 - Motion: fade, slide, small scale, subtle parallax, slow 3D hover. No bouncing, spinning cards, scroll hijacking or constant background animation. Honour `prefers-reduced-motion: reduce` for every decorative animation.
 - Every visible link and button must lead to a real destination. No dead `#` links.
@@ -391,10 +397,10 @@ Authority: `context/Aventra_Design_Specification.md`.
 ## 22. Responsive-design rules
 
 - Primary desktop test sizes: 1440×900, 1366×768, 1280×720. Also check tablet (~768–900 px) and mobile (360–420 px); the existing CSS breakpoints are 900, 800, 700, 600, 560 and 420 px.
-- Sections use `min-height: 100svh`. Never clip content to force one screen. Hero CTAs must stay above the fold on 1280×720.
+- Only the hero uses `min-height: 100svh`; other sections take their natural height with `--section-y` padding. Never clip content to force one screen. Hero CTAs must stay above the fold on 1280×720 (verified 2026-09-28).
 - No horizontal page scroll at any width (the root uses `overflow-x: clip`; do not rely on it to hide overflowing components).
 - Mobile: single column, smaller type, reduced 3D depth, vertical timelines, hero order heading → description → CTA → visual.
-- The existing CSS softens scroll-snap on mobile (`proximity`). Keep that.
+- No scroll-snap (removed in the redesign: it fought sections taller than the viewport). Breakpoints: 1180, 980, 760, 560 px.
 
 ## 23. Accessibility expectations
 
@@ -413,7 +419,7 @@ Authority: `context/Aventra_Design_Specification.md`.
 - Commit or push only when the user asks. Never force-push. Never rewrite history on `main`.
 - One logical change per commit. Commit messages use the existing style `feat: …`, `fix: …`, `docs: …`.
 - Do not commit: `.env`, model weights (`backend/models/finbert/`), `node_modules/`, `frontend/dist/`, `__pycache__/`, raw data dumps, or experiment binaries.
-- The working tree may contain the user's uncommitted work (currently `three`/`@types/three` in `package.json` + lock, `.neural-*` CSS in `index.css`, the untracked `context/` folder, and `AGENTS.md`/`CLAUDE.md`; run `git status` for the live list). Never discard, stash, reset or overwrite it without asking.
+- The working tree may contain the user's uncommitted work (run `git status` for the live list). Never discard, stash, reset or overwrite it without asking.
 - If `package.json` changes, update `package-lock.json` in the same change via `npm install`, never by hand.
 
 ## 25. Rules for modifying existing code
@@ -510,7 +516,8 @@ Full list: docs/25_LIMITATIONS.md. The ones agents trip over most:
 - TypeScript is not linted (C12). Routing is manual, so every navigation is a full page load.
 - Port 5000 may already be taken on a developer machine. Use `PORT` / `AVENTRA_API_PROXY` (docs/21_DEPLOYMENT.md).
 - A global `pip install -r backend/requirements.txt` upgraded `packaging`, which conflicts with an unrelated Streamlit install on the development machine. Use a virtual environment.
-- Unused leftovers: `three`/`@types/three`, `.neural-*` and `.demo-visual` CSS, `App.css`, `react.svg`, `vite.svg`.
+- Unused leftovers: `App.css`, `react.svg`, `vite.svg`, and the old illustration PNGs (`about.png`, `hero page.png`, `hero-shadow.png`).
+- The first page with a 3D scene downloads the lazy three.js chunk (~133 kB gzip). Without WebGL (or in jsdom) an SVG fallback is shown.
 
 ## 32. Known conflicts and open questions
 
@@ -519,25 +526,27 @@ Record new conflicts here. On 2026-09-27 the user authorised autonomous decision
 | ID | Conflict | Status / decision |
 |---|---|---|
 | C1 | Empty `ML/` vs the docs' `ml/` package | **Resolved 2026-09-27:** the empty `ML/` was removed and `ml/` created (lowercase, importable as `ml.*`). |
-| C2 | Empty `doc/` vs `docs/`; `/doc` is a UI route | **Resolved 2026-09-27:** the empty `doc/` was removed; engineering docs live in `docs/`. The `/doc` UI route is not built (see C11). |
+| C2 | Empty `doc/` vs `docs/`; `/doc` is a UI route | **Resolved 2026-09-27:** the empty `doc/` was removed; engineering docs live in `docs/`. The `/doc` UI route was built on 2026-09-28 (`DocPage`). |
 | C3 | Flat backend vs `backend/app/` + `run.py` | **Resolved:** the flat layout was kept (`routes/`, `services/`, `utils/`). There is no `backend/database/`: storage lives in `ml/data/store.py` because the ML CLIs also persist results. |
 | C4 | FinBERT weights location | **Resolved:** kept `backend/models/finbert/` (`FINBERT_MODEL_PATH`). New artefacts go in `artifacts/`. No finBERT clone. |
 | C5 | API paths differ between the docs | **Resolved:** both path styles are served; an `AN-`/`EV-` prefix marks an ID. See docs/14_API_SPECIFICATION.md. |
 | C6 | Market data through Flask | **Resolved:** `/api/market/*` (snapshots by canonical ID). `marketApi.ts` was removed in Phase 10; market calls live in `intelligenceApi.ts`. |
 | C7 | Anomaly scope and scale | **Resolved:** the production ensemble is statistical + fingerprint + Isolation Forest, scored 0–1 with LOW/MEDIUM/HIGH/CRITICAL. LOF and LSTM-AE appear in EXP-01 only. PELT change points are retrospective context only (they use later bars within the window). |
 | C8 | Risk formula | **Resolved:** the ML Pipeline's six components plus a documented **anomaly gate** (context terms × anomaly score), added after the ungated sum gave ordinary sessions risk ≈ 48 on real data. The Final Plan's price/volume/event-severity/change-point terms are not used. |
-| C9 | Routes / React Router | **Open (design task):** manual routing kept; `/intelligence` added. The design-spec routes (`/about`, `/services`, `/doc`, `/services/*`) are not built. |
-| C10 | Palette | **Open:** the existing palette is kept. `intelligence.css` introduces `--av-*` custom properties with the existing values, which is the first step if a migration is approved. |
-| C11 | Homepage structure vs Design Spec | **Open (design task):** only the Market Intelligence preview was added (after LiveMarketData). WhyAventra, the contact form and CTA labels are unchanged. |
+| C9 | Routes / React Router | **Resolved 2026-09-28 (frontend redesign brief):** manual routing kept (no new dependency); `/about`, `/research`, `/doc`, `/contact` added. `/#about` and `/#contact` redirect to the new pages; `/#services`, `/#how-it-works`, `/#why-aventra`, `/#market`, `/#intelligence` remain home anchors. No `/services/*` routes: the five capability routes already exist. |
+| C10 | Palette | **Resolved 2026-09-28:** migrated to the design-spec palette (near-black + green `#4DFF9A` + semantic amber/red/cyan) via `styles/tokens.css`, as the redesign brief instructed. |
+| C11 | Homepage structure vs Design Spec | **Resolved 2026-09-28:** Hero → Market intelligence (story + real preview) → Watchlist monitor → Capabilities → Why Aventra → How it works → Closing CTA. About and Contact became pages. |
 | C12 | ESLint ignores TS | **Open:** `npm run typecheck` is the gate; `typescript-eslint` not added. |
 | C13 | Asset universe | **Superseded (Phases 1–12):** the universe is the Instrument Master synced from permitted listings. Support is claimed only where a legitimate provider supplies data (docs/06 §0). The v0.1 five-name registry remains only as a seed. |
-| C14 | Leftover `three` deps / `.neural-*` CSS | **Open, user decision:** still present and unused. |
+| C14 | Leftover `three` deps / `.neural-*` CSS | **Resolved 2026-09-28:** `three` now powers the lazy decorative scenes; the unused `.neural-*` / `.demo-visual` rules went with the old `index.css` (recoverable from git history). |
 | C15 | Chart library | **Resolved:** no library. The dependency-free SVG `LineChart` component follows the existing hand-drawn SVG approach. |
 | C16 | Validation library | **Resolved:** manual validation via `backend/utils/responses.py`; no Pydantic/Marshmallow. |
 | C17 | Sentiment output shape | **Resolved:** additive fields only (`sentiment`, `confidence`, `model`, `model_version`, `timestamp`, `source`, `text`); `label` is unchanged. |
 | C18 | ±15 min window vs available data | **Resolved:** daily observations for analytics. The correlation window is session-based ([open − 24 h, close + 12 h], configurable). No intraday data is used. |
 | C19 | Vercel vs Docker | **Resolved:** both are supported (docs/21_DEPLOYMENT.md). |
-| C20 | Research/patent cards without documents | **Open:** not built; no placeholder patent/paper content. |
+| C20 | Research/patent cards without documents | **Resolved 2026-09-28:** `/doc` shows PATENT, RESEARCH PAPER and REVIEW PAPER cards, all marked **Coming Soon** with neutral copy (no invented publication or patent information). Replace with real links when documents exist. |
+| C25 | Fonts: §21 said "do not add fonts"; design spec §4 requires an editorial serif + an Inter-style sans | **Resolved 2026-09-28 by the §5 hierarchy (spec rank 4 > AGENTS rank 6):** Instrument Serif + Inter + DM Mono; Manrope dropped. |
+| C26 | Design spec file: `context/Aventra_Design_Specification.md` had been replaced by an untracked `…_Final.md`; the redesign brief names the canonical path | **Resolved 2026-09-28:** the final spec was moved to `context/Aventra_Design_Specification.md`; no second design spec remains. |
 | C22 | **Provider terms (Phase 0, 2026-09-27):** Yahoo's Terms of Service §2.4(i) prohibit automated data collection without permission, and the NSE Terms of Use prohibit automated collection from the NSE website. | **Resolved by the user (master implementation instruction):** Yahoo removed from production (no fallback); legacy Yahoo rows excluded from reads. NSE: no automated download; manual import only (`ml.instruments.sync --import-nse`). |
 | C23 | Google News RSS (v0.1 news source) vs robots.txt: `news.google.com/robots.txt` disallows `/rss/search` | **Resolved 2026-09-27:** removed. News comes only from Alpha Vantage `NEWS_SENTIMENT` (key; US tickers, crypto, forex). Indian equities have no permitted news source and report `unavailable`. Legacy RSS rows are excluded from production reads. |
 | C24 | NSE calendar | **Resolved:** exchange_calendars has no XNSE; XBOM is the proxy for session logic, historical sessions come from observed bars (docs/06 §3). |

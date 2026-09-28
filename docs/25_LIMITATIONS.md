@@ -40,8 +40,9 @@
 
 - The API process keeps a small in-memory cache for sync mode only. The worker and API share state through the database.
 - One gunicorn worker (FinBERT memory); the worker container scales horizontally on PostgreSQL (`SKIP LOCKED`).
-- The frontend uses a manual router and hand-drawn SVG charts.
-- Design-specification items not implemented: `/doc` route, Research & Documentation cards, contact globe, homepage reordering (AGENTS.md C11, C20).
+- The frontend uses a manual router (every navigation is a full page load) and hand-drawn SVG charts.
+- The `/doc` publication cards (patent, research paper, review paper) are marked Coming Soon: no documents exist yet.
+- The 3D scenes are decorative; the first page that shows one downloads the three.js chunk (~133 kB gzip). There is no "Financials" tab because no fundamentals endpoint exists.
 - `pip install` of the backend requirements may upgrade shared packages in a global Python (it upgraded `packaging`, which conflicts with an unrelated Streamlit install on the development machine). Use a virtual environment.
 
 ## Future work (ordered)
