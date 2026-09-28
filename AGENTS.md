@@ -85,7 +85,7 @@ Aventra/
         ├── styles/               index.css entry → tokens, base, site, intelligence
         ├── pages/                Home, IntelligencePage, CapabilityPage, NewsAnalysisPage, AboutPage, ResearchPage, DocPage, ContactPage, NotFoundPage (+ pages.test.tsx)
         ├── components/common/    Navbar, Footer (API status), Logo, Button, Badge (tones), Metric, Panel, SectionHeading
-        ├── components/visual/    Scene3D (lazy three.js container) + scenes/ (field, globe, terrain) + SVG fallbacks
+        ├── components/visual/    Scene3D (lazy three.js container) + scenes/ (field, globe, terrain, mountain) + SVG fallbacks
         ├── components/search/    GlobalSearch (+ test)
         ├── components/intelligence/  IntelligenceWorkspace, panels, FingerprintGlyph, EvidenceChain, LineChart, StateViews (DataUnavailableState)
         ├── components/home/      Hero, IntelligencePreview, LiveMarketData, Services (+ CapabilityVisual), WhyAventra, HowItWorks, ClosingCta
@@ -156,7 +156,7 @@ Legend: **REAL** = working code exists · **PARTIAL** = works only in some condi
 |---|---|---|
 | Landing page, Navbar (with global search), Footer (live API status) | REAL | Redesigned 2026-09-28 to the design spec: `components/home/**`, `components/common/**` |
 | About, Research, Documentation (`/doc`), Contact pages | REAL | `AboutPage`, `ResearchPage` (content from docs/05, 17, 25), `DocPage` (publications marked Coming Soon; engineering docs link to the public repo), `ContactPage` |
-| Decorative 3D (hero behaviour field, contact globe, data terrain) | REAL | `components/visual/` — lazy chunk, off-screen pause, reduced-motion still frame, SVG fallback without WebGL |
+| Decorative 3D (hero intelligence field with cursor response and label-linked lifecycle, contact globe, data terrain, About-page summit) | REAL | `components/visual/` — lazy chunk, off-screen pause, reduced-motion still frame, SVG fallback without WebGL |
 | Instrument Master + search (`/api/instruments/search`) | REAL | ~68,600 instruments synced from permitted listings; ranking, filters, cursor pagination |
 | Canonical IDs + capability profiles | REAL | `ml/instruments/ids.py`, `profiles.py` (11 classes) |
 | Provider registry / router / rate limits / circuit breaker / budget | REAL | `ml/providers/`; `GET /api/providers` |

@@ -1,864 +1,784 @@
-# Aventra — UI/UX Design Specification
+# Aventra Design Specification
 
-## 1. Design Goal
+## 1. Purpose
 
-Aventra should feel like a **premium financial intelligence product**, not a generic AI landing page.
+Aventra is a financial intelligence platform designed to turn fragmented
+market signals into contextual, explainable intelligence.
 
-Visual direction:
+The interface should communicate:
 
-**Dark financial terminal + premium product website + restrained 3D depth**
+> **Signal → Context → Explanation → Evidence**
 
-Avoid:
-- generic AI/robot imagery
-- excessive neon/glow
-- particle backgrounds
-- excessive glassmorphism
-- random decorative animation
-- stock-template sections
-- overcrowded cards
+The product should feel like a:
 
-The current hero design is the visual baseline: dark navy/charcoal, cyan/teal technical accents, orange/gold actions, large white typography and a financial 3D visual.
+> **Financial Intelligence Instrument**
 
----
+The design must not feel like a generic AI SaaS dashboard, generic admin
+panel, crypto dashboard, or template landing page.
 
-## 2. Color System
+------------------------------------------------------------------------
 
-```text
-Background  #071216 / #0B171B / #0E1C21
-Surface     #102126 / #13282E
-Border      #1E3940 / #28464C
-Primary     #F6A51A / #FFB52E
-Cyan        #26D9D2 / #25C9D4
-Text        #F4F7F8
-Muted       #94A6AA
-```
+# 2. Core Design Direction
 
-Orange = primary actions/highlights.  
-Cyan = technical labels, active states and subtle accents.  
-White = main content.  
-Grey = secondary content.
+### Visual character
 
----
+**Premium dark editorial fintech + scientific data visualization +
+restrained 3D**
 
-## 3. Typography
+The experience should combine:
 
-Use one modern font consistently:
+-   editorial typography
+-   strong whitespace
+-   precise information hierarchy
+-   financial data visualization
+-   subtle spatial depth
+-   meaningful 3D
+-   controlled motion
+-   technical details shown progressively
 
-- Inter
-- Manrope
-- Plus Jakarta Sans
+The design should feel sophisticated without becoming decorative.
 
-Hero heading:
+### Design principle
 
-```text
-Desktop: 72–96px
-Tablet: 48–64px
-Mobile: 38–48px
-Weight: 600–700
-Line-height: 0.95–1.05
-```
+> **Complex intelligence underneath. Simple interface above.**
 
----
+------------------------------------------------------------------------
 
-## 4. Global Viewport Rule
+# 3. Brand System
 
-The landing page should be designed for a laptop viewport.
+## Background
 
-Use:
+Primary:
 
-```css
-min-height: 100svh;
-```
+`#08090B`
 
-Major landing sections should visually fit within approximately one screen where practical.
+Secondary surfaces:
 
-Primary desktop test sizes:
+`#0D1013`\
+`#11151A`\
+`#151A1F`
 
-```text
-1440 × 900
-1366 × 768
-1280 × 720
-```
+Use subtle tonal differences rather than heavy card borders.
 
-Do not clip content to force exactly `100vh`. Smaller screens must remain usable.
+## Primary intelligence accent
 
----
+`#4DFF9A`
 
-# 5. Navbar
+Alternative:
 
-The current navbar is too generic.
+`#65F6A5`
 
-Desktop:
+Green represents intelligence, positive/stable state, action, or
+confirmed signal.
 
-```text
-[ Aventra Logo ]
+Do not use green everywhere.
 
-          Home   About Us   Services   Contact
+## Semantic colours
 
-                                  [ Explore ]
-```
+-   Positive/stable → green
+-   Warning/elevated → amber
+-   Anomaly/negative → red
+-   Informational → cyan/blue
+-   Neutral → muted grey
 
-Remove unnecessary desktop icons such as profile/search unless they become real product features.
+Status must not rely only on colour.
 
-Dimensions:
+------------------------------------------------------------------------
 
-```text
-max-width: 1240–1320px
-height: 64–72px
-top margin: 18–24px
-border radius: 18–22px
-```
+# 4. Typography
 
-Use a subtle translucent dark surface and thin border.
+Use an editorial display/serif style for selected major storytelling
+headlines.
 
-Use the existing Aventra logo asset.
+Use a modern sans-serif such as Inter/Geist-style typography for:
 
-### Interaction
+-   navigation
+-   buttons
+-   controls
+-   body text
+-   UI
 
-Navigation links:
+Use monospace for:
 
-```text
-normal → white
-hover  → cyan
-active → cyan underline/indicator
-```
+-   prices
+-   percentages
+-   timestamps
+-   IDs
+-   technical values
+-   model/system metadata
 
-Primary CTA:
+Typography should create hierarchy without excessive borders or cards.
 
-```text
-orange
-```
+------------------------------------------------------------------------
 
-Mobile:
+# 5. Layout
 
-```text
-[ Logo ]                         [ Menu ]
-```
+Avoid uniform card grids.
 
-Menu opens:
+Prefer:
 
-```text
-Home
-About Us
-Services
-Contact
-Docs
-```
+-   asymmetrical composition
+-   large focal elements
+-   whitespace
+-   editorial sections
+-   controlled overlap
+-   spatial grouping
+-   progressive disclosure
+-   occasional dense analytical areas
 
----
+The layout should feel intentionally composed.
 
-# 6. Hero — First Screen
+Where a section is designed around a viewport, approximately one screen
+of content may be used, but never hide content simply to enforce
+`100vh`.
 
-Layout:
+------------------------------------------------------------------------
 
-```text
-┌──────────────────────────────────────────────────┐
-│ NAVBAR                                           │
-│                                                  │
-│ AI-POWERED FINANCIAL INTELLIGENCE               │
-│                                                  │
-│ Detect Hidden                                   │
-│ Patterns.                                       │
-│ Understand                                      │
-│ Market Risk.                 3D VISUAL          │
-│                                                  │
-│ short description                               │
-│                                                  │
-│ [ Explore Intelligence ] [ How It Works ]       │
-└──────────────────────────────────────────────────┘
-```
+# 6. 3D Philosophy
 
-Hero copy:
+3D must communicate meaning.
 
-**Detect Hidden Patterns. Understand Market Risk.**
+Do not add 3D only because it looks modern.
 
-Description:
+## Behavioural Fingerprint
 
-> Aventra combines market behaviour, financial news, sentiment and temporal signals to identify unusual patterns and provide contextual, explainable risk insights.
+Represent behavioural structure spatially.
 
-Buttons:
+Desired conceptual state:
 
-```text
-Explore Intelligence
-How It Works
-```
+`stable structure → signal → local distortion → anomaly pulse → equilibrium`
 
-Do not let the CTA fall below the first laptop viewport.
+## Market Intelligence
 
----
+A living market visualization showing relationships and signals.
 
-# 7. Hero 3D Visual
+## Risk Field
 
-Keep the existing financial visual direction but make it feel like a designed product composition.
+A spatial risk landscape/grid where appropriate.
 
-Layer:
+## Evidence Network
 
-```text
-dark background
-→ subtle cyan/orange light
-→ financial monitor
-→ main 3D object
-→ chart layers
-→ 2–3 small information cards
-→ shadow
-```
+Connected evidence nodes representing actual relationships.
 
-Maximum floating cards: **3**.
+## Global Intelligence Globe
 
-Examples:
+A dark globe with:
 
-```text
-ANOMALY REVIEW
-Unusual volume detected
+-   slow rotation
+-   subtle signal arcs
+-   sparse nodes
+-   restrained glow
+-   small mouse/parallax response
+-   slow camera movement
 
-RISK SIGNAL
-Context required
+## Data Terrain
 
-SENTIMENT SHIFT
-Negative signal
-```
+Use subtle terrain-like geometry for the Why Aventra/footer experience.
 
-Use slow motion only:
+It should represent a financial data landscape rather than literal
+mountains.
 
-```text
-translateY ± 6–10px
-rotateZ ± 1deg
-5–8 seconds
-```
+Motion should be slow, approximately 10--30 seconds for major cycles.
 
-No bouncing or aggressive rotation.
+------------------------------------------------------------------------
 
----
+# 7. Motion
 
-# 8. About Aventra
+Motion is purposeful.
 
-Keep it compact.
+It should communicate:
 
-```text
-ABOUT AVENTRA
-
-A financial intelligence layer
-for understanding unusual
-market behaviour.
-
-Short explanation.
-
-Market data     News
-Behaviour       Context
-Risk            Evidence
-```
-
-Use typography and separators instead of a grid of generic cards.
-
----
-
-# 9. Live Market Intelligence
-
-Section title:
-
-**Market Intelligence**
-
-Subheading:
-
-> Live market context, behaviour and signals in one view.
-
-Layout:
-
-```text
-Asset Search
-
-Price     Change     Volume     Volatility
-
-┌─────────────────────────┬──────────────────┐
-│ Market Chart            │ Market Signal    │
-│                         │                  │
-└─────────────────────────┴──────────────────┘
-```
-
-Show real backend-driven data:
-
-- price
-- percentage change
-- volume
-- volatility
-- anomaly state
-- relevant market signal
-
-Frontend must call Flask; do not directly couple UI components to the provider.
-
----
-
-# 10. Services — Intelligence Suite
-
-Five capabilities:
-
-### 01 — Behavioural Fingerprinting
-Understand normal behaviour for an asset.
-
-### 02 — Anomaly Detection
-Identify unusual price, volume and volatility behaviour.
-
-### 03 — AI Financial News Analysis
-Analyse financial text and sentiment using FinBERT.
-
-### 04 — Cross-Source Event Correlation
-Connect market anomalies with relevant financial events/news.
-
-### 05 — Risk & Evidence
-Turn multiple signals into contextual, explainable evidence.
-
-Do not make five identical flat cards.
-
-Use large numbered sections/cards with subtle depth.
-
-Hover:
-
-```text
-translateY(-6px)
-small scale
-cyan/orange accent
-```
-
----
-
-# 11. How It Works
-
-Title:
-
-**From Signal to Evidence**
-
-Desktop:
-
-```text
-01 Market Data
-      ↓
-02 Behaviour
-      ↓
-03 Anomaly
-      ↓
-04 News Context
-      ↓
-05 Correlation
-      ↓
-06 Evidence
-```
-
-Use a thin cyan connection line.
-
-On mobile, convert this to a vertical timeline.
-
-Do not use six oversized cards.
-
----
-
-# 12. Behavioural Fingerprinting Showcase
-
-This is the core product feature.
-
-Left:
-
-```text
-CORE INTELLIGENCE
-
-Adaptive Behavioural
-Fingerprinting
-
-Understand what normal
-behaviour looks like.
-```
-
-Right:
-
-```text
-┌──────────────────────────────┐
-│ Normal Behaviour             │
-│ ───────────────────────────  │
-│ historical baseline          │
-│                              │
-│ Current Behaviour            │
-│ ──────────────────────●────  │
-│ current deviation            │
-└──────────────────────────────┘
-```
-
-Use a real line chart/baseline visualization.
-
----
-
-# 13. Research & Documentation
-
-Create three floating 3D cards.
-
-```text
-┌──────────────┐
-│ PATENT       │
-│ Aventra      │
-│ Core Concept │
-│ View →       │
-└──────────────┘
-
-┌──────────────┐
-│ RESEARCH     │
-│ PAPER        │
-│ View →       │
-└──────────────┘
-
-┌──────────────┐
-│ REVIEW PAPER │
-│ Coming Soon  │
-│ Stay tuned   │
-└──────────────┘
-```
-
-Use subtle depth:
-
-```text
-perspective: 1200px
-translateZ
-shadow
-```
-
-Hover:
-
-```text
-translateY(-12px)
-scale(1.025)
-```
-
-Avoid dramatic rotations.
-
-Documentation route:
-
-```text
-/doc
-```
-
-Patent and research-paper cards should link to their actual documents/routes.
-
----
-
-# 14. Documentation Page
-
-Route:
-
-```text
-/doc
-```
-
-Structure:
-
-```text
-Documentation
-
-Aventra
-├── System Overview
-├── Architecture
-├── Behavioural Fingerprinting
-├── Anomaly Detection
-├── Financial News Analysis
-├── Event Correlation
-├── Risk & Evidence
-├── Research
-└── Patent
-```
-
-Desktop can use a left documentation navigation rail.
-
-Mobile should use stacked navigation/dropdown.
-
----
-
-# 15. Contact Page
-
-Keep contact compact.
-
-Desktop:
-
-```text
-┌──────────────────────┬────────────────────────┐
-│ Let's connect.       │                        │
-│                      │       3D EARTH         │
-│ Research             │       / GLOBE         │
-│ Technical            │                        │
-│ Collaboration        │                        │
-│                      │                        │
-└──────────────────────┴────────────────────────┘
-```
-
-Approximately 50% text / 50% visual.
-
-Do not create a huge traditional contact form.
-
-Content:
-
-```text
-Let's connect.
-
-Have a research collaboration,
-technical question, or project inquiry?
-
-Email
-Portfolio
-GitHub / LinkedIn
-```
-
----
-
-# 16. Contact 3D Earth
-
-Use a proper dark 3D globe.
-
-Characteristics:
-
-- slow rotation
-- dark surface
-- subtle cyan/orange illumination
-- atmospheric glow
-- premium depth
-
-Rotation:
-
-```text
-20–40 seconds
-```
-
-Do not spin quickly.
-
----
-
-# 17. Footer
-
-Keep the footer minimal.
-
-```text
-AVENTRA
-
-Detect hidden patterns.
-Understand market risk.
-
-Home   About   Services   Contact   Docs
-
-© 2026 Aventra
-```
-
-Use a subtle text hover effect on `AVENTRA`:
-
-- letter spacing expansion
-- subtle cyan glow
-- slight vertical movement
-
-No giant footer sitemap.
-
----
-
-# 18. Homepage Order
-
-Final landing page:
-
-```text
-01 Hero
-02 About Aventra
-03 Market Intelligence
-04 Intelligence Suite
-05 How It Works
-06 Behavioural Fingerprinting
-07 Research & Documentation
-08 Contact CTA
-09 Footer
-```
-
-Do not add unnecessary sections.
-
----
-
-# 19. Visual Rhythm
-
-Alternate:
-
-```text
-large visual
-→ information
-→ interactive data
-→ process
-→ deep feature
-→ research
-→ contact
-```
-
-This prevents the page from becoming a wall of cards.
-
----
-
-# 20. 3D Design Language
-
-Create depth through:
-
-```text
-perspective
-layering
-shadows
-blur
-z-index
-subtle transforms
-lighting
-```
-
-Use:
-
-```css
-perspective: 1200px;
-transform-style: preserve-3d;
-backface-visibility: hidden;
-```
-
-Do not rely on:
-
-- giant card rotations
-- excessive neon
-- floating random objects
-- constant animation
-
----
-
-# 21. Motion
-
-Allowed:
-
-- fade
-- slide
-- small scale
-- subtle parallax
-- 3D hover
-- line reveal
-- metric count-up for real data
-- slow globe rotation
+-   transition
+-   state
+-   hierarchy
+-   data change
+-   spatial relationships
+-   interaction
 
 Avoid:
 
-- bouncing
-- spinning cards
-- scroll hijacking
-- constant background animation
+-   constant spinning
+-   excessive particles
+-   bouncing
+-   aggressive parallax
+-   animation on every element
+-   flashy transitions
 
-Support:
+Respect:
 
-```css
-@media (prefers-reduced-motion: reduce)
+`prefers-reduced-motion`
+
+------------------------------------------------------------------------
+
+# 8. Navigation
+
+Navigation should be a premium control surface.
+
+It should include:
+
+-   Aventra logo/identity
+-   primary navigation
+-   important action/search
+-   responsive mobile navigation
+
+Avoid oversized admin-style sidebars.
+
+Keep navigation visually quiet so content remains dominant.
+
+------------------------------------------------------------------------
+
+# 9. Homepage
+
+## Hero
+
+Primary category:
+
+**FINANCIAL INTELLIGENCE PLATFORM**
+
+Primary headline:
+
+**Understand What The Market Is Really Doing.**
+
+Supporting message should explain that Aventra brings together:
+
+-   market behaviour
+-   unusual patterns
+-   news
+-   cross-source events
+-   risk
+-   evidence
+
+Include an instrument search.
+
+Possible example instruments:
+
+-   RELIANCE
+-   AAPL
+-   BTC
+-   USDINR
+-   NIFTY
+
+Examples must not imply fabricated live values.
+
+Hero visual:
+
+A living 3D market/behavioural intelligence object.
+
+------------------------------------------------------------------------
+
+# 10. Market Intelligence Section
+
+Core concept:
+
+> **Market intelligence, in one view.**
+
+The user should understand that one instrument can be investigated
+through:
+
+-   current state
+-   behaviour
+-   anomaly
+-   news
+-   events
+-   risk
+-   evidence
+
+The dashboard/product visualization should emerge naturally from the
+storytelling.
+
+Closing concept:
+
+> **From fragmented signals to one explainable view.**
+
+CTA:
+
+**Explore Intelligence →**
+
+------------------------------------------------------------------------
+
+# 11. Intelligence Workspace
+
+The intelligence interface is a financial investigation workspace.
+
+Recommended hierarchy:
+
+1.  Instrument
+2.  Current state
+3.  Key insight
+4.  Behaviour
+5.  Anomaly/context
+6.  News
+7.  Risk
+8.  Evidence
+
+Possible tabs:
+
+-   Overview
+-   Intelligence
+-   Price
+-   News
+-   Risk
+-   Evidence
+-   Financials
+
+Only show capabilities that exist in the application.
+
+------------------------------------------------------------------------
+
+# 12. Behavioural Fingerprint
+
+The behavioural fingerprint is one of Aventra's signature visuals.
+
+It should communicate that the system learns/represents market behaviour
+and identifies deviations.
+
+It should not be merely a decorative 3D object.
+
+Where actual data supports it, visually communicate:
+
+-   normal behaviour
+-   deviation
+-   unusual signal
+-   anomaly
+-   contextual state
+
+------------------------------------------------------------------------
+
+# 13. Risk
+
+Risk should not be represented only by one large opaque number.
+
+Show:
+
+-   contributing factors
+-   context
+-   signal relationships
+-   evidence
+-   supporting explanations
+
+Use visual hierarchy so the user can understand why a risk state exists.
+
+Do not invent risk values.
+
+------------------------------------------------------------------------
+
+# 14. News + Sentiment
+
+News should be contextual.
+
+Where available show:
+
+-   source
+-   time
+-   headline
+-   relevance
+-   sentiment
+-   relationship to instrument/event
+
+FinBERT is a technical implementation detail.
+
+The main UI should communicate understandable financial intelligence
+rather than model jargon.
+
+------------------------------------------------------------------------
+
+# 15. Evidence Chain
+
+Evidence is a signature Aventra concept.
+
+Represent the relationship:
+
+**Signal → Context → Event/News → Interpretation → Risk**
+
+Possible visual forms:
+
+-   connected nodes
+-   timeline
+-   evidence path
+-   relationship graph
+
+Only display relationships supported by actual backend data.
+
+------------------------------------------------------------------------
+
+# 16. Why Aventra
+
+Primary concept:
+
+**DESIGNED FOR CONTEXT**
+
+Headline:
+
+**Financial data is abundant. Context is not.**
+
+## Problem story
+
+### 01 --- Fragmented Data
+
+PRICE\
+NEWS\
+EVENTS\
+VOLUME\
+REPORTS\
+SENTIMENT
+
+These sources exist separately.
+
+### 02 --- Lack of Context
+
+A market movement creates the question:
+
+**But why?**
+
+### 03 --- Information Overload
+
+Multiple streams need to become:
+
+**SIGNAL / CONTEXT / EVIDENCE**
+
+### 04 --- Unclear Risk
+
+**Market Movement + Behaviour + News + Events → Risk Context**
+
+Then introduce:
+
+-   Unified Intelligence
+-   Behavioural Understanding
+-   Context-Rich Insights
+-   Explainable Risk
+
+Use restrained 3D/data terrain.
+
+Do not create an excessive glowing green landscape.
+
+------------------------------------------------------------------------
+
+# 17. Services
+
+Five core modules:
+
+### 01
+
+**Behavioural Fingerprinting**
+
+### 02
+
+**Anomaly Detection**
+
+### 03
+
+**News Intelligence**
+
+### 04
+
+**Cross-Source Correlation**
+
+### 05
+
+**Explainable Risk**
+
+Do not display these as five identical cards.
+
+Each should have its own spatial/editorial treatment.
+
+------------------------------------------------------------------------
+
+# 18. How It Works
+
+Show the actual product flow:
+
+``` text
+USER
+↓
+INSTRUMENT SEARCH
+↓
+INSTRUMENT RESOLUTION
+↓
+PROVIDER ROUTER
+↓
+REAL DATA
+↓
+VALIDATION
+↓
+FEATURE ENGINEERING
+↓
+ML INTELLIGENCE
+↓
+RISK + EVIDENCE
+↓
+USER
 ```
 
-Disable decorative motion when enabled.
+Supporting concepts may include:
 
----
+-   Instrument Master
+-   provider selection
+-   validation/provenance
+-   behavioural fingerprint
+-   anomaly detection
+-   financial news
+-   FinBERT
+-   cross-source correlation
+-   risk
+-   evidence
 
-# 22. Responsive Rules
+------------------------------------------------------------------------
 
-### Desktop
+# 19. About
 
-Use two-column layouts where appropriate.
+Editorial opening:
 
-### Tablet
+> **Financial data is abundant. Context is not.**
 
-Reduce hero typography and spacing. Collapse navbar.
+Explain:
 
-### Mobile
+-   what Aventra is
+-   why it exists
+-   how it approaches financial intelligence
+-   its research direction
+-   explainability philosophy
 
-Use:
+Avoid exaggerated claims.
 
-```text
-single column
-smaller typography
-reduced 3D depth
-vertical service sections
-vertical How It Works timeline
+------------------------------------------------------------------------
+
+# 20. Research
+
+Research page structure:
+
+-   Research Problem
+-   Objective
+-   Methodology
+-   Behavioural Fingerprinting
+-   Anomaly Detection
+-   News Intelligence
+-   Cross-Source Correlation
+-   Risk & Evidence
+-   Evaluation
+-   Limitations
+-   Future Work
+
+Technical concepts should be explained clearly without overwhelming the
+main product experience.
+
+------------------------------------------------------------------------
+
+# 21. Documentation
+
+`/doc`
+
+Use three premium floating/spatial cards:
+
+**PATENT**
+
+**RESEARCH PAPER**
+
+**REVIEW PAPER**
+
+Use actual available documents/links.
+
+If unavailable:
+
+**Coming Soon**
+
+Never invent publication or patent information.
+
+------------------------------------------------------------------------
+
+# 22. Contact
+
+Split-screen composition:
+
+### Left
+
+Contact content/form.
+
+### Right
+
+Subtle rotating 3D intelligence globe.
+
+The globe should remain secondary to the contact task.
+
+------------------------------------------------------------------------
+
+# 23. Footer
+
+Keep it minimal.
+
+Include:
+
+-   Aventra identity
+-   navigation
+-   documentation links
+-   relevant project information
+
+Optional subtle data terrain behind/below the footer.
+
+The terrain should be slow and understated.
+
+------------------------------------------------------------------------
+
+# 24. Responsive Design
+
+Design intentionally for:
+
+-   large desktop
+-   laptop
+-   tablet
+-   mobile
+
+Do not simply scale desktop downward.
+
+On mobile, prioritize:
+
+``` text
+Instrument
+↓
+Current State
+↓
+Key Insight
+↓
+Behaviour
+↓
+News
+↓
+Risk
+↓
+Evidence
 ```
 
-Hero order:
+3D complexity should be reduced on mobile.
 
-```text
-heading
-description
-CTA
-visual
+Provide fallback visuals where necessary.
+
+------------------------------------------------------------------------
+
+# 25. Reusable UI Primitives
+
+Recommended reusable primitives:
+
+``` text
+AventraButton
+AventraInput
+AventraBadge
+AventraMetric
+AventraPanel
+AventraSection
+AventraDataLabel
+AventraChart
+AventraSignal
+AventraEvidenceNode
+Aventra3DContainer
+AventraNavigation
+AventraFooter
+AventraLoadingState
+AventraEmptyState
+AventraErrorState
 ```
 
----
+Adapt to the actual project architecture.
 
-# 23. Routes
+------------------------------------------------------------------------
+
+# 26. Asset Strategy
+
+Reuse existing official Aventra branding.
+
+The frontend implementation may create appropriate assets through:
+
+-   SVG
+-   CSS
+-   Three.js/WebGL
+-   chart/data visualization
+-   optimized images where necessary
+
+Do not create unnecessary stock-image galleries.
+
+Do not create decorative assets without purpose.
+
+------------------------------------------------------------------------
+
+# 27. Accessibility
 
 Required:
 
-```text
-/
- /about
- /services
- /contact
- /doc
-```
+-   semantic HTML
+-   keyboard navigation
+-   visible focus
+-   accessible forms
+-   appropriate ARIA
+-   sufficient contrast
+-   meaningful alt text
+-   reduced-motion support
+-   non-colour-only status indicators
 
-Optional service routes:
+------------------------------------------------------------------------
 
-```text
-/services/fingerprint
-/services/anomaly
-/services/news
-/services/correlation
-/services/risk
-```
+# 28. Performance
 
-Every visible button/link must have a real destination.
-
----
-
-# 24. Component Structure
+3D and animation must not compromise usability.
 
 Use:
 
-```text
-Navbar
-Hero
-About
-MarketIntelligence
-ServiceSuite
-HowItWorks
-FingerprintShowcase
-ResearchCards
-Contact
-Footer
-```
+-   lazy loading
+-   code splitting where useful
+-   controlled animation loops
+-   reduced mobile complexity
+-   optimized assets
+-   appropriate memoization
+-   static fallbacks
 
-Frontend stack:
+Avoid unnecessary heavy WebGL scenes.
 
-```text
-React
-TypeScript
-Vite
-Tailwind CSS
-React Router
-```
+------------------------------------------------------------------------
 
-Keep API calls in a service layer.
+# 29. Design Do
 
----
+-   Use whitespace.
+-   Use strong typography.
+-   Use asymmetry.
+-   Use meaningful data visualization.
+-   Use restrained 3D.
+-   Make evidence understandable.
+-   Make risk explainable.
+-   Make complex intelligence feel simple.
+-   Maintain consistent visual language.
+-   Use real application data.
 
-# 25. Asset Rules
+------------------------------------------------------------------------
 
-Use existing Aventra assets first.
+# 30. Design Don't
 
-Suggested:
+Do not create:
 
-```text
-assets/
-├── logo
-├── hero
-├── market
-├── research
-├── documents
-└── contact
-```
+-   generic AI dashboard layouts
+-   excessive card grids
+-   excessive green glow
+-   neon cyberpunk styling
+-   random 3D objects
+-   giant decorative spheres
+-   constant particle effects
+-   fake financial numbers
+-   fake news
+-   fake risk scores
+-   fake ML results
+-   unnecessary stock imagery
+-   excessive animation
+-   inaccessible interactions
+-   desktop-only layouts
 
-Do not introduce unrelated stock imagery.
+------------------------------------------------------------------------
 
-The product should visually depend on:
+# 31. Final Experience Goal
 
-- Aventra logo
-- financial visualization
-- actual market data
-- UI composition
-- controlled 3D elements
+The final product should feel like:
 
----
+> **A financial intelligence instrument built for understanding market
+> context.**
 
-# 26. Current Design Improvements
+The visual experience should move naturally through:
 
-### Navbar
+**Signal → Context → Explanation → Evidence**
 
-Problem:
-- too generic
-- unnecessary empty space
-- CTA feels disconnected
-
-Fix:
-- compact navigation
-- stronger logo
-- clear active state
-- fewer controls
-- better spacing
-
-### Hero
-
-Problem:
-- floating labels compete with main visual
-- CTA can fall below shorter laptop screens
-- visual hierarchy can be tighter
-
-Fix:
-- keep hero within first screen
-- maximum three floating labels
-- move CTA higher
-- stronger depth
-- contained visual
-
-### Overall
-
-The page should communicate:
-
-```text
-DATA
- ↓
-BEHAVIOUR
- ↓
-SIGNAL
- ↓
-CONTEXT
- ↓
-EVIDENCE
-```
-
-not simply “AI + finance”.
-
----
-
-# 27. Definition of Done
-
-- [ ] Hero fits a laptop screen.
-- [ ] Navbar is compact and premium.
-- [ ] Existing Aventra logo asset is used.
-- [ ] No unnecessary desktop icons.
-- [ ] Hero has controlled 3D depth.
-- [ ] No generic AI/robot aesthetic.
-- [ ] Dark/cyan/orange palette is consistent.
-- [ ] Live Market Intelligence is visible.
-- [ ] Market data is backend-driven.
-- [ ] Five services are represented.
-- [ ] How It Works explains the complete pipeline.
-- [ ] Fingerprinting has a dedicated visual showcase.
-- [ ] Research section has three floating cards.
-- [ ] Patent card works.
-- [ ] Research paper card works.
-- [ ] Review paper says Coming Soon.
-- [ ] `/doc` exists.
-- [ ] Documentation card routes to `/doc`.
-- [ ] Contact is approximately 50/50 text and globe.
-- [ ] Globe has subtle rotation.
-- [ ] Footer is minimal.
-- [ ] Footer links to documentation.
-- [ ] Aventra footer text has subtle hover interaction.
-- [ ] Mobile is fully responsive.
-- [ ] Reduced-motion support exists.
-- [ ] No dead links.
-- [ ] No excessive animation.
-- [ ] No unnecessary AI-themed decoration.
-
----
-
-# 28. Final UX Principle
-
-Aventra should **not** look like another AI startup landing page.
-
-It should look like:
-
-> **A serious financial intelligence product that happens to use AI.**
-
-Every visual decision should reinforce:
-
-**Market → Behaviour → Anomaly → Context → Correlation → Risk → Evidence.**
+It should be premium, restrained, technical, editorial, spatial,
+explainable, and credible.

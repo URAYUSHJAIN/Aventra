@@ -9,10 +9,11 @@ const DEPTH = 5
 
 const FIELD = `uniform float uTime; uniform float uAmp; attribute float aK;
   float field(float x, float k, float t) {
-    float s = x * 0.9 - t * 0.18;
+    float s = x * 0.9 - t * 0.26;
     float v = sin(s * 1.3 + k * 4.1) * 0.32 + sin(s * 2.6 + k * 9.3 + 1.7) * 0.16 + sin(s * 5.3 + k * 2.3 + t * 0.1) * 0.06;
     float peak = pow(max(0.0, sin(s * 0.55 + k * 3.7 + 1.3)), 8.0) * 0.9;
-    return v * 0.45 + peak;
+    float swell = 0.8 + 0.3 * sin(t * 0.45 + k * 2.1); // each series rises and falls on its own ~14 s phase
+    return (v * 0.45 + peak) * swell;
   }`
 
 const create: SceneFactory = (canvas, { lite, variant }) => {

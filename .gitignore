@@ -5,9 +5,13 @@ __pycache__/
 
 # Secrets / local configuration
 .env
+docker-compose.override.yml
 
 # Local tool state (headless-browser QA)
 .gstack/
+
+# /brag launch-video output (Hyperframes project + rendered MP4), including timestamped runs
+brag-output*/
 
 # Generated data and model artefacts (reproducible from code; see README)
 data/aventra.sqlite3*

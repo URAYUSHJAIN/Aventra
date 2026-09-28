@@ -1,5 +1,6 @@
 import { ArrowRight } from 'lucide-react'
 import { Button } from '../components/common/Button'
+import { Scene3D } from '../components/visual/Scene3D'
 
 const APPROACH = [
   ['Signal', 'Detect what changed relative to the instrument’s own behaviour, not a market-wide rule.'],
@@ -18,9 +19,15 @@ const PRINCIPLES = [
 export function AboutPage() {
   return <main id="main" className="page page-about">
     <header className="wrap about-opening">
-      <p className="eyebrow">ABOUT AVENTRA</p>
-      <h1 className="display-title about-title">Financial data is abundant. <em>Context is not.</em></h1>
-      <p className="about-lead">Aventra is an explainable financial-intelligence pipeline that combines adaptive behavioural profiling, anomaly detection, financial-news sentiment and cross-source temporal correlation to contextualise unusual market behaviour.</p>
+      <div className="about-copy">
+        <p className="eyebrow">ABOUT AVENTRA</p>
+        <h1 className="display-title about-title">Financial data is abundant. <em>Context is not.</em></h1>
+        <p className="about-lead">Aventra is an explainable financial-intelligence pipeline that combines adaptive behavioural profiling, anomaly detection, financial-news sentiment and cross-source temporal correlation to contextualise unusual market behaviour.</p>
+      </div>
+      <div className="about-visual">
+        <Scene3D scene="mountain" />
+        <p className="visual-caption">Illustrative, not data: a peak that stands out from its own baseline, the kind of deviation Aventra flags.</p>
+      </div>
     </header>
 
     <section className="wrap about-block" aria-labelledby="why-exists">

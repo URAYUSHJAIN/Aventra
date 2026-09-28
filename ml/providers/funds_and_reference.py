@@ -47,7 +47,7 @@ class AmfiProvider(Provider):
             except ValueError:
                 active = False
             iid = ids.make("MF-IN", code)
-            full_name = f"{name} — {plan}" if plan else name
+            full_name = f"{name} - {plan}" if plan else name
             isin = fields[1].strip() if len(fields[1].strip()) == 12 else None
             rows.append(instrument_row(iid, code, full_name, "mutual_fund", "AMFI", country="IN", currency="INR", isin=isin, status="listed" if active else "inactive",
                                        source="amfi_navall", class_source="amfi", class_confidence=1.0))
