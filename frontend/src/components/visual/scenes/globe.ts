@@ -89,7 +89,7 @@ const create: SceneFactory = (canvas, { lite }) => {
     },
     render(time, pointer) {
       arcMaterial.uniforms.uTime.value = time
-      globe.rotation.set(0.42 + pointer.y * 0.08, -1.2 + time * 0.022 + pointer.x * 0.2, 0)
+      globe.rotation.set(0.42 + pointer.y * 0.08, -1.2 + time * 0.06 + pointer.x * 0.2, 0)
       renderer.render(scene, camera)
     },
     dispose() { disposables.forEach((d) => d.dispose()); renderer.dispose() },
