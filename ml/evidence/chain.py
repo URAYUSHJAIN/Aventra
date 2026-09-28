@@ -31,7 +31,7 @@ def build_evidence(assessment: dict, market_source: dict | str, change_points: l
     for match in correlation.get("matches", []):
         news_provenance = {"publisher": match.get("source"), "url": match.get("url"), "published_at": match["published_at"], "news_id": match["news_id"]}
         items.append({"timestamp": match["published_at"], "type": "news", "signal": "news_article",
-                      "description": f"{match['headline']} — {match.get('source') or 'unknown source'} ({session_relation_text(match['hours_from_session'], match['relation'])}; category: {match['category']['category']}).",
+                      "description": f"{match['headline']} ({match.get('source') or 'unknown source'}; {session_relation_text(match['hours_from_session'], match['relation'])}; category: {match['category']['category']}).",
                       "value": match["entity"]["confidence"], "source": f"news:{match.get('source') or 'unknown'}", "url": match.get("url"), "provenance": news_provenance})
         if match["sentiment"]:
             s = match["sentiment"]

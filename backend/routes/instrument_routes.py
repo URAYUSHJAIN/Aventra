@@ -23,7 +23,7 @@ def search():
                            limit=int_arg(request.args.get("limit"), 20, 1, 50), cursor=request.args.get("cursor"))
     total = store.count_instruments()
     return ok({**result, "query": query, "master_size": total,
-               "master_status": "empty — run the listing sync (py -3.12 -m ml.instruments.sync)" if total == 0 else "ok"})
+               "master_status": "empty: run the listing sync (py -3.12 -m ml.instruments.sync)" if total == 0 else "ok"})
 
 
 @instrument_api.post("/instruments/resolve")

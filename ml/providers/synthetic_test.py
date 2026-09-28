@@ -18,7 +18,7 @@ class SyntheticTestProvider(Provider):
     name = "aventra_demo_dataset"
     is_synthetic = True
     capability = ProviderCapability(asset_classes=("equity",), exchanges=("TEST",), fields=("open", "high", "low", "close", "volume"), listing=True,
-                                    terms="Synthetic test fixture — automated tests only.")
+                                    terms="Synthetic test fixture: automated tests only.")
 
     def history(self, instrument: dict, provider_symbol: str, start=None) -> Series:
         path = config.DEMO_DIR / "market.csv"
