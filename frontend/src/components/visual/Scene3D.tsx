@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import { FieldFallback, GlobeFallback, TerrainFallback } from './Fallbacks'
+import { FieldFallback, GlobeFallback, MountainFallback, TerrainFallback } from './Fallbacks'
 import type { Pointer, SceneHandle } from './scenes/types'
 
 // Lazy-loaded WebGL scenes (three.js is split into its own chunk and never blocks first paint).
-const LOADERS = { field: () => import('./scenes/field'), globe: () => import('./scenes/globe'), terrain: () => import('./scenes/terrain') }
-const FALLBACKS = { field: FieldFallback, globe: GlobeFallback, terrain: TerrainFallback }
+const LOADERS = { field: () => import('./scenes/field'), globe: () => import('./scenes/globe'), terrain: () => import('./scenes/terrain'), mountain: () => import('./scenes/mountain') }
+const FALLBACKS = { field: FieldFallback, globe: GlobeFallback, terrain: TerrainFallback, mountain: MountainFallback }
 export type SceneName = keyof typeof LOADERS
 
 const MAX_DPR = 1.75

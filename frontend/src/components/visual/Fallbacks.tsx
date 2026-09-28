@@ -23,6 +23,17 @@ export function GlobeFallback() {
   </svg>
 }
 
+export function MountainFallback() {
+  const ridge = (row: number) => {
+    const depth = 1 - row / 8, base = 250 + row * 12
+    return Array.from({ length: 41 }, (_, i) => { const x = i * 10, d = (x - 200) / (70 + row * 12); return `${x},${(base - (Math.exp(-d * d) * 150 + Math.exp(-(((x - 262) / 40) ** 2)) * 50) * depth).toFixed(1)}` }).join(' ')
+  }
+  return <svg className="scene-fallback" viewBox="0 0 400 360" aria-hidden="true">
+    <g fill="none" stroke="var(--scene-line)" strokeWidth="1">{Array.from({ length: 8 }, (_, row) => <polyline key={row} points={ridge(row)} opacity={0.35 + row * 0.08} />)}</g>
+    <circle cx="200" cy="100" r="4" fill="var(--scene-signal)" />
+  </svg>
+}
+
 export function TerrainFallback() {
   const ridge = (offset: number, amp: number) => Array.from({ length: 41 }, (_, i) => `${i * 10},${60 + offset - Math.sin(i * 0.45 + offset) * amp - (i % 13 === 5 ? amp : 0)}`).join(' ')
   return <svg className="scene-fallback" viewBox="0 0 400 160" preserveAspectRatio="none" aria-hidden="true">

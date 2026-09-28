@@ -84,6 +84,17 @@ describe('home page', () => {
   })
 })
 
+describe('about page', () => {
+  it('shows the decorative summit as hidden from assistive technology, labelled illustrative, with an SVG fallback without WebGL', () => {
+    mockFetch(routeSite)
+    visit('/about')
+    const scene = document.querySelector('.about-visual .scene-mountain')
+    expect(scene?.getAttribute('aria-hidden')).toBe('true')
+    expect(scene?.querySelector('svg.scene-fallback')).toBeTruthy()
+    expect(screen.getByText(/Illustrative, not data/)).toBeTruthy()
+  })
+})
+
 describe('documentation page', () => {
   it('marks every unpublished publication as Coming Soon and links only to real engineering docs', () => {
     mockFetch(routeSite)
