@@ -10,6 +10,13 @@ Aventra is an explainable financial-intelligence platform. It detects unusual ma
 
 B.Tech final-year project — ABES Engineering College, Ghaziabad, India.
 
+<p align="center">
+  <video controls playsinline preload="metadata" width="100%" style="max-width: 960px; height: auto;">
+    <source src="./Aventra.mp4" type="video/mp4">
+    Your browser does not support embedded video. <a href="./Aventra.mp4">Open Aventra.mp4</a>.
+  </video>
+</p>
+
 ## What is implemented
 
 | Area | Status |
